@@ -159,8 +159,16 @@ git push -u origin main
 
 ---
 
-## 🔑 KREDENSIAL DEMO INTERNAL
+## 🔑 KREDENSIAL LOGIN & DEMO INTERNAL
 
-- **PIN Pengesahan Pejabat (Panitera)**: `123456`
-- **Nomor Registrasi Contoh untuk Pelacakan**: `REG-202611-0082` atau `REG-202611-0088`
-- **Pencarian Telepon Contoh**: `081298457721` atau `081688992211`
+### Daftar Akun Default Aparatur Pengadilan:
+
+| No | Peran / Jabatan | Username | Password | NIP | Akses Menu |
+|:---|:---|:---|:---|:---|:---|
+| 1 | **Administrator IT** | `admin` | `admin123` | `19850101 201001 1 001` | **Semua Menu** (Dashboard Admin, Verifikator, Pengesahan, dsb.) |
+| 2 | **Petugas Loket PTSP** | `petugas1` *(atau `petugas`)* | `petugas123` | `19920315 201602 1 003` | **Meja Verifikator PTSP** & Verifikasi Berkas |
+| 3 | **Panitera Pengadilan** | `panitera` | `panitera123` | `19740512 199903 1 002` | **Meja Pengesahan (TTE)** & Dashboard |
+
+* **PIN Keamanan Pengesahan Pejabat (Panitera)**: `123456`
+* **Nomor Registrasi Contoh untuk Pelacakan**: `REG-202611-0082` atau `REG-202611-0088`
+* **Pencarian Telepon Contoh**: `081298457721` atau `081688992211`

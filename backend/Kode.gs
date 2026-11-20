@@ -140,6 +140,10 @@ function doPost(e) {
         result = getAdminMetrics();
         break;
 
+      case 'login':
+        result = loginPegawai(payload.username, payload.password);
+        break;
+
       default:
         result = { success: false, message: 'Aksi (' + action + ') tidak dikenali oleh server.' };
         break;
@@ -455,4 +459,75 @@ function antrekanNotifikasi_(event, data, refId) {
     ]);
     PROPS.setProperty('ANTRIAN_ADA', '1');
   } catch (e) {}
+}
+
+function loginPegawai(username, password) {
+  try {
+    const u = String(username || '').trim().toLowerCase();
+    const p = String(password || '').trim();
+
+    if (!u || !p) {
+      return { success: false, message: 'Username dan password wajib diisi.' };
+    }
+
+    const defaultAccounts = {
+      admin: {
+        userId: 'USR-01',
+        username: 'admin',
+        nama: 'Administrator IT Pengadilan',
+        nip: '19850101 201001 1 001',
+        jabatan: 'Pranata Komputer Ahli',
+        role: 'ADMIN',
+        pwd: 'admin123'
+      },
+      petugas1: {
+        userId: 'USR-02',
+        username: 'petugas1',
+        nama: 'Ahmad Syafii, S.Kom.',
+        nip: '19920315 201602 1 003',
+        jabatan: 'Staf Meja 1 PTSP Perdata',
+        role: 'PETUGAS',
+        pwd: 'petugas123'
+      },
+      panitera: {
+        userId: 'USR-03',
+        username: 'panitera',
+        nama: 'Dr. H. Sulaiman, S.H., M.H.',
+        nip: '19740512 199903 1 002',
+        jabatan: 'Panitera Pengadilan Negeri',
+        role: 'PEJABAT',
+        pwd: 'panitera123'
+      }
+    };
+
+    let target = defaultAccounts[u];
+    if (!target && u === 'petugas') {
+      target = defaultAccounts['petugas1'];
+    }
+
+    if (!target) {
+      return { success: false, message: 'Akun ' + u + ' tidak terdaftar dalam sistem pengadilan.' };
+    }
+
+    if (p !== target.pwd) {
+      return { success: false, message: 'Kata sandi tidak sesuai. Silakan periksa kembali.' };
+    }
+
+    catatLog_('LOGIN_SUCCESS', target.userId, 'Pegawai ' + target.nama + ' (' + target.role + ') berhasil masuk');
+
+    return {
+      success: true,
+      message: 'Login berhasil.',
+      user: {
+        userId: target.userId,
+        username: target.username,
+        nama: target.nama,
+        nip: target.nip,
+        jabatan: target.jabatan,
+        role: target.role
+      }
+    };
+  } catch (err) {
+    return { success: false, message: 'Gagal autentikasi: ' + err.toString() };
+  }
 }

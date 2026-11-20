@@ -300,6 +300,299 @@ function generateMockSha256() {
 }
 
 // =========================================================================
+// 2.5. APARATUR AUTHENTICATION & SESSION MANAGEMENT
+// =========================================================================
+
+const DEFAULT_USERS = {
+  admin: {
+    userId: 'USR-01',
+    username: 'admin',
+    password: 'admin123',
+    nama: 'Administrator IT Pengadilan',
+    nip: '19850101 201001 1 001',
+    jabatan: 'Pranata Komputer Ahli',
+    role: 'ADMIN'
+  },
+  petugas1: {
+    userId: 'USR-02',
+    username: 'petugas1',
+    password: 'petugas123',
+    nama: 'Ahmad Syafii, S.Kom.',
+    nip: '19920315 201602 1 003',
+    jabatan: 'Staf Meja 1 PTSP Perdata',
+    role: 'PETUGAS'
+  },
+  panitera: {
+    userId: 'USR-03',
+    username: 'panitera',
+    password: 'panitera123',
+    nama: 'Dr. H. Sulaiman, S.H., M.H.',
+    nip: '19740512 199903 1 002',
+    jabatan: 'Panitera Pengadilan Negeri',
+    role: 'PEJABAT'
+  }
+};
+
+let currentUser = null;
+let redirectAfterLogin = null;
+
+function initAuth() {
+  try {
+    const saved = localStorage.getItem('court_active_user');
+    if (saved) {
+      currentUser = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.warn('Gagal memuat sesi akun:', e);
+  }
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  const loggedOutNav = document.getElementById('navLoggedOutArea');
+  const loggedInNav = document.getElementById('navLoggedInArea');
+  const drawerLoggedOut = document.getElementById('mobileDrawerLoggedOut');
+  const drawerLoggedIn = document.getElementById('mobileDrawerLoggedIn');
+  const drawerLogoutWrapper = document.getElementById('mobileDrawerLogoutWrapper');
+
+  if (currentUser) {
+    if (loggedOutNav) loggedOutNav.classList.add('hidden');
+    if (loggedInNav) loggedInNav.classList.remove('hidden');
+
+    const navAdmin = document.getElementById('navAdminLink');
+    if (navAdmin) navAdmin.classList.remove('hidden');
+
+    const drawerAdmin = document.getElementById('drawerAdminSection');
+    if (drawerAdmin) drawerAdmin.classList.remove('hidden');
+
+    const navName = document.getElementById('navUserName');
+    const navRole = document.getElementById('navUserRole');
+    if (navName) navName.textContent = currentUser.nama.split(',')[0];
+    if (navRole) navRole.textContent = `${currentUser.role} • NIP. ${currentUser.nip.slice(0, 8)}...`;
+
+    const dropFullName = document.getElementById('dropdownFullName');
+    const dropNip = document.getElementById('dropdownNip');
+    const dropRole = document.getElementById('dropdownRoleBadge');
+    if (dropFullName) dropFullName.textContent = currentUser.nama;
+    if (dropNip) dropNip.textContent = `NIP. ${currentUser.nip}`;
+    if (dropRole) dropRole.textContent = currentUser.role;
+
+    if (drawerLoggedOut) drawerLoggedOut.classList.add('hidden');
+    if (drawerLoggedIn) drawerLoggedIn.classList.remove('hidden');
+    if (drawerLogoutWrapper) drawerLogoutWrapper.classList.remove('hidden');
+
+    const mName = document.getElementById('mobileDrawerUserName');
+    const mRole = document.getElementById('mobileDrawerUserRole');
+    if (mName) mName.textContent = currentUser.nama;
+    if (mRole) mRole.textContent = `${currentUser.role} • ${currentUser.jabatan}`;
+  } else {
+    if (loggedOutNav) loggedOutNav.classList.remove('hidden');
+    if (loggedInNav) loggedInNav.classList.add('hidden');
+
+    const navAdmin = document.getElementById('navAdminLink');
+    if (navAdmin) navAdmin.classList.add('hidden');
+
+    const drawerAdmin = document.getElementById('drawerAdminSection');
+    if (drawerAdmin) drawerAdmin.classList.add('hidden');
+
+    if (drawerLoggedOut) drawerLoggedOut.classList.remove('hidden');
+    if (drawerLoggedIn) drawerLoggedIn.classList.add('hidden');
+    if (drawerLogoutWrapper) drawerLogoutWrapper.classList.add('hidden');
+
+    toggleUserDropdown(false);
+  }
+}
+
+function toggleUserDropdown(force) {
+  const menu = document.getElementById('userDropdownMenu');
+  if (!menu) return;
+  if (typeof force === 'boolean') {
+    if (force) menu.classList.remove('hidden');
+    else menu.classList.add('hidden');
+  } else {
+    menu.classList.toggle('hidden');
+  }
+}
+
+// Tutup dropdown jika klik di luar
+document.addEventListener('click', (e) => {
+  const btn = document.getElementById('btnUserMenu');
+  const menu = document.getElementById('userDropdownMenu');
+  if (menu && !menu.classList.contains('hidden')) {
+    if (btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+      menu.classList.add('hidden');
+    }
+  }
+});
+
+function openLoginModal(noticeMessage = '') {
+  const modal = document.getElementById('loginModal');
+  const banner = document.getElementById('loginNoticeBanner');
+  const bannerText = document.getElementById('loginNoticeText');
+  const errBox = document.getElementById('loginErrorBox');
+
+  if (errBox) errBox.classList.add('hidden');
+
+  if (banner && bannerText) {
+    if (noticeMessage) {
+      bannerText.textContent = noticeMessage;
+      banner.classList.remove('hidden');
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  if (modal) {
+    modal.classList.remove('hidden');
+    const uInput = document.getElementById('loginUsername');
+    if (uInput) setTimeout(() => uInput.focus(), 100);
+  }
+}
+
+function closeLoginModal() {
+  const modal = document.getElementById('loginModal');
+  if (modal) modal.classList.add('hidden');
+  const banner = document.getElementById('loginNoticeBanner');
+  if (banner) banner.classList.add('hidden');
+}
+
+function selectQuickUser(roleKey) {
+  const uInput = document.getElementById('loginUsername');
+  const pInput = document.getElementById('loginPassword');
+  const errBox = document.getElementById('loginErrorBox');
+  if (errBox) errBox.classList.add('hidden');
+
+  const preset = DEFAULT_USERS[roleKey];
+  if (preset && uInput && pInput) {
+    uInput.value = preset.username;
+    pInput.value = preset.password;
+    showToast(`Akun ${preset.role} (${preset.username}) dipilih. Klik Masuk.`, 'info');
+  }
+}
+
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const isPass = input.type === 'password';
+  input.type = isPass ? 'text' : 'password';
+  const icon = btn.querySelector('.material-symbols-outlined');
+  if (icon) {
+    icon.textContent = isPass ? 'visibility_off' : 'visibility';
+  }
+}
+
+async function handleLoginSubmit(e) {
+  if (e) e.preventDefault();
+  const u = (document.getElementById('loginUsername')?.value || '').trim().toLowerCase();
+  const p = (document.getElementById('loginPassword')?.value || '').trim();
+  const errBox = document.getElementById('loginErrorBox');
+  const errMsg = document.getElementById('loginErrorMsg');
+  const submitBtn = document.getElementById('btnLoginSubmit');
+
+  if (!u || !p) {
+    if (errBox && errMsg) {
+      errMsg.textContent = 'Username dan kata sandi wajib diisi.';
+      errBox.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-lg">progress_activity</span><span>Memverifikasi...</span>';
+  }
+
+  let matchedUser = DEFAULT_USERS[u];
+  if (!matchedUser && u === 'petugas') {
+    matchedUser = DEFAULT_USERS['petugas1'];
+  }
+
+  let isVerified = false;
+
+  // Verifikasi ke server GAS jika online
+  if (typeof CONFIG !== 'undefined' && CONFIG.GAS_URL && !CONFIG.DEMO_MODE) {
+    try {
+      const res = await callGasApi('login', { username: u, password: p });
+      if (res && res.success && res.user) {
+        matchedUser = res.user;
+        isVerified = true;
+      } else if (res && !res.success) {
+        if (errBox && errMsg) {
+          errMsg.textContent = res.message || 'Kredensial login tidak cocok.';
+          errBox.classList.remove('hidden');
+        }
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span class="material-symbols-outlined text-lg">login</span><span>Masuk ke Sistem</span>';
+        }
+        return;
+      }
+    } catch (errApi) {
+      console.warn('API login offline, menggunakan verifikasi lokal:', errApi);
+    }
+  }
+
+  // Verifikasi password lokal (offline / demo)
+  if (!isVerified) {
+    if (matchedUser && matchedUser.password === p) {
+      isVerified = true;
+    }
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<span class="material-symbols-outlined text-lg">login</span><span>Masuk ke Sistem</span>';
+  }
+
+  if (isVerified && matchedUser) {
+    currentUser = {
+      userId: matchedUser.userId,
+      username: matchedUser.username,
+      nama: matchedUser.nama,
+      nip: matchedUser.nip,
+      jabatan: matchedUser.jabatan,
+      role: matchedUser.role,
+      token: 'SESSION-' + Date.now()
+    };
+    localStorage.setItem('court_active_user', JSON.stringify(currentUser));
+    updateAuthUI();
+    closeLoginModal();
+    showToast(`Berhasil masuk! Selamat datang, ${currentUser.nama}.`, 'success');
+
+    // Alihkan ke halaman yang dituju sebelumnya jika ada
+    if (redirectAfterLogin) {
+      const target = redirectAfterLogin;
+      redirectAfterLogin = null;
+      navigateTo(target);
+    } else {
+      if (currentUser.role === 'ADMIN') navigateTo('dashboard-admin');
+      else if (currentUser.role === 'PETUGAS') navigateTo('meja-verifikator');
+      else if (currentUser.role === 'PEJABAT') navigateTo('meja-pengesahan');
+      else navigateTo('beranda-dan-lacak');
+    }
+  } else {
+    if (errBox && errMsg) {
+      errMsg.textContent = 'Username atau kata sandi tidak cocok. Silakan gunakan tombol akun demo di atas.';
+      errBox.classList.remove('hidden');
+    }
+  }
+}
+
+function handleLogout() {
+  if (confirm('Apakah Anda yakin ingin keluar dari sesi aparatur pengadilan?')) {
+    currentUser = null;
+    localStorage.removeItem('court_active_user');
+    updateAuthUI();
+    showToast('Sesi Anda telah diakhiri.', 'info');
+
+    const internalViews = ['meja-verifikator', 'meja-pengesahan', 'dashboard-admin'];
+    if (internalViews.includes(currentView)) {
+      navigateTo('beranda-dan-lacak');
+    }
+  }
+}
+
+// =========================================================================
 // 3. SPA ROUTER & VIEW SWITCHER (0ms INSTANT NAVIGATION)
 // =========================================================================
 
@@ -312,12 +605,91 @@ const VALID_VIEWS = [
   'validasi-qr-dokumen'
 ];
 
+const PROTECTED_VIEWS = [
+  'meja-verifikator',
+  'meja-pengesahan',
+  'dashboard-admin'
+];
+
 let currentView = 'beranda-dan-lacak';
+let currentAdminTab = 'analitik';
+
+function switchAdminTab(tabName) {
+  const tabs = ['analitik', 'verifikator', 'pengesahan'];
+  if (!tabs.includes(tabName)) tabName = 'analitik';
+  currentAdminTab = tabName;
+
+  // Toggle visual pane
+  tabs.forEach(t => {
+    const pane = document.getElementById(
+      t === 'analitik' ? 'adminPaneAnalitik' : (t === 'verifikator' ? 'adminPaneVerifikator' : 'adminPanePengesahan')
+    );
+    const btn = document.getElementById(
+      t === 'analitik' ? 'tabBtnAnalitik' : (t === 'verifikator' ? 'tabBtnVerifikator' : 'tabBtnPengesahan')
+    );
+    if (pane) {
+      if (t === tabName) pane.classList.remove('hidden');
+      else pane.classList.add('hidden');
+    }
+    if (btn) {
+      if (t === tabName) {
+        btn.className = 'flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-primary text-on-primary shadow-sm transition-all cursor-pointer flex-shrink-0';
+      } else {
+        btn.className = 'flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs bg-surface-container-low text-on-surface hover:bg-surface-container transition-all cursor-pointer flex-shrink-0';
+      }
+    }
+  });
+
+  // Update badge counter di tab
+  try {
+    const list = Storage.load();
+    const pendingVerif = list.filter(x => x.status === 'Menunggu Verifikasi').length;
+    const pendingSah = list.filter(x => x.status === 'Menunggu Pengesahan').length;
+    const bVerif = document.getElementById('tabBadgeVerif');
+    const bSah = document.getElementById('tabBadgeSah');
+    if (bVerif) bVerif.textContent = pendingVerif;
+    if (bSah) bSah.textContent = pendingSah;
+  } catch (e) {}
+
+  // Jalankan lifecycle data per tab
+  if (tabName === 'analitik') {
+    renderAdminDashboard();
+  } else if (tabName === 'verifikator') {
+    renderVerifikatorTable();
+  } else if (tabName === 'pengesahan') {
+    renderPengesahanQueue();
+  }
+}
 
 function navigateTo(viewId, triggerHistory = true) {
   if (!VALID_VIEWS.includes(viewId)) {
     viewId = 'beranda-dan-lacak';
   }
+
+  // Route Guard: Proteksi akses area kerja internal pengadilan
+  if (PROTECTED_VIEWS.includes(viewId) && !currentUser) {
+    redirectAfterLogin = viewId;
+    const viewLabels = {
+      'dashboard-admin': 'Dashboard Admin',
+      'meja-verifikator': 'Meja Verifikator PTSP',
+      'meja-pengesahan': 'Meja Pengesahan Panitera'
+    };
+    openLoginModal('Akses ' + (viewLabels[viewId] || 'menu ini') + ' memerlukan login akun aparatur pengadilan.');
+    return;
+  }
+
+  // Meja Verifikator & Meja Pengesahan terintegrasi ke dalam Dashboard Admin
+  if (viewId === 'meja-verifikator') {
+    navigateTo('dashboard-admin', triggerHistory);
+    switchAdminTab('verifikator');
+    return;
+  }
+  if (viewId === 'meja-pengesahan') {
+    navigateTo('dashboard-admin', triggerHistory);
+    switchAdminTab('pengesahan');
+    return;
+  }
+
   currentView = viewId;
 
   // Sembunyikan semua views
@@ -372,19 +744,11 @@ function navigateTo(viewId, triggerHistory = true) {
 function onViewActivated(viewId) {
   switch (viewId) {
     case 'beranda-dan-lacak':
-      // Reset tracker jika kosong
       break;
     case 'pendaftaran-kuasa':
-      // Reset form stepper ke langkah 1 jika belum dimulai
-      break;
-    case 'meja-verifikator':
-      renderVerifikatorTable();
-      break;
-    case 'meja-pengesahan':
-      renderPengesahanQueue();
       break;
     case 'dashboard-admin':
-      renderAdminDashboard();
+      switchAdminTab(currentAdminTab || 'analitik');
       break;
     case 'validasi-qr-dokumen':
       renderQrValidationPage();
@@ -399,6 +763,22 @@ window.addEventListener('hashchange', () => {
     navigateTo(hash, false);
   }
 });
+
+// Toggle Mobile Navigation Drawer
+function toggleMobileMenu() {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const drawer = document.getElementById('mobileMenuDrawer');
+  if (overlay && drawer) {
+    const isHidden = overlay.classList.contains('hidden');
+    if (isHidden) {
+      overlay.classList.remove('hidden');
+      drawer.classList.remove('hidden');
+    } else {
+      overlay.classList.add('hidden');
+      drawer.classList.add('hidden');
+    }
+  }
+}
 
 // =========================================================================
 // 4. TOAST NOTIFICATIONS & MODALS
@@ -1520,6 +1900,9 @@ if ('serviceWorker' in navigator) {
 // =========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Inisialisasi sesi autentikasi pengguna
+  initAuth();
+
   // Setup routing awal berdasarkan hash URL
   const hash = window.location.hash.replace('#', '');
   if (hash && VALID_VIEWS.includes(hash)) {
