@@ -95,6 +95,8 @@ function doGet(e) {
       result = trackPengajuan(e.parameter.query || '');
     } else if (action === 'getMetrics') {
       result = getAdminMetrics();
+    } else if (action === 'getCaseTypes') {
+      result = getCaseTypesBackend();
     } else {
       result = { success: true, message: 'REST API Surat Kuasa Online Pengadilan aktif.', version: APP_VERSION };
     }
@@ -142,6 +144,14 @@ function doPost(e) {
 
       case 'login':
         result = loginPegawai(payload.username, payload.password);
+        break;
+
+      case 'getCaseTypes':
+        result = getCaseTypesBackend();
+        break;
+
+      case 'saveCaseTypes':
+        result = saveCaseTypesBackend(payload.list);
         break;
 
       default:
@@ -530,4 +540,30 @@ function loginPegawai(username, password) {
   } catch (err) {
     return { success: false, message: 'Gagal autentikasi: ' + err.toString() };
   }
+}
+
+function getCaseTypesBackend() {
+  const raw = prop_('JENIS_PERKARA', '');
+  if (raw) {
+    try {
+      return { success: true, data: JSON.parse(raw) };
+    } catch (e) {}
+  }
+  return {
+    success: true,
+    data: [
+      { id: 'CT-01', nama: 'Perdata Gugatan', kategori: 'Perdata', kode: 'Pdt.G', aktif: true },
+      { id: 'CT-02', nama: 'Perdata Permohonan', kategori: 'Perdata', kode: 'Pdt.P', aktif: true },
+      { id: 'CT-03', nama: 'Pidana Umum', kategori: 'Pidana', kode: 'Pid.B', aktif: true },
+      { id: 'CT-04', nama: 'Pidana Khusus / Tipikor', kategori: 'Pidana', kode: 'Pid.Sus', aktif: true },
+      { id: 'CT-05', nama: 'Perselisihan Hubungan Industrial (PHI)', kategori: 'Khusus', kode: 'PHI', aktif: true }
+    ]
+  };
+}
+
+function saveCaseTypesBackend(list) {
+  if (!Array.isArray(list)) return { success: false, message: 'Data list jenis perkara tidak valid.' };
+  setProp_('JENIS_PERKARA', JSON.stringify(list));
+  catatLog_('UPDATE_CASE_TYPES', 'CONFIG', 'Memperbarui master klasifikasi jenis perkara (' + list.length + ' item)');
+  return { success: true, message: 'Master klasifikasi perkara berhasil disimpan ke server.' };
 }
