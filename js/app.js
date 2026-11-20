@@ -615,18 +615,28 @@ let currentView = 'beranda-dan-lacak';
 let currentAdminTab = 'analitik';
 
 function switchAdminTab(tabName) {
-  const tabs = ['analitik', 'verifikator', 'pengesahan'];
+  const tabs = ['analitik', 'verifikator', 'pengesahan', 'pengaturan'];
   if (!tabs.includes(tabName)) tabName = 'analitik';
   currentAdminTab = tabName;
 
+  const paneMap = {
+    analitik: 'adminPaneAnalitik',
+    verifikator: 'adminPaneVerifikator',
+    pengesahan: 'adminPanePengesahan',
+    pengaturan: 'adminPanePengaturan'
+  };
+
+  const btnMap = {
+    analitik: 'tabBtnAnalitik',
+    verifikator: 'tabBtnVerifikator',
+    pengesahan: 'tabBtnPengesahan',
+    pengaturan: 'tabBtnPengaturan'
+  };
+
   // Toggle visual pane
   tabs.forEach(t => {
-    const pane = document.getElementById(
-      t === 'analitik' ? 'adminPaneAnalitik' : (t === 'verifikator' ? 'adminPaneVerifikator' : 'adminPanePengesahan')
-    );
-    const btn = document.getElementById(
-      t === 'analitik' ? 'tabBtnAnalitik' : (t === 'verifikator' ? 'tabBtnVerifikator' : 'tabBtnPengesahan')
-    );
+    const pane = document.getElementById(paneMap[t]);
+    const btn = document.getElementById(btnMap[t]);
     if (pane) {
       if (t === tabName) pane.classList.remove('hidden');
       else pane.classList.add('hidden');
@@ -658,6 +668,9 @@ function switchAdminTab(tabName) {
     renderVerifikatorTable();
   } else if (tabName === 'pengesahan') {
     renderPengesahanQueue();
+  } else if (tabName === 'pengaturan') {
+    renderCaseTypesTable();
+    loadGeneralSettings();
   }
 }
 
@@ -1836,6 +1849,222 @@ function downloadTandaTerima(id) {
 }
 
 // =========================================================================
+// 11.5. MASTER DATA MANAGEMENT: KLASIFIKASI & JENIS PERKARA (SETTINGS)
+// =========================================================================
+
+const DEFAULT_CASE_TYPES = [
+  { id: 'CT-01', nama: 'Perdata Gugatan', kategori: 'Perdata', kode: 'Pdt.G', aktif: true },
+  { id: 'CT-02', nama: 'Perdata Permohonan', kategori: 'Perdata', kode: 'Pdt.P', aktif: true },
+  { id: 'CT-03', nama: 'Pidana Umum', kategori: 'Pidana', kode: 'Pid.B', aktif: true },
+  { id: 'CT-04', nama: 'Pidana Khusus / Tipikor', kategori: 'Pidana', kode: 'Pid.Sus', aktif: true },
+  { id: 'CT-05', nama: 'Perselisihan Hubungan Industrial (PHI)', kategori: 'Khusus', kode: 'PHI', aktif: true }
+];
+
+function getCaseTypes() {
+  try {
+    const saved = localStorage.getItem('court_case_types');
+    if (saved) return JSON.parse(saved);
+  } catch (e) {
+    console.warn('Gagal memuat jenis perkara:', e);
+  }
+  return [...DEFAULT_CASE_TYPES];
+}
+
+function saveCaseTypes(list) {
+  localStorage.setItem('court_case_types', JSON.stringify(list));
+  populateJenisPerkaraDropdown();
+  renderCaseTypesTable();
+}
+
+function populateJenisPerkaraDropdown() {
+  const select = document.getElementById('wzJenisPerkara');
+  if (!select) return;
+
+  const currentVal = select.value;
+  const list = getCaseTypes().filter(x => x.aktif);
+
+  select.innerHTML = '';
+  list.forEach(ct => {
+    const opt = document.createElement('option');
+    opt.value = ct.nama;
+    opt.textContent = ct.nama;
+    if (ct.nama === currentVal) opt.selected = true;
+    select.appendChild(opt);
+  });
+
+  if (!select.value && list.length > 0) {
+    select.value = list[0].nama;
+  }
+}
+
+function renderCaseTypesTable() {
+  const tbody = document.getElementById('caseTypesTableBody');
+  const countBadge = document.getElementById('caseTypeCountBadge');
+  if (!tbody) return;
+
+  const list = getCaseTypes();
+  const activeCount = list.filter(x => x.aktif).length;
+  if (countBadge) countBadge.textContent = `${activeCount} Opsi Aktif (${list.length} Total)`;
+
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-xs text-outline">Belum ada jenis perkara yang ditambahkan. Klik tombol "Tambah Jenis Perkara" di atas.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map((ct, idx) => `
+    <tr class="border-b border-surface-container hover:bg-surface-container-low/50 transition-colors">
+      <td class="px-4 py-3 text-xs font-mono font-bold text-outline">${idx + 1}</td>
+      <td class="px-4 py-3">
+        <div class="text-xs font-bold text-on-surface">${escapeHtml(ct.nama)}</div>
+        <div class="text-[10px] text-outline font-mono">${ct.id}</div>
+      </td>
+      <td class="px-4 py-3">
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${
+          ct.kategori === 'Perdata' ? 'bg-primary-fixed text-on-primary-fixed-variant' :
+          (ct.kategori === 'Pidana' ? 'bg-tertiary-container text-on-primary' : 'bg-secondary-fixed text-on-secondary-fixed-variant')
+        }">
+          ${escapeHtml(ct.kategori)}
+        </span>
+      </td>
+      <td class="px-4 py-3 text-xs font-mono font-semibold text-outline">
+        ${escapeHtml(ct.kode || '-')}
+      </td>
+      <td class="px-4 py-3">
+        <button onclick="toggleCaseTypeStatus('${ct.id}')" class="px-2.5 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-all ${
+          ct.aktif ? 'bg-primary text-on-primary hover:opacity-90' : 'bg-surface-container text-outline hover:bg-surface-container-high'
+        }">
+          ${ct.aktif ? '✓ Aktif di Form' : '✕ Nonaktif'}
+        </button>
+      </td>
+      <td class="px-4 py-3 text-right">
+        <div class="flex items-center justify-end gap-1.5">
+          <button onclick="editCaseType('${ct.id}')" class="p-1 rounded text-outline hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Edit Jenis Perkara">
+            <span class="material-symbols-outlined text-base">edit</span>
+          </button>
+          <button onclick="deleteCaseType('${ct.id}')" class="p-1 rounded text-outline hover:text-error hover:bg-error-container/30 transition-colors cursor-pointer" title="Hapus Jenis Perkara">
+            <span class="material-symbols-outlined text-base">delete</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openCaseTypeModal() {
+  document.getElementById('caseTypeId').value = '';
+  document.getElementById('caseTypeName').value = '';
+  document.getElementById('caseTypeCategory').value = 'Perdata';
+  document.getElementById('caseTypeCode').value = '';
+  document.getElementById('caseTypeActive').checked = true;
+  document.getElementById('caseTypeModalTitle').textContent = 'Tambah Jenis Perkara Baru';
+  document.getElementById('caseTypeModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('caseTypeName')?.focus(), 100);
+}
+
+function closeCaseTypeModal() {
+  const modal = document.getElementById('caseTypeModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function handleSaveCaseType(e) {
+  if (e) e.preventDefault();
+  const idInput = document.getElementById('caseTypeId').value;
+  const name = (document.getElementById('caseTypeName').value || '').trim();
+  const category = document.getElementById('caseTypeCategory').value;
+  const code = (document.getElementById('caseTypeCode').value || '').trim();
+  const active = document.getElementById('caseTypeActive').checked;
+
+  if (!name) {
+    showToast('Nama klasifikasi jenis perkara wajib diisi.', 'error');
+    return;
+  }
+
+  const list = getCaseTypes();
+  if (idInput) {
+    const idx = list.findIndex(x => x.id === idInput);
+    if (idx !== -1) {
+      list[idx] = { ...list[idx], nama: name, kategori: category, kode: code, aktif: active };
+      showToast(`Jenis perkara "${name}" berhasil diperbarui.`, 'success');
+    }
+  } else {
+    const newId = 'CT-' + String(list.length + 1).padStart(2, '0') + '-' + Date.now().toString().slice(-3);
+    list.push({ id: newId, nama: name, kategori: category, kode: code, aktif: active });
+    showToast(`Jenis perkara "${name}" berhasil ditambahkan ke formulir pendaftaran!`, 'success');
+  }
+
+  saveCaseTypes(list);
+  closeCaseTypeModal();
+}
+
+function editCaseType(id) {
+  const list = getCaseTypes();
+  const target = list.find(x => x.id === id);
+  if (!target) return;
+
+  document.getElementById('caseTypeId').value = target.id;
+  document.getElementById('caseTypeName').value = target.nama;
+  document.getElementById('caseTypeCategory').value = target.kategori;
+  document.getElementById('caseTypeCode').value = target.kode || '';
+  document.getElementById('caseTypeActive').checked = !!target.aktif;
+
+  document.getElementById('caseTypeModalTitle').textContent = 'Edit Jenis Perkara';
+  document.getElementById('caseTypeModal').classList.remove('hidden');
+}
+
+function deleteCaseType(id) {
+  const list = getCaseTypes();
+  const target = list.find(x => x.id === id);
+  if (!target) return;
+
+  if (confirm(`Apakah Anda yakin ingin menghapus jenis perkara "${target.nama}" dari formulir pendaftaran?`)) {
+    const updated = list.filter(x => x.id !== id);
+    saveCaseTypes(updated);
+    showToast(`Jenis perkara "${target.nama}" berhasil dihapus.`, 'warning');
+  }
+}
+
+function toggleCaseTypeStatus(id) {
+  const list = getCaseTypes();
+  const target = list.find(x => x.id === id);
+  if (target) {
+    target.aktif = !target.aktif;
+    saveCaseTypes(list);
+    showToast(`Status "${target.nama}" kini: ${target.aktif ? 'Aktif di Form' : 'Nonaktif'}`, 'info');
+  }
+}
+
+function resetCaseTypesToDefault() {
+  if (confirm('Kembalikan seluruh daftar jenis perkara ke opsi bawaan standar Mahkamah Agung?')) {
+    saveCaseTypes([...DEFAULT_CASE_TYPES]);
+    showToast('Daftar jenis perkara berhasil dikembalikan ke standar bawaan.', 'success');
+  }
+}
+
+function loadGeneralSettings() {
+  try {
+    const saved = localStorage.getItem('court_general_config');
+    if (saved) {
+      const cfg = JSON.parse(saved);
+      if (document.getElementById('cfgBiayaPnbp') && cfg.pnbp) document.getElementById('cfgBiayaPnbp').value = cfg.pnbp;
+      if (document.getElementById('cfgBiayaMeterai') && cfg.meterai) document.getElementById('cfgBiayaMeterai').value = cfg.meterai;
+      if (document.getElementById('cfgHotline') && cfg.hotline) document.getElementById('cfgHotline').value = cfg.hotline;
+      if (document.getElementById('cfgWaPtsp') && cfg.wa) document.getElementById('cfgWaPtsp').value = cfg.wa;
+    }
+  } catch (e) {}
+}
+
+function saveGeneralSettings(e) {
+  if (e) e.preventDefault();
+  const pnbp = document.getElementById('cfgBiayaPnbp')?.value || '10000';
+  const meterai = document.getElementById('cfgBiayaMeterai')?.value || '10000';
+  const hotline = document.getElementById('cfgHotline')?.value || '(021) 8092-2345';
+  const wa = document.getElementById('cfgWaPtsp')?.value || '081298457721';
+
+  localStorage.setItem('court_general_config', JSON.stringify({ pnbp, meterai, hotline, wa }));
+  showToast('Pengaturan tarif & hotline instansi berhasil disimpan!', 'success');
+}
+
+// =========================================================================
 // 12. HELPER UTILITIES
 // =========================================================================
 
@@ -1902,6 +2131,10 @@ if ('serviceWorker' in navigator) {
 document.addEventListener('DOMContentLoaded', () => {
   // Inisialisasi sesi autentikasi pengguna
   initAuth();
+
+  // Inisialisasi dropdown opsi klasifikasi perkara dari master data
+  populateJenisPerkaraDropdown();
+  loadGeneralSettings();
 
   // Setup routing awal berdasarkan hash URL
   const hash = window.location.hash.replace('#', '');
