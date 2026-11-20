@@ -227,8 +227,15 @@ function getSubmissions() {
         uraian: o.lingkup_wewenang || ''
       },
       berkas: {
-        ktp: o.url_ktp_pemberi || '',
-        kta: o.url_kta_penerima || ''
+        ktp_pemberi: o.url_ktp_pemberi || o.url_ktp || '',
+        ktp_penerima: o.url_ktp_penerima || '',
+        kta_penerima: o.url_kta_penerima || o.url_kta || '',
+        bas_penerima: o.url_bas_penerima || '',
+        surat_kuasa: o.url_surat_kuasa || '',
+        surat_lurah: o.url_surat_lurah || '',
+        bukti_pnbp: o.url_bukti_pnbp || '',
+        ktp: o.url_ktp_pemberi || o.url_ktp || '',
+        kta: o.url_kta_penerima || o.url_kta || ''
       },
       petugas: o.petugas_verifikator || '',
       pejabat: o.pejabat_pengesah || '',
@@ -274,38 +281,45 @@ function simpanPendaftaranBaru(data) {
     const hash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, newId + nowIso)
       .map(b => ('0' + (b & 0xff).toString(16)).slice(-2)).join('');
 
-    // Susun baris database
-    const row = [
-      newId,
-      nowIso,
-      'Dalam Proses Verifikasi', // nomor_register_resmi
-      data.kategori || 'Advokat',
-      (data.pemberi && data.pemberi.nama) || '',
-      (data.pemberi && data.pemberi.nik) || '',
-      (data.pemberi && data.pemberi.pekerjaan) || '',
-      (data.pemberi && data.pemberi.alamat) || '',
-      (data.pemberi && data.pemberi.telepon) || '',
-      (data.pemberi && data.pemberi.email) || '',
-      (data.penerima && data.penerima.nama) || '',
-      (data.penerima && data.penerima.identitas) || '',
-      (data.penerima && data.penerima.kantor) || '',
-      (data.penerima && data.penerima.telepon) || '',
-      (data.penerima && data.penerima.alamat) || '',
-      (data.materi && data.materi.jenisPerkara) || '',
-      (data.materi && data.materi.nomorPerkara) || '',
-      (data.materi && data.materi.uraian) || '',
-      (data.berkas && data.berkas.ktp) || '',
-      (data.berkas && data.berkas.kta) || '',
-      'Menunggu Verifikasi', // status
-      '', // catatan_petugas
-      '', // petugas_verifikator
-      '', // pejabat_pengesah
-      '', // tanggal_pengesahan
-      '', // url_dokumen_pdf
-      hash,
-      20000 // total_biaya
-    ];
+    // Susun baris database berbasis header dinamis (Pola /gas-scale-turbo)
+    const headerRow = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
+    const dataMap = {
+      id_pengajuan: newId,
+      tanggal_daftar: nowIso,
+      nomor_register_resmi: 'Dalam Proses Verifikasi',
+      kategori_pemohon: data.kategori || 'Advokat',
+      nama_pemberi_kuasa: (data.pemberi && data.pemberi.nama) || '',
+      nik_pemberi_kuasa: (data.pemberi && data.pemberi.nik) || '',
+      pekerjaan_pemberi_kuasa: (data.pemberi && data.pemberi.pekerjaan) || '',
+      alamat_pemberi_kuasa: (data.pemberi && data.pemberi.alamat) || '',
+      no_wa_pemohon: (data.pemberi && data.pemberi.telepon) || '',
+      email_pemohon: (data.pemberi && data.pemberi.email) || '',
+      nama_penerima_kuasa: (data.penerima && data.penerima.nama) || '',
+      identitas_penerima_kuasa: (data.penerima && data.penerima.identitas) || '',
+      kantor_penerima_kuasa: (data.penerima && data.penerima.kantor) || '',
+      no_wa_penerima: (data.penerima && data.penerima.telepon) || '',
+      alamat_penerima_kuasa: (data.penerima && data.penerima.alamat) || '',
+      jenis_perkara: (data.materi && data.materi.jenisPerkara) || '',
+      nomor_perkara: (data.materi && data.materi.nomorPerkara) || '',
+      lingkup_wewenang: (data.materi && data.materi.uraian) || '',
+      url_ktp_pemberi: (data.berkas && (data.berkas.ktp_pemberi || data.berkas.ktp)) || '',
+      url_ktp_penerima: (data.berkas && data.berkas.ktp_penerima) || '',
+      url_kta_penerima: (data.berkas && (data.berkas.kta_penerima || data.berkas.kta)) || '',
+      url_bas_penerima: (data.berkas && data.berkas.bas_penerima) || '',
+      url_surat_kuasa: (data.berkas && data.berkas.surat_kuasa) || '',
+      url_surat_lurah: (data.berkas && data.berkas.surat_lurah) || '',
+      url_bukti_pnbp: (data.berkas && data.berkas.bukti_pnbp) || '',
+      status: 'Menunggu Verifikasi',
+      catatan_petugas: '',
+      petugas_verifikator: '',
+      pejabat_pengesah: '',
+      tanggal_pengesahan: '',
+      url_dokumen_pdf: '',
+      hash_verifikasi: hash,
+      total_biaya: 20000
+    };
 
+    const row = headerRow.map(h => dataMap[h] !== undefined ? dataMap[h] : '');
     sh.appendRow(row);
 
     // Invalidate Cache

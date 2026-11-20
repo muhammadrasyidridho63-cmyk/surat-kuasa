@@ -146,28 +146,42 @@ Setelah aparatur/admin login, di navbar akan muncul tautan **`Dashboard Admin`**
   - Catatan resmi petugas verifikator secara transparan.
   - Tombol unduh draf / salinan dokumen pendaftaran resmi.
 
-### 6.2. Modul Pendaftaran Kuasa Multi-Step Wizard
-1. **Langkah 1: Identitas Pemberi Kuasa (Prinsipal)**
-   - Pilihan kategori: `Advokat / Penasihat Hukum` atau `Kuasa Insidentil (Keluarga)`.
-   - Nama lengkap (sesuai KTP), NIK 16 digit, pekerjaan, nomor WhatsApp, email, dan alamat domisili lengkap.
-2. **Langkah 2: Data Penerima Kuasa & Unggah Dokumen**
-   - Nama Advokat / Penerima Kuasa, Nomor KTA Advokat / Berita Acara Sumpah (BAS), nomor telepon kantor, dan alamat kantor hukum.
-   - Upload KTP Pemberi Kuasa & KTA/BAS Penerima Kuasa.
-   - **Fitur Kritis: Kompresi Foto di Sisi Klien (*Canvas Compression*)**. Gambar dikompresi otomatis di bawah 500 KB sebelum dikirim ke server untuk menghemat bandwidth HP dan mematuhi batas payload Apps Script.
-3. **Langkah 3: Materi Perkara & Ruang Lingkup Wewenang**
-   - **Dropdown Klasifikasi / Jenis Perkara:** Dihasilkan secara dinamis dari Master Data Pengaturan (`Perdata Gugatan`, `Perdata Permohonan`, `Pidana Umum`, `Pidana Khusus`, `PHI`, dll.).
-   - Nomor Perkara Terkait (jika sudah terdaftar di SIPP).
-   - Rincian wewenang khusus (mediasi, replik/duplik, banding, kasasi, perdamaian).
-4. **Langkah 4: Tinjauan Berkas, Pernyataan & Biaya**
-   - Ringkasan rincian biaya: Tarif PNBP (Rp 10.000) + Tarif e-Meterai Peruri (Rp 10.000) = Total Rp 20.000.
-   - Pernyataan keabsahan data hukum berbobot hukum PERMA.
-   - Tombol kirim pendaftaran dengan penerbitan nomor agenda instan (`REG-YYYYMM-XXXX`).
+### 6.2. Modul Pendaftaran Kuasa Terpadu 1 Halaman (Langkah 2, 3, 4 Dihapus Total)
+1. **Pilihan 3 Kategori Kuasa & Input Identitas Minimalis (Nama & WhatsApp)**
+   - **Kategori 1: Advokat / Kuasa Hukum**
+     - Form Input: **Nama Pemohon** & **Nomor WhatsApp Aktif**.
+     - Berkas yang diunggah (5 berkas):
+       a. KTP Pemberi Kuasa
+       b. KTP Penerima Kuasa
+       c. KTA Penerima Kuasa
+       d. Berita Acara Sumpah Advokat Penerima Kuasa
+       e. Surat Kuasa
+   - **Kategori 2: Kuasa Instansi Pemerintah**
+     - Form Input: **Nama Pemohon** & **Nomor WhatsApp Aktif**.
+     - Berkas yang diunggah (3 berkas):
+       a. KTP Pemberi Kuasa
+       b. KTP Penerima Kuasa
+       c. Surat Kuasa
+   - **Kategori 3: Kuasa Insidentil**
+     - Form Input: **Nama Pemohon** & **Nomor WhatsApp Aktif**.
+     - Berkas yang diunggah (4 berkas):
+       a. KTP Pemberi Kuasa
+       b. KTP Penerima Kuas
+       c. Surat Kuasa
+       d. Surat Keterangan Lurah / Desa terkait status hubungan
+2. **Unggah Dokumen Berkas Pendukung Dinamis (*Canvas Compression & PDF Handler*)**
+   - Kompresi gambar otomatis di sisi klien (maks 800px / 72% kualitas) dan dukungan file PDF.
+   - Slot unggahan menyesuaikan secara instan dan reaktif saat kategori dipilih (5 slot untuk Advokat, 3 slot untuk Instansi, 4 slot untuk Insidentil).
+3. **Pernyataan Kebenaran Data & Pengiriman Langsung**
+   - Checklist konfirmasi keabsahan dokumen.
+   - Tombol kirim pendaftaran langsung dengan penerbitan nomor agenda instan (`REG-YYYYMM-XXXX`) tanpa perlu melalui wizard multi-langkah.
 
 ### 6.3. Modul Meja Verifikator PTSP
 * **Laci Inspeksi Berkas (*Document Inspection Drawer*):**
   - Slide-over panel dari sisi kanan layar tanpa meninggalkan halaman antrean.
-  - Pratinjau gambar KTP/KTA pemohon dengan kontrol rotasi dan perbesaran (*zoom*).
-  - Checklist Uji Kelayakan 3 Poin: Validasi KTP Dukcapil, Keabsahan KTA/BAS, dan Kelengkapan Klausul Khusus.
+  - Tab pengalih berkas dinamis sesuai kategori (KTP Pemberi, KTP Penerima, KTA, BAS, Surat Kuasa, atau Surat Keterangan Lurah).
+  - Kontrol zoom dan rotasi gambar, serta penampil dokumen PDF terintegrasi.
+  - Checklist Uji Kelayakan Formal & Material berkas.
 * **Aksi Verifikator:**
   - `Lolos Verifikasi & Teruskan ke Pejabat`: Mengubah status berkas menjadi `Menunggu Pengesahan`.
   - `Minta Revisi`: Menginput catatan perbaikan berkas dan mengirim notifikasi WhatsApp ke pemohon.
@@ -230,8 +244,12 @@ Basis data disimpan pada Google Sheets dengan struktur relasional 6 sheet:
 | `jenis_perkara` | String | Klasifikasi perkara (dinamis dari master) |
 | `nomor_perkara` | String | Nomor perkara SIPP terkait |
 | `lingkup_wewenang` | Text | Uraian wewenang yang diberikan |
-| `url_ktp_pemberi` | String (URL) | Link file KTP di Google Drive |
-| `url_kta_penerima` | String (URL) | Link file KTA di Google Drive |
+| `url_ktp_pemberi` | String (URL) | Link file KTP Pemberi Kuasa di Google Drive |
+| `url_ktp_penerima` | String (URL) | Link file KTP Penerima Kuasa di Google Drive |
+| `url_kta_penerima` | String (URL) | Link file KTA Advokat di Google Drive |
+| `url_bas_penerima` | String (URL) | Link file Berita Acara Sumpah PT di Drive |
+| `url_surat_kuasa` | String (URL) | Link file Naskah Asli Surat Kuasa di Drive |
+| `url_bukti_pnbp` | String (URL) | Link file Bukti Setor PNBP Leges di Drive |
 | `status` | Enum | `Menunggu Verifikasi`, `Perlu Revisi`, `Menunggu Pengesahan`, `Disahkan/Terdaftar`, `Ditolak` |
 | `catatan_petugas` | Text | Catatan revisi / perbaikan dari staf loket |
 | `petugas_verifikator`| String | Nama & NIP staf loket yang memeriksa |

@@ -43,20 +43,25 @@ Sistem memanfaatkan Google Sheets sebagai database relasional, Google Drive untu
    - `id_pengajuan`: UUID unik (contoh: `REG-202611-0001`)
    - `tanggal_daftar`: Timestamp pengajuan (format ISO/WIB)
    - `nomor_register_resmi`: Nomor surat register pengadilan (contoh: `W11-U1/123/HK.02/XI/2026`)
-   - `kategori_pemohon`: `Advokat` / `Masyarakat Umum`
-   - `nama_pemberi_kuasa`: Nama lengkap pihak pemberi kuasa
+   - `kategori_pemohon`: `Advokat / Kuasa Hukum` / `Kuasa Instansi Pemerintah` / `Kuasa Insidentil`
+   - `nama_pemberi_kuasa`: Nama lengkap pihak pemohon / pemberi kuasa
    - `nik_pemberi_kuasa`: NIK KTP pemberi kuasa
    - `pekerjaan_pemberi_kuasa`: Profesi pemberi kuasa
    - `alamat_pemberi_kuasa`: Domisili lengkap
    - `no_wa_pemohon`: Nomor WhatsApp aktif
    - `email_pemohon`: Email aktif pemohon
    - `nama_penerima_kuasa`: Nama advokat atau penerima kuasa
-   - `identitas_penerima_kuasa`: No. KTA Advokat / NIK Penerima Kuasa
+   - `identitas_penerima_kuasa`: No. KTA Advokat / NIP / NIK Penerima Kuasa
    - `alamat_penerima_kuasa`: Alamat kantor hukum / domisili
    - `perihal_kuasa`: Perihal perkara/keperluan kuasa
    - `lingkup_wewenang`: Rincian hak/wewenang yang diberikan
-   - `url_ktp_pemberi`: Tautan file Google Drive KTP Pemberi
-   - `url_kta_penerima`: Tautan file Google Drive KTA Advokat / KTP Penerima
+   - `url_ktp_pemberi`: Tautan file Google Drive KTP Pemberi Kuasa
+   - `url_ktp_penerima`: Tautan file Google Drive KTP Penerima Kuasa
+   - `url_kta_penerima`: Tautan file Google Drive KTA Advokat Penerima Kuasa (Kategori Advokat)
+   - `url_bas_penerima`: Tautan file Google Drive Berita Acara Sumpah (BAS) Penerima Kuasa (Kategori Advokat)
+   - `url_surat_kuasa`: Tautan file Google Drive Naskah Surat Kuasa
+   - `url_surat_lurah`: Tautan file Google Drive Surat Keterangan Lurah/Desa (Kategori Insidentil)
+   - `url_bukti_pnbp`: Tautan file Google Drive Bukti Pembayaran Leges PNBP Kuasa
    - `status`: `Menunggu Verifikasi` | `Perlu Revisi` | `Menunggu Pengesahan` | `Disahkan/Terdaftar` | `Ditolak`
    - `catatan_petugas`: Alasan perbaikan / catatan verifikasi staf
    - `petugas_verifikator`: Nama staf yang memverifikasi
@@ -98,11 +103,31 @@ Sistem memanfaatkan Google Sheets sebagai database relasional, Google Drive untu
 ### 5. Persyaratan Fungsional
 
 #### A. Modul Pemohon (Publik)
-1. **Formulir Pendaftaran Multi-Step:**
-   - Langkah 1: Kategori Pemohon & Identitas Pemberi Kuasa.
-   - Langkah 2: Identitas Penerima Kuasa (Advokat/Keluarga) + Unggah Berkas Persyaratan (KTP/KTA).
-   - Langkah 3: Rincian Keperluan Kuasa & Ringkasan Wewenang.
-   - Langkah 4: Tinjauan Akhir (Review) & Persetujuan Pernyataan Kebenaran Data.
+1. **Formulir Pendaftaran Terpadu 1 Halaman (Single-Page Form — Langkah 2, 3, 4 Dihapus Total):**
+   - **Bagian 1: Pemilihan 3 Kategori Kuasa & Identitas Pemohon:**
+     - Kategori 1: **Advokat / Kuasa Hukum**
+       - Input Identitas: Nama Pemohon & No WhatsApp Aktif.
+       - Berkas yang diunggah (5 berkas):
+         a. KTP Pemberi Kuasa
+         b. KTP Penerima Kuasa
+         c. KTA Penerima Kuasa
+         d. Berita Acara Sumpah Advokat Penerima Kuasa
+         e. Surat Kuasa
+     - Kategori 2: **Kuasa Instansi Pemerintah**
+       - Input Identitas: Nama Pemohon & No WhatsApp Aktif.
+       - Berkas yang diunggah (3 berkas):
+         a. KTP Pemberi Kuasa
+         b. KTP Penerima Kuasa
+         c. Surat Kuasa
+     - Kategori 3: **Kuasa Insidentil**
+       - Input Identitas: Nama Pemohon & Nomor WhatsApp Aktif.
+       - Berkas yang diunggah (4 berkas):
+         a. KTP Pemberi Kuasa
+         b. KTP Penerima Kuas
+         c. Surat Kuasa
+         d. Surat Keterangan Lurah / Desa terkait status hubungan
+   - **Bagian 2: Unggah Dokumen Berkas Pendukung (Dinamis Sesuai Kategori Terpilih):** Kompresi otomatis gambar di browser (maks 800px / 72% kualitas) dan dukungan file PDF native.
+   - **Bagian 3: Pernyataan Kebenaran Data & Tombol Kirim Langsung (Instan):** Menerbitkan nomor agenda registrasi seketika tanpa perlu tahapan multi-langkah berbelit.
 2. **Nomor Tanda Terima Instan:** Pemohon langsung mendapatkan Nomor Agenda Pendaftaran dan tautan cek status.
 3. **Pencarian / Cek Status (*Tracking*):** Pencarian instan menggunakan Nomor Pendaftaran atau NIK/Nomor WA.
 4. **Validasi Publik QR Code:** Halaman verifikasi publik terbuka saat QR Code pada dokumen PDF dipindai oleh pihak ketiga (hakim/lawan perkara/instansi lain) untuk membuktikan dokumen sah terdaftar di buku register pengadilan.

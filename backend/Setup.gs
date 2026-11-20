@@ -81,7 +81,12 @@ function setupAppEnvironment() {
       'nomor_perkara',
       'lingkup_wewenang',
       'url_ktp_pemberi',
+      'url_ktp_penerima',
       'url_kta_penerima',
+      'url_bas_penerima',
+      'url_surat_kuasa',
+      'url_surat_lurah',
+      'url_bukti_pnbp',
       'status',
       'catatan_petugas',
       'petugas_verifikator',
@@ -93,7 +98,7 @@ function setupAppEnvironment() {
     ]);
 
     // Format Header Baris 1
-    shPengajuan.getRange(1, 1, 1, 28).setBackground('#0D5236').setFontColor('#FFFFFF').setFontWeight('bold');
+    shPengajuan.getRange(1, 1, 1, 32).setBackground('#0D5236').setFontColor('#FFFFFF').setFontWeight('bold');
     shPengajuan.setFrozenRows(1);
 
     // Seed Data Awal
@@ -116,8 +121,13 @@ function setupAppEnvironment() {
       'Perdata Gugatan',
       '89/Pdt.G/2026/PN',
       'Mewakili secara penuh untuk menghadiri persidangan, perdamaian/mediasi, mengajukan replik, kesimpulan, hingga upaya hukum banding.',
-      '',
-      '',
+      '', // url_ktp_pemberi
+      '', // url_ktp_penerima
+      '', // url_kta_penerima
+      '', // url_bas_penerima
+      '', // url_surat_kuasa
+      '', // url_surat_lurah
+      '', // url_bukti_pnbp
       'Disahkan/Terdaftar',
       'Berkas lengkap dan absah.',
       'Ahmad Syafii, S.Kom.',

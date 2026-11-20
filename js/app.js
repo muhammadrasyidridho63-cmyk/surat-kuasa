@@ -131,6 +131,7 @@ const INITIAL_SUBMISSIONS = [
       kta_penerima: '',
       bas_penerima: '',
       surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+      surat_lurah: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
       bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
       ktp: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
       kta: ''
@@ -139,6 +140,44 @@ const INITIAL_SUBMISSIONS = [
     pejabat: '',
     catatanPetugas: 'Lampiran Kartu Keluarga (KK) dan Surat Keterangan Hubungan Keluarga dari Kelurahan belum diunggah. Mohon lengkapi berkas insidentil.',
     hashSha256: '99887766554433221100aabbccddeeff99887766554433221100aabbccddeeff',
+    totalBiaya: 20000
+  },
+  {
+    id: 'REG-202611-0095',
+    timestamp: '2026-11-15T11:20:00.000Z',
+    tanggal: '15 Nov 2026, 11:20 WIB',
+    nomorRegister: 'W11-U1/246/HK.02/XI/2026',
+    kategori: 'Instansi',
+    status: 'Menunggu Verifikasi',
+    pemberi: {
+      nama: 'Biro Hukum Kementerian ATR/BPN',
+      nik: '3171012304750001',
+      pekerjaan: 'Instansi Pemerintah',
+      telepon: '081288776655',
+      email: 'birohukum@atrbpn.go.id',
+      alamat: 'Jl. Sisingamangaraja No. 2, Kebayoran Baru, Jakarta Selatan'
+    },
+    penerima: {
+      nama: 'Pratama Wicaksana, S.H. (Jaksa Pengacara Negara)',
+      identitas: 'NIP. 19850412 200801 1 003',
+      kantor: 'Kejaksaan Negeri / JPN',
+      telepon: '081288776655',
+      alamat: 'Jl. Melawai Raya No. 10, Jakarta Selatan'
+    },
+    materi: {
+      jenisPerkara: 'Perdata Gugatan',
+      nomorPerkara: '115/Pdt.G/2026/PN',
+      uraian: 'Mewakili Pemerintah cq Kementerian ATR/BPN dalam gugatan pembatalan sertifikat hak milik.'
+    },
+    berkas: {
+      ktp_pemberi: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+      ktp_penerima: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+      surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80'
+    },
+    petugas: '',
+    pejabat: 'Dr. H. Sulaiman, S.H., M.H.',
+    catatanPetugas: '',
+    hashSha256: 'c3d4e5f6a1b234567890abcdef1234567890abcdef1234567890abcdef123456',
     totalBiaya: 20000
   },
   {
@@ -189,7 +228,7 @@ const INITIAL_SUBMISSIONS = [
 
 // App Local Database Engine (LocalStorage-backed with SWR Cache)
 const Storage = {
-  KEY: 'esuratkuasa_db_v1',
+  KEY: 'esuratkuasa_db_v2',
   load() {
     try {
       const raw = localStorage.getItem(this.KEY);
@@ -1017,27 +1056,95 @@ const wizardData = {
     kta_penerima: '',
     bas_penerima: '',
     surat_kuasa: '',
+    surat_lurah: '',
     bukti_pnbp: '',
     ktp: '',
     kta: ''
   }
 };
 
+// Konfigurasi 3 Kategori & Dokumen Persyaratan Sesuai Ketentuan Kepaniteraan
+const CATEGORY_DOC_CONFIG = {
+  Advokat: {
+    title: 'Advokat / Kuasa Hukum',
+    countText: 'Wajib 5 Dokumen Persyaratan',
+    docs: [
+      { key: 'ktp_pemberi', code: 'a', title: 'KTP Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
+      { key: 'ktp_penerima', code: 'b', title: 'KTP Penerima Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
+      { key: 'kta_penerima', code: 'c', title: 'KTA Penerima Kuasa', desc: 'KTA Advokat Aktif • Maks 5 MB', icon: 'contact_mail', color: 'secondary' },
+      { key: 'bas_penerima', code: 'd', title: 'Berita Acara Sumpah Advokat Penerima Kuasa', desc: 'BAS Pengadilan Tinggi • Maks 5 MB', icon: 'history_edu', color: 'secondary' },
+      { key: 'surat_kuasa', code: 'e', title: 'Surat Kuasa', desc: 'Asli Bermeterai & TTD • JPG/PDF', icon: 'article', color: 'primary' }
+    ]
+  },
+  Instansi: {
+    title: 'Kuasa Instansi Pemerintah',
+    countText: 'Wajib 3 Dokumen Persyaratan',
+    docs: [
+      { key: 'ktp_pemberi', code: 'a', title: 'KTP Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
+      { key: 'ktp_penerima', code: 'b', title: 'KTP Penerima Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
+      { key: 'surat_kuasa', code: 'c', title: 'Surat Kuasa', desc: 'Surat Tugas / Kuasa Kedinasan • JPG/PDF', icon: 'article', color: 'primary' }
+    ]
+  },
+  Insidentil: {
+    title: 'Kuasa Insidentil',
+    countText: 'Wajib 4 Dokumen Persyaratan',
+    docs: [
+      { key: 'ktp_pemberi', code: 'a', title: 'KTP Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
+      { key: 'ktp_penerima', code: 'b', title: 'KTP Penerima Kuas', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
+      { key: 'surat_kuasa', code: 'c', title: 'Surat Kuasa', desc: 'Asli Bermeterai & TTD • JPG/PDF', icon: 'article', color: 'primary' },
+      { key: 'surat_lurah', code: 'd', title: 'Surat Keterangan Lurah / Desa terkait status hubungan', desc: 'Keterangan Hubungan Keluarga • JPG/PDF', icon: 'family_restroom', color: 'secondary' }
+    ]
+  }
+};
+
+function renderUploadCards(cat) {
+  const container = document.getElementById('uploadCardsContainer');
+  const badgeEl = document.getElementById('uploadCategoryBadge');
+  const cfg = CATEGORY_DOC_CONFIG[cat] || CATEGORY_DOC_CONFIG.Advokat;
+
+  if (badgeEl) badgeEl.textContent = cfg.countText;
+  if (!container) return;
+
+  container.innerHTML = cfg.docs.map(doc => {
+    const isUploaded = !!wizardData.berkas[doc.key];
+    const borderCls = doc.color === 'primary' ? 'border-primary/40' : 'border-secondary/40';
+    const bgIconCls = doc.color === 'primary' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary';
+    const btnCls = doc.color === 'primary' ? 'bg-primary text-on-primary hover:bg-primary-container' : 'bg-secondary text-on-secondary hover:bg-secondary-fixed';
+
+    return `
+      <div class="p-3.5 rounded-xl border border-dashed ${borderCls} bg-surface-container-low/50 flex flex-col items-center text-center">
+        <div class="w-10 h-10 rounded-full ${bgIconCls} flex items-center justify-center mb-1.5">
+          <span class="material-symbols-outlined text-2xl">${doc.icon}</span>
+        </div>
+        <span class="font-bold text-xs text-on-surface leading-tight min-h-[32px] flex items-center justify-center">${doc.code}. ${doc.title}</span>
+        <span class="text-[10px] text-outline mb-2.5 mt-1">${doc.desc}</span>
+        <label class="px-3 py-1.5 rounded-lg ${btnCls} text-xs font-semibold cursor-pointer transition-colors shadow-sm">
+          Pilih Berkas
+          <input type="file" accept="image/*,.pdf" class="hidden" onchange="handleFileUpload(this, '${doc.key}')"/>
+        </label>
+        <span id="uploadBadge_${doc.key}" class="mt-2 text-[10px] text-outline ${isUploaded ? 'px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-semibold flex items-center gap-1' : ''}">
+          ${isUploaded ? '<span class="material-symbols-outlined text-xs">check_circle</span> Berkas Terpasang' : 'Gunakan contoh otomatis jika dilewati'}
+        </span>
+      </div>
+    `;
+  }).join('');
+}
+
 function setWizardCategory(cat) {
   wizardData.kategori = cat;
-  const btnAdvokat = document.getElementById('btnCatAdvokat');
-  const btnInsidentil = document.getElementById('btnCatInsidentil');
-  const labelKta = document.getElementById('labelKtaField');
 
-  if (cat === 'Advokat') {
-    if (btnAdvokat) btnAdvokat.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold bg-primary text-on-primary shadow-sm transition-all';
-    if (btnInsidentil) btnInsidentil.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all';
-    if (labelKta) labelKta.textContent = 'Nomor KTA Advokat *';
-  } else {
-    if (btnAdvokat) btnAdvokat.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all';
-    if (btnInsidentil) btnInsidentil.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold bg-secondary text-on-secondary shadow-sm transition-all';
-    if (labelKta) labelKta.textContent = 'Nomor NIK Penerima Kuasa Insidentil *';
-  }
+  const btnAdvokat = document.getElementById('btnCatAdvokat');
+  const btnInstansi = document.getElementById('btnCatInstansi');
+  const btnInsidentil = document.getElementById('btnCatInsidentil');
+
+  const activeCls = 'py-3 px-3 rounded-xl text-xs sm:text-sm font-bold bg-primary text-on-primary shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer text-center';
+  const inactiveCls = 'py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all flex items-center justify-center gap-2 cursor-pointer text-center';
+
+  if (btnAdvokat) btnAdvokat.className = cat === 'Advokat' ? activeCls : inactiveCls;
+  if (btnInstansi) btnInstansi.className = cat === 'Instansi' ? activeCls : inactiveCls;
+  if (btnInsidentil) btnInsidentil.className = cat === 'Insidentil' ? activeCls : inactiveCls;
+
+  renderUploadCards(cat);
 }
 
 function goWizardStep(step) {
@@ -1048,163 +1155,35 @@ function goWizardStep(step) {
 }
 
 function updateWizardStepperUI(step) {
-  // Tidak diperlukan lagi karena multi-step 2, 3, dan 4 telah dihapus
+  // Tidak diperlukan lagi karena langkah 2, 3, dan 4 telah dihapus
 }
 
 function validateWizardStep1() {
   const nama = document.getElementById('wzNamaPemberi').value.trim();
-  const nik = document.getElementById('wzNikPemberi').value.trim();
   const wa = document.getElementById('wzWaPemberi').value.trim();
-  const alamat = document.getElementById('wzAlamatPemberi').value.trim();
 
-  if (!nama || !nik || !wa || !alamat) {
-    showToast('Harap lengkapi semua kolom identitas pemberi kuasa.', 'warning');
+  if (!nama || !wa) {
+    showToast('Harap lengkapi nama pemohon dan nomor WhatsApp aktif.', 'warning');
     return false;
   }
-  if (nik.length < 16) {
-    showToast('Nomor NIK harus 16 digit.', 'warning');
-    return false;
-  }
+
+  const nik = (document.getElementById('wzNikPemberi') && document.getElementById('wzNikPemberi').value.trim()) || '3174082209840002';
+  const alamat = (document.getElementById('wzAlamatPemberi') && document.getElementById('wzAlamatPemberi').value.trim()) || 'Sesuai Berkas Identitas Terlampir';
 
   wizardData.pemberi = {
     nama,
     nik,
-    pekerjaan: document.getElementById('wzPekerjaanPemberi').value.trim() || 'Wiraswasta',
+    pekerjaan: (document.getElementById('wzPekerjaanPemberi') && document.getElementById('wzPekerjaanPemberi').value.trim()) || 'Pemohon Kuasa',
     telepon: wa,
-    email: document.getElementById('wzEmailPemberi').value.trim() || `${nik}@mail.com`,
+    email: (document.getElementById('wzEmailPemberi') && document.getElementById('wzEmailPemberi').value.trim()) || `${wa.replace(/\D/g, '')}@layanan.go.id`,
     alamat
   };
   return true;
 }
 
-function validateWizardStep2() {
-  const nama = document.getElementById('wzNamaPenerima').value.trim();
-  const kta = document.getElementById('wzKtaPenerima').value.trim();
-  const kantor = document.getElementById('wzKantorPenerima').value.trim();
-  const alamat = document.getElementById('wzAlamatPenerima').value.trim();
-
-  if (!nama || !kta) {
-    showToast('Harap isi Nama dan Nomor KTA/Identitas Penerima Kuasa.', 'warning');
-    return false;
-  }
-
-  wizardData.penerima = {
-    nama,
-    identitas: kta,
-    kantor: kantor || 'Kantor Advokat / Mandiri',
-    telepon: document.getElementById('wzWaPenerima').value.trim() || wizardData.pemberi.telepon,
-    alamat: alamat || wizardData.pemberi.alamat
-  };
-
-  // Pastikan 6 berkas diisi atau gunakan mock jika demo
-  const demoImages = {
-    ktp_pemberi: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
-    ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-    kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-    bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
-    surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-    bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80'
-  };
-
-  ['ktp_pemberi', 'ktp_penerima', 'kta_penerima', 'bas_penerima', 'surat_kuasa', 'bukti_pnbp'].forEach(k => {
-    if (!wizardData.berkas[k]) {
-      wizardData.berkas[k] = demoImages[k];
-    }
-  });
-  wizardData.berkas.ktp = wizardData.berkas.ktp_pemberi;
-  wizardData.berkas.kta = wizardData.berkas.kta_penerima;
-
-  return true;
-}
-
-function validateWizardStep3() {
-  const jenis = document.getElementById('wzJenisPerkara').value;
-  const noPerkara = document.getElementById('wzNoPerkara').value.trim();
-  const uraian = document.getElementById('wzUraianKuasa').value.trim();
-
-  if (!uraian) {
-    showToast('Harap uraikan keperluan dan ruang lingkup kuasa.', 'warning');
-    return false;
-  }
-
-  wizardData.materi = {
-    jenisPerkara: jenis,
-    nomorPerkara: noPerkara || 'Belum Terdaftar (Perkara Baru)',
-    uraian
-  };
-  return true;
-}
-
-function renderWizardStep4Review() {
-  const container = document.getElementById('wizardStep4Summary');
-  if (!container) return;
-
-  const docItems = [
-    { key: 'ktp_pemberi', label: '1. KTP Pemberi Kuasa' },
-    { key: 'ktp_penerima', label: '2. KTP Penerima Kuasa' },
-    { key: 'kta_penerima', label: '3. KTA Penerima Kuasa' },
-    { key: 'bas_penerima', label: '4. BAS Penerima Kuasa' },
-    { key: 'surat_kuasa', label: '5. Naskah Surat Kuasa' },
-    { key: 'bukti_pnbp', label: '6. Bukti Bayar Leges PNBP' }
-  ];
-
-  const docsHtml = docItems.map(d => {
-    const isUploaded = !!wizardData.berkas[d.key];
-    return `
-      <div class="flex items-center gap-2 p-2 rounded-lg bg-surface-container-low border border-surface-container">
-        <span class="material-symbols-outlined text-sm ${isUploaded ? 'text-primary' : 'text-outline'}">
-          ${isUploaded ? 'check_circle' : 'pending'}
-        </span>
-        <span class="text-[11px] font-semibold text-on-surface truncate">${d.label}</span>
-      </div>
-    `;
-  }).join('');
-
-  container.innerHTML = `
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container">
-        <div class="flex items-center justify-between mb-2">
-          <span class="font-label-sm text-label-sm uppercase font-bold text-outline">Identitas Pemberi Kuasa</span>
-          <button onclick="goWizardStep(1)" class="text-xs text-primary font-semibold hover:underline">Ubah</button>
-        </div>
-        <p class="font-bold text-on-surface">${wizardData.pemberi.nama}</p>
-        <p class="text-xs text-on-surface-variant">NIK: ${wizardData.pemberi.nik}</p>
-        <p class="text-xs text-on-surface-variant">WhatsApp: ${wizardData.pemberi.telepon}</p>
-        <p class="text-xs text-on-surface-variant mt-1">${wizardData.pemberi.alamat}</p>
-      </div>
-
-      <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container">
-        <div class="flex items-center justify-between mb-2">
-          <span class="font-label-sm text-label-sm uppercase font-bold text-outline">Identitas Penerima Kuasa (${wizardData.kategori})</span>
-          <button onclick="goWizardStep(2)" class="text-xs text-primary font-semibold hover:underline">Ubah</button>
-        </div>
-        <p class="font-bold text-on-surface">${wizardData.penerima.nama}</p>
-        <p class="text-xs text-on-surface-variant">KTA/ID: ${wizardData.penerima.identitas}</p>
-        <p class="text-xs text-on-surface-variant">${wizardData.penerima.kantor}</p>
-      </div>
-    </div>
-
-    <!-- Kelengkapan 6 Berkas Persyaratan -->
-    <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container">
-      <div class="flex items-center justify-between mb-2.5">
-        <span class="font-label-sm text-label-sm uppercase font-bold text-outline">Kelengkapan 6 Berkas Persyaratan</span>
-        <button onclick="goWizardStep(2)" class="text-xs text-primary font-semibold hover:underline">Cek Berkas</button>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        ${docsHtml}
-      </div>
-    </div>
-
-    <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container">
-      <div class="flex items-center justify-between mb-2">
-        <span class="font-label-sm text-label-sm uppercase font-bold text-outline">Perihal &amp; Ruang Lingkup Kuasa</span>
-        <button onclick="goWizardStep(3)" class="text-xs text-primary font-semibold hover:underline">Ubah</button>
-      </div>
-      <p class="text-xs font-semibold text-primary">Klasifikasi: ${wizardData.materi.jenisPerkara} • No. Perkara: ${wizardData.materi.nomorPerkara}</p>
-      <p class="text-xs text-on-surface-variant mt-1">${wizardData.materi.uraian}</p>
-    </div>
-  `;
-}
+function validateWizardStep2() { return true; }
+function validateWizardStep3() { return true; }
+function renderWizardStep4Review() { return true; }
 
 // Client-Side Image & PDF Compression / Loading (Pola /gas-scale-turbo)
 function handleFileUpload(input, type) {
@@ -1271,18 +1250,10 @@ function handleFileUpload(input, type) {
 
 async function submitWizardRegistration() {
   const nama = document.getElementById('wzNamaPemberi').value.trim();
-  const nik = document.getElementById('wzNikPemberi').value.trim();
   const wa = document.getElementById('wzWaPemberi').value.trim();
-  const alamat = document.getElementById('wzAlamatPemberi').value.trim();
-  const pekerjaan = document.getElementById('wzPekerjaanPemberi') ? document.getElementById('wzPekerjaanPemberi').value.trim() : 'Wiraswasta';
-  const email = document.getElementById('wzEmailPemberi') ? document.getElementById('wzEmailPemberi').value.trim() : `${nik}@mail.com`;
 
-  if (!nama || !nik || !wa || !alamat) {
-    showToast('Harap lengkapi seluruh kolom identitas pemberi kuasa.', 'warning');
-    return;
-  }
-  if (nik.length < 16) {
-    showToast('Nomor NIK harus 16 digit.', 'warning');
+  if (!nama || !wa) {
+    showToast('Harap masukkan Nama Pemohon dan Nomor WhatsApp aktif.', 'warning');
     return;
   }
 
@@ -1292,6 +1263,11 @@ async function submitWizardRegistration() {
     return;
   }
 
+  const nik = (document.getElementById('wzNikPemberi') && document.getElementById('wzNikPemberi').value.trim()) || '3174082209840002';
+  const alamat = (document.getElementById('wzAlamatPemberi') && document.getElementById('wzAlamatPemberi').value.trim()) || 'Sesuai Berkas Identitas Terlampir';
+  const pekerjaan = (document.getElementById('wzPekerjaanPemberi') && document.getElementById('wzPekerjaanPemberi').value.trim()) || 'Pemohon Kuasa';
+  const email = (document.getElementById('wzEmailPemberi') && document.getElementById('wzEmailPemberi').value.trim()) || `${wa.replace(/\D/g, '')}@layanan.go.id`;
+
   // Fallback dokumen untuk demonstrasi jika dilewati
   const demoImages = {
     ktp_pemberi: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
@@ -1299,16 +1275,19 @@ async function submitWizardRegistration() {
     kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
     bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
     surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+    surat_lurah: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
     bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80'
   };
 
-  ['ktp_pemberi', 'ktp_penerima', 'kta_penerima', 'bas_penerima', 'surat_kuasa', 'bukti_pnbp'].forEach(k => {
-    if (!wizardData.berkas[k]) {
-      wizardData.berkas[k] = demoImages[k];
+  const activeCfg = CATEGORY_DOC_CONFIG[wizardData.kategori] || CATEGORY_DOC_CONFIG.Advokat;
+  activeCfg.docs.forEach(d => {
+    if (!wizardData.berkas[d.key]) {
+      wizardData.berkas[d.key] = demoImages[d.key] || demoImages.surat_kuasa;
     }
   });
+
   wizardData.berkas.ktp = wizardData.berkas.ktp_pemberi;
-  wizardData.berkas.kta = wizardData.berkas.kta_penerima;
+  wizardData.berkas.kta = wizardData.berkas.kta_penerima || '';
 
   wizardData.pemberi = {
     nama,
@@ -1319,18 +1298,24 @@ async function submitWizardRegistration() {
     alamat
   };
 
+  const penerimaLabel = wizardData.kategori === 'Advokat'
+    ? 'Advokat / Kuasa Hukum (Sesuai KTA & BAS Terlampir)'
+    : (wizardData.kategori === 'Instansi'
+        ? 'Kuasa Instansi Pemerintah (Sesuai Dokumen Kedinasan Terlampir)'
+        : 'Penerima Kuasa Insidentil (Sesuai Surat Keterangan Lurah Terlampir)');
+
   wizardData.penerima = {
-    nama: wizardData.kategori === 'Advokat' ? 'Advokat Penerima Kuasa (Terlampir pada Berkas)' : 'Penerima Kuasa Insidentil (Terlampir pada Berkas)',
-    identitas: 'Sesuai KTA/BAS/KTP Terlampir',
-    kantor: 'Sesuai Naskah Surat Kuasa',
+    nama: penerimaLabel,
+    identitas: wizardData.kategori === 'Advokat' ? 'KTA & BAS Terlampir' : (wizardData.kategori === 'Instansi' ? 'NIP/Identitas Kedinasan' : 'KTP & SK Lurah Terlampir'),
+    kantor: wizardData.kategori === 'Advokat' ? 'Kantor Advokat / Lembaga Bantuan Hukum' : (wizardData.kategori === 'Instansi' ? 'Instansi Pemerintah / Kementerian / Badan' : 'Keluarga / Kerabat'),
     telepon: wa,
-    alamat: alamat
+    alamat: 'Sesuai Berkas Terlampir'
   };
 
   wizardData.materi = {
     jenisPerkara: 'Sesuai Naskah Surat Kuasa',
     nomorPerkara: 'Dalam Proses Registrasi',
-    uraian: 'Pemberian kuasa sebagaimana termaktub dalam naskah Surat Kuasa terlampir.'
+    uraian: `Pemberian kuasa permohonan kategori ${wizardData.kategori} sebagaimana termaktub dalam naskah Surat Kuasa terlampir.`
   };
 
   const btnSubmit = document.getElementById('btnSubmitWizard');
@@ -1460,8 +1445,11 @@ function renderVerifikatorTable() {
         </div>
       </td>
       <td class="px-space-md py-4">
-        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.kategori === 'Advokat' ? 'bg-primary-fixed text-on-primary-fixed-variant' : 'bg-secondary-fixed text-on-secondary-fixed-variant'}">
-          ${item.kategori}
+        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${
+          item.kategori === 'Advokat' ? 'bg-primary-fixed text-on-primary-fixed-variant' :
+          (item.kategori === 'Instansi' ? 'bg-tertiary-fixed text-on-tertiary-fixed-variant' : 'bg-secondary-fixed text-on-secondary-fixed-variant')
+        }">
+          ${item.kategori === 'Advokat' ? 'Advokat' : (item.kategori === 'Instansi' ? 'Instansi Pemerintah' : 'Insidentil')}
         </span>
       </td>
       <td class="px-space-md py-4">
@@ -1486,29 +1474,42 @@ let currentPreviewRotate = 0;
 let currentInspectDocType = 'ktp_pemberi';
 
 const INSPECT_DOC_TITLES = {
-  ktp_pemberi: '1. KTP Pemberi Kuasa',
-  ktp_penerima: '2. KTP Penerima Kuasa',
-  kta_penerima: '3. KTA Penerima Kuasa',
-  bas_penerima: '4. BAS Penerima Kuasa',
-  surat_kuasa: '5. Naskah Surat Kuasa',
-  bukti_pnbp: '6. Bukti Bayar Leges PNBP'
+  ktp_pemberi: 'KTP Pemberi Kuasa',
+  ktp_penerima: 'KTP Penerima Kuasa',
+  kta_penerima: 'KTA Penerima Kuasa',
+  bas_penerima: 'Berita Acara Sumpah Advokat Penerima Kuasa',
+  surat_kuasa: 'Naskah Surat Kuasa',
+  surat_lurah: 'Surat Keterangan Lurah / Desa',
+  bukti_pnbp: 'Bukti Bayar Leges PNBP'
 };
+
+function renderInspectTabs(category) {
+  const tabsContainer = document.getElementById('inspectDocTabs');
+  if (!tabsContainer) return;
+  const cfg = CATEGORY_DOC_CONFIG[category] || CATEGORY_DOC_CONFIG.Advokat;
+  tabsContainer.innerHTML = cfg.docs.map(doc => `
+    <button type="button" onclick="switchInspectDoc('${doc.key}')" id="tab_${doc.key}" class="px-2.5 py-1 rounded text-[10px] font-semibold bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all text-center">
+      ${doc.code}. ${doc.title.length > 20 ? doc.title.slice(0, 18) + '...' : doc.title}
+    </button>
+  `).join('');
+}
 
 function switchInspectDoc(docKey) {
   if (!currentInspectedItem) return;
   currentInspectDocType = docKey;
 
   // Update tabs active state
-  Object.keys(INSPECT_DOC_TITLES).forEach(key => {
-    const tab = document.getElementById(`tab_${key}`);
-    if (tab) {
-      if (key === docKey) {
-        tab.className = 'px-1.5 py-1 rounded text-[10px] font-bold bg-primary text-on-primary transition-all text-center truncate shadow-sm';
+  const tabsContainer = document.getElementById('inspectDocTabs');
+  if (tabsContainer) {
+    const tabs = tabsContainer.querySelectorAll('button');
+    tabs.forEach(tab => {
+      if (tab.id === `tab_${docKey}`) {
+        tab.className = 'px-2.5 py-1 rounded text-[10px] font-bold bg-primary text-on-primary transition-all text-center shadow-sm';
       } else {
-        tab.className = 'px-1.5 py-1 rounded text-[10px] font-semibold bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all text-center truncate';
+        tab.className = 'px-2.5 py-1 rounded text-[10px] font-semibold bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all text-center';
       }
-    }
-  });
+    });
+  }
 
   // Update title
   const titleEl = document.getElementById('inspectDocTitle');
@@ -1561,7 +1562,10 @@ function openInspectDrawer(id) {
   document.getElementById('insPerkara').textContent = `${item.materi.jenisPerkara} • ${item.materi.nomorPerkara}`;
   document.getElementById('insCatatanInput').value = item.catatanPetugas || '';
 
-  // Switch ke dokumen pertama (1. KTP Pemberi Kuasa)
+  // Render tabs dinamis sesuai kategori (Advokat / Instansi / Insidentil)
+  renderInspectTabs(item.kategori);
+
+  // Switch ke dokumen pertama (KTP Pemberi Kuasa)
   switchInspectDoc('ktp_pemberi');
 
   overlay.classList.remove('hidden');
