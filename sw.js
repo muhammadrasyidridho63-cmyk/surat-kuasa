@@ -1,4 +1,4 @@
-const CACHE_NAME = 'esuratkuasa-pwa-v1';
+const CACHE_NAME = 'esuratkuasa-pwa-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -10,17 +10,17 @@ const STATIC_ASSETS = [
   './icon-512.png'
 ];
 
-// Install: Cache static assets
+// Install: Cache static assets & langsung aktifkan tanpa tunggu restart tab
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS);
     })
   );
-  self.skipWaiting();
 });
 
-// Activate: Clean up older caches
+// Activate: Bersihkan semua cache lama
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -36,7 +36,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: Network-first for GAS API, Stale-While-Revalidate for static assets
+// Fetch: Network First untuk aset lokal agar selalu mendapatkan tampilan & kode terbaru
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -46,30 +46,40 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Permintaan font atau CDN eksternal (Tailwind, Google Fonts)
+  // Permintaan CDN eksternal (Tailwind, Google Fonts)
   if (url.origin.includes('fonts.googleapis.com') || url.origin.includes('fonts.gstatic.com') || url.origin.includes('cdn.tailwindcss.com')) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
-        return cached || fetch(event.request).then((res) => {
-          return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, res.clone());
-            return res;
-          });
-        });
+        const fetchPromise = fetch(event.request).then((res) => {
+          if (res && res.status === 200) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(event.request, clone));
+          }
+          return res;
+        }).catch(() => cached);
+        return cached || fetchPromise;
       })
     );
     return;
   }
 
-  // Aset lokal aplikasi (Cache First, fallback ke Network)
+  // Aset lokal aplikasi: NETWORK FIRST (selalu ambil dari server/disk terbaru saat online, fallback ke cache jika offline)
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      return cached || fetch(event.request).catch(() => {
-        // Fallback untuk navigasi offline
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
+    fetch(event.request)
+      .then((networkRes) => {
+        if (networkRes && networkRes.status === 200) {
+          const clone = networkRes.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(event.request, clone));
         }
-      });
-    })
+        return networkRes;
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cached) => {
+          if (cached) return cached;
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+        });
+      })
   );
 });
