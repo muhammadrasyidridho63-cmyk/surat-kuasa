@@ -1,0 +1,590 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panduan Pasang E-Surat Kuasa Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <style>
+  :root {
+    --bg: #F7F5EF; --surface: #FFFFFF; --surface-2: #EFEBE2; --ink: #1F1F1F; --muted: #625F58; --line: #E2DDD2;
+    --accent: #FFD35C; --accent-ink: #1F1F1F; --action: #0D5236; --action-ink: #FFFFFF;
+    --ok: #166534; --ok-bg: #DCFCE7; --warn: #7A4A00; --warn-bg: #FFF4CC; --bad: #9B1C1C; --bad-bg: #FDE4E4; --info: #1D4ED8; --info-bg: #E2ECFF;
+    --code-bg: #1F1F1F; --code-fg: #F2EEE4; --code-dim: #A9A398;
+    --f-ui: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --f-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+    --r: 14px; --r-s: 9px;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #151514; --surface: #1F1F1D; --surface-2: #2A2926; --ink: #F1EEE6; --muted: #ABA69B; --line: #393732;
+    --accent: #FFD35C; --accent-ink: #1F1F1F; --action: #94D4B0; --action-ink: #002112;
+    --ok: #86EFAC; --ok-bg: #12301E; --warn: #FCD97A; --warn-bg: #3A2F12; --bad: #FCA5A5; --bad-bg: #3B1717; --info: #9DB8FF; --info-bg: #1B2440;
+    --code-bg: #0E0E0D; --code-fg: #EDE9DF; --code-dim: #8F8A80; color-scheme: dark } }
+  :root[data-theme="dark"] {
+    --bg: #151514; --surface: #1F1F1D; --surface-2: #2A2926; --ink: #F1EEE6; --muted: #ABA69B; --line: #393732;
+    --accent: #FFD35C; --accent-ink: #1F1F1F; --action: #94D4B0; --action-ink: #002112;
+    --ok: #86EFAC; --ok-bg: #12301E; --warn: #FCD97A; --warn-bg: #3A2F12; --bad: #FCA5A5; --bad-bg: #3B1717; --info: #9DB8FF; --info-bg: #1B2440;
+    --code-bg: #0E0E0D; --code-fg: #EDE9DF; --code-dim: #8F8A80; color-scheme: dark }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--f-ui); font-size: 16px; line-height: 1.6; margin: 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 48px; }
+  a { color: inherit; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+  :focus-visible { outline: 3px solid var(--info); outline-offset: 2px; border-radius: 6px; }
+  code, .mono { font-family: var(--f-mono); font-size: .88em; }
+  code { background: var(--surface-2); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
+  h1, h2, h3 { line-height: 1.2; text-wrap: balance; margin: 0; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  /* kepala */
+  .top { padding-block: 34px 22px; display: grid; gap: 16px; }
+  .eyebrow { font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--muted); }
+  .top h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 700; letter-spacing: -.02em; }
+  .top h1 mark { background: var(--accent); color: var(--accent-ink); padding: 0 .18em; border-radius: 8px; }
+  .lead { max-width: 64ch; color: var(--muted); font-size: 17px; margin: 0; }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .fact { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-size: 14px; display: inline-flex; gap: 6px; align-items: center; }
+  .fact b { font-variant-numeric: tabular-nums; }
+  .meter { display: grid; gap: 6px; max-width: 520px; }
+  .meter .bar { height: 10px; border-radius: 99px; background: var(--surface-2); overflow: hidden; border: 1px solid var(--line); }
+  .meter .bar i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .3s; }
+  .meter small { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* tata letak */
+  .layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; align-items: start; }
+  .rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 6px; }
+  .rail a { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; text-decoration: none; padding: 10px 12px; border-radius: 12px; border: 1.5px solid transparent; }
+  .rail a:hover { background: var(--surface); border-color: var(--line); }
+  .rail .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); font-weight: 700; font-size: 13px; }
+  .rail .t { font-weight: 600; font-size: 14.5px; line-height: 1.25; }
+  .rail .t small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
+  .rail .c { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .rail a.done .n { background: var(--ok); color: var(--surface); }
+  .rail-note { margin-top: 10px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
+
+  /* tahap & langkah */
+  .stage { min-width: 0; display: grid; gap: 16px; margin-bottom: 44px; scroll-margin-top: 16px; }
+  .stage-h { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
+  .stage-h h2 { font-size: clamp(22px, 3.2vw, 30px); font-weight: 700; letter-spacing: -.01em; }
+  .stage-h h2 span { color: var(--muted); font-weight: 500; }
+  .stage-h p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .step { min-width: 0; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r); padding: 18px 20px; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; scroll-margin-top: 16px; }
+  .step.done { border-color: var(--ok); }
+  .step .num { width: 40px; height: 40px; border-radius: 12px; background: var(--ink); color: var(--surface); display: grid; place-items: center; font-weight: 700; font-size: 17px; }
+  .step.done .num { background: var(--ok); }
+  .step h3 { font-size: 19px; font-weight: 600; margin-bottom: 6px; }
+  .step .body { min-width: 0; display: grid; gap: 10px; }
+  .step .body > p { margin: 0; }
+  .step ol, .step ul { margin: 0; padding-left: 22px; display: grid; gap: 5px; }
+  .ui { display: inline; font-weight: 600; border: 1.5px solid var(--line); background: var(--surface-2); border-radius: 7px; padding: 0 6px; font-size: .92em; -webkit-box-decoration-break: clone; box-decoration-break: clone; overflow-wrap: anywhere; }
+  .tick { display: inline-flex; align-items: center; gap: 9px; font-size: 14.5px; font-weight: 600; cursor: pointer; user-select: none; justify-self: start; border: 1.5px dashed var(--line); border-radius: 10px; padding: 6px 12px; }
+  .tick input { width: 18px; height: 18px; accent-color: var(--ok); }
+  .step.done .tick { border-style: solid; border-color: var(--ok); color: var(--ok); background: var(--ok-bg); }
+
+  .note { border-radius: 12px; padding: 12px 14px; font-size: 14.5px; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; }
+  .note::before { font-weight: 700; }
+  .note.warn { background: var(--warn-bg); color: var(--warn); } .note.warn::before { content: "!"; }
+  .note.info { background: var(--info-bg); color: var(--info); } .note.info::before { content: "i"; font-style: italic; }
+  .note.ok { background: var(--ok-bg); color: var(--ok); } .note.ok::before { content: "✓"; }
+  .note p { margin: 0; }
+
+  /* tombol */
+  .btn { font: inherit; font-size: 14.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 7px; border-radius: 10px; padding: 8px 14px; border: 1.5px solid var(--ink); background: var(--surface); color: var(--ink); cursor: pointer; text-decoration: none; white-space: nowrap; }
+  .btn:hover { background: var(--surface-2); }
+  .btn.main { background: var(--action); color: var(--action-ink); border-color: var(--action); }
+  .btn.main:hover { filter: brightness(1.12); }
+  .btn.ok { background: var(--ok-bg); color: var(--ok); border-color: var(--ok); }
+  .btn.sm { font-size: 13.5px; padding: 6px 11px; }
+  .btn[disabled] { opacity: .45; cursor: not-allowed; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  /* kode & perintah */
+  .cmd { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; background: var(--code-bg); color: var(--code-fg); border-radius: 10px; padding: 6px 6px 6px 14px; gap: 10px; }
+  .cmd pre { margin: 0; font-family: var(--f-mono); font-size: 13.5px; overflow-x: auto; white-space: pre; padding: 6px 0; }
+  .cmd .btn { background: var(--code-fg); color: var(--code-bg); border-color: var(--code-fg); }
+  .cmd .lbl { grid-column: 1 / -1; font-size: 12px; color: var(--code-dim); font-family: var(--f-ui); margin-top: -2px; }
+  .field { display: grid; gap: 5px; }
+  .field label { font-size: 14px; font-weight: 600; }
+  .field input { font: inherit; font-size: 15px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); width: 100%; min-width: 0; }
+  .field input:focus { border-color: var(--ink); outline: none; }
+  .field small { color: var(--muted); font-size: 13px; }
+  .field .st { font-size: 13px; font-weight: 600; }
+  .field .st.ok { color: var(--ok); } .field .st.bad { color: var(--bad); }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .log { background: var(--code-bg); color: var(--code-fg); border-radius: 10px; padding: 12px 14px; font-family: var(--f-mono); font-size: 13px; overflow-x: auto; white-space: pre; margin: 0; line-height: 1.55; }
+  .log em { color: var(--accent); font-style: normal; }
+
+  /* stasiun berkas backend */
+  .station { border: 2px solid var(--ink); border-radius: 18px; overflow: hidden; background: var(--surface); }
+  .helper { background: var(--accent); color: var(--accent-ink); padding: 16px 18px; display: grid; gap: 10px; }
+  .helper .lbl { font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; opacity: .75; }
+  .helper .cur { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: baseline; }
+  .helper .cur b { font-family: var(--f-mono); font-size: clamp(22px, 3.6vw, 30px); letter-spacing: -.01em; }
+  .helper .cur span { font-size: 14px; }
+  .helper .how { font-size: 14px; margin: 0; }
+  .helper .btn { border-color: var(--accent-ink); background: #FFFDF5; color: #1F1F1F; }
+  .helper .btn.main { background: #1F1F1F; color: #FFFFFF; border-color: #1F1F1F; }
+  .helper .btn.ok { background: #DCFCE7; color: #166534; border-color: #166534; }
+  .helper.selesai { background: var(--ok-bg); color: var(--ok); }
+  .files { list-style: none; margin: 0; padding: 0; }
+  .file { border-top: 1px solid var(--line); padding: 10px 16px; display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+  .file .i { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; font-weight: 600; }
+  .file .nm { font-family: var(--f-mono); font-weight: 600; font-size: 15px; overflow-wrap: anywhere; }
+  .file .nm small { font-family: var(--f-ui); font-weight: 400; color: var(--muted); font-size: 12.5px; margin-left: 6px; }
+  .file .acts { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+  .file .desc { grid-column: 2 / -1; font-size: 13px; color: var(--muted); margin-top: -2px; }
+  .file.on { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); }
+  .file.done .nm { text-decoration: line-through; text-decoration-thickness: 1.5px; color: var(--muted); }
+  .file.done .i { color: var(--ok); }
+  .file details { grid-column: 1 / -1; }
+  .file summary { cursor: pointer; font-size: 13px; color: var(--muted); width: fit-content; }
+  .file pre.code { margin: 8px 0 4px; max-height: 340px; overflow: auto; background: var(--code-bg); color: var(--code-fg); border-radius: 10px; padding: 12px 14px; font-family: var(--f-mono); font-size: 12.5px; line-height: 1.5; white-space: pre; }
+  .station-foot { border-top: 1px solid var(--line); padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; font-size: 14px; color: var(--muted); }
+
+  /* lain-lain */
+  .mock { border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; font-size: 13.5px; }
+  .mock .bar { background: var(--surface-2); padding: 6px 10px; display: flex; gap: 6px; align-items: center; font-weight: 600; }
+  .mock .bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); display: inline-block; }
+  .mock .in { display: grid; grid-template-columns: 170px minmax(0, 1fr); min-height: 120px; }
+  .mock .side { border-right: 1px solid var(--line); padding: 8px; display: grid; align-content: start; gap: 3px; font-family: var(--f-mono); font-size: 12.5px; }
+  .mock .side div { padding: 3px 8px; border-radius: 6px; }
+  .mock .side .hl { background: var(--accent); color: var(--accent-ink); }
+  .mock .side .plus { font-family: var(--f-ui); font-weight: 600; display: flex; justify-content: space-between; }
+  .mock .side .plus b { border: 1.5px solid var(--ink); border-radius: 6px; padding: 0 6px; }
+  .mock .ed { padding: 10px 12px; color: var(--muted); font-family: var(--f-mono); font-size: 12.5px; }
+  .faq { display: grid; gap: 8px; }
+  .faq details { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 16px; }
+  .faq summary { cursor: pointer; font-weight: 600; }
+  .faq details p { margin: 8px 0 0; color: var(--muted); }
+  .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-weight: 600; font-size: 14.5px; z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,.25); max-width: calc(100% - 32px); }
+  .dlg { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: grid; place-items: center; z-index: 60; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+  .dlg .box { background: var(--surface); border-radius: 16px; padding: 18px; width: min(760px, 100%); display: grid; gap: 10px; max-height: 100%; }
+  .dlg textarea { width: 100%; min-height: 240px; font-family: var(--f-mono); font-size: 12.5px; border: 1.5px solid var(--line); border-radius: 10px; padding: 10px; background: var(--bg); color: var(--ink); resize: vertical; }
+  footer { color: var(--muted); font-size: 13.5px; border-top: 1px solid var(--line); padding-top: 16px; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .rail { position: static; display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+    .rail a { grid-template-columns: 24px auto; padding: 8px 10px; border-color: var(--line); background: var(--surface); flex-shrink: 0; }
+    .rail .n { width: 24px; height: 24px; font-size: 12px; }
+    .rail .t small, .rail .c, .rail-note { display: none; }
+  }
+  @media (max-width: 560px) {
+    .step { grid-template-columns: minmax(0, 1fr); padding: 16px; }
+    .step .num { width: 34px; height: 34px; font-size: 15px; }
+    .grid2 { grid-template-columns: minmax(0, 1fr); }
+    .file { grid-template-columns: 26px minmax(0, 1fr); }
+    .file .acts { grid-column: 1 / -1; justify-content: flex-start; }
+    .mock .in { grid-template-columns: minmax(0, 1fr); }
+    .mock .side { border-right: 0; border-bottom: 1px solid var(--line); }
+  }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">E-Surat Kuasa Online · Pengadilan Negeri · versi 2.4.0</div>
+    <h1>Panduan Pasang <mark>E-Surat Kuasa Online</mark></h1>
+    <p class="lead">Ikuti langkah bernomor dari atas ke bawah. Untuk backend Anda cukup menekan <b>Salin nama</b> dan <b>Salin isi</b>, lalu menempelkannya di Google Apps Script. Tidak perlu menulis kode.</p>
+    <div class="facts">
+      <span class="fact">⏱ <b>±20–30</b> menit</span>
+      <span class="fact">📄 <b>5</b> berkas backend siap salin</span>
+      <span class="fact">💻 Kerjakan di laptop/komputer</span>
+      <span class="fact">✅ Centang tersimpan otomatis di browser ini</span>
+    </div>
+    <div class="meter" aria-live="polite"><div class="bar"><i id="mAll"></i></div><small id="mAllTxt">0 dari 0 langkah selesai</small></div>
+  </header>
+
+  <div class="layout">
+    <nav class="rail" aria-label="Tahap pemasangan">
+      <a href="#backend" data-stage="backend"><span class="n">A</span><span class="t">Backend<small>Google Apps Script</small></span><span class="c"></span></a>
+      <a href="#frontend" data-stage="frontend"><span class="n">B</span><span class="t">Frontend<small>GitHub Pages</small></span><span class="c"></span></a>
+      <a href="#masuk-pertama" data-stage="masuk-pertama"><span class="n">C</span><span class="t">Uji Alur<small>Verifikasi & TTE</small></span><span class="c"></span></a>
+      <a href="#pasang-hp" data-stage="pasang-hp"><span class="n">D</span><span class="t">Pasang di HP<small>Android & iPhone</small></span><span class="c"></span></a>
+      <a href="#masalah"><span class="n">?</span><span class="t">Jika ada masalah<small>Solusi cepat</small></span><span class="c"></span></a>
+      <div class="rail-note">Yang Anda perlukan: Akun Google, folder proyek lokal, dan koneksi internet.</div>
+    </nav>
+
+    <main>
+      <!-- TAHAP A: BACKEND -->
+      <section class="stage" id="backend" data-stage="backend">
+        <div class="stage-h"><h2>A. Backend <span>· Google Apps Script</span></h2><p>Server aplikasi REST API. Berjalan gratis di akun Google Anda.</p></div>
+        <ol class="steps">
+          <li class="step" data-step="a1"><div class="num">1</div><div class="body">
+            <h3>Buat proyek Apps Script baru</h3>
+            <ol>
+              <li>Pastikan browser sedang masuk dengan <b>akun Google yang akan menjadi pemilik database pengadilan</b>.</li>
+              <li>Klik tombol di bawah untuk membuka proyek baru.</li>
+              <li>Klik judul <span class="ui">Proyek tanpa judul</span> di kiri atas, ganti menjadi <b>E-Surat Kuasa Backend</b>, lalu klik <span class="ui">Ganti nama</span>.</li>
+            </ol>
+            <div class="row"><a class="btn main" href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">Buka Apps Script ↗</a></div>
+            <label class="tick"><input type="checkbox"> Sudah, proyek terbuka</label>
+          </div></li>
+
+          <li class="step" data-step="a2"><div class="num">2</div><div class="body">
+            <h3>Tampilkan berkas <code>appsscript.json</code></h3>
+            <ol>
+              <li>Di bilah kiri Apps Script, klik ikon roda gigi <span class="ui">⚙ Setelan proyek</span>.</li>
+              <li>Centang <span class="ui">Tampilkan file manifes "appsscript.json" di editor</span>.</li>
+              <li>Kembali ke editor dengan klik ikon <span class="ui">&lt; &gt; Editor</span>. Sekarang terlihat berkas <code>appsscript.json</code> dan <code>Kode.gs</code>.</li>
+            </ol>
+            <label class="tick"><input type="checkbox"> Manifes appsscript.json sudah tampil</label>
+          </div></li>
+
+          <li class="step" data-step="a3" id="tempel"><div class="num">3</div><div class="body">
+            <h3>Tempel 5 berkas backend</h3>
+            <p>Gunakan stasiun berkas di bawah. Kotak kuning selalu menunjukkan <b>berkas berikutnya</b> yang harus ditempel. Ulangi gerakan ini:</p>
+            <ol>
+              <li>Di Apps Script, klik tanda <span class="ui">+</span> di samping <b>Berkas</b> &rarr; pilih <span class="ui">Skrip</span>.</li>
+              <li>Tekan <b>Salin nama</b> di sini, lalu di kotak nama Apps Script tekan <b>Ctrl+V</b> &rarr; <b>Enter</b>.</li>
+              <li>Tekan <b>Salin isi</b> di sini. Di Apps Script klik area kode, tekan <b>Ctrl+A</b> (pilih semua) lalu <b>Ctrl+V</b>.</li>
+              <li>Tekan <b>Ctrl+S</b> untuk menyimpan, lalu klik <b>Sudah, lanjut</b> di sini.</li>
+            </ol>
+            <p class="note warn"><span>Untuk <code>appsscript.json</code>: klik langsung berkasnya di daftar kiri Apps Script, ganti isinya dengan tombol <b>Salin isi</b>. Untuk <code>Kode.gs</code> bawaan: ganti namanya menjadi <code>Kode</code> lewat tombol <span class="ui">⋮</span> &rarr; <span class="ui">Ganti nama</span>.</span></p>
+
+            <div class="station" id="station">
+              <div class="helper" id="helper" aria-live="polite"></div>
+              <ul class="files" id="files"></ul>
+              <div class="station-foot"><span id="fileCount">0 berkas ditempel</span><button class="btn sm" id="resetFiles" type="button">Ulang daftar dari awal</button></div>
+            </div>
+            <label class="tick"><input type="checkbox" id="tickFiles"> Ke-5 berkas sudah ditempel dan disimpan</label>
+          </div></li>
+
+          <li class="step" data-step="a4"><div class="num">4</div><div class="body">
+            <h3>Jalankan <code>setupAppEnvironment</code> sekali</h3>
+            <p>Fungsi ini otomatis membuat folder Google Drive (Berkas & Arsip PDF), Spreadsheet Database dengan 6 tabel PRD, akun staf/pejabat awal, dan konfigurasi Script Properties.</p>
+            <ol>
+              <li>Buka berkas <code>Setup.gs</code> di Apps Script.</li>
+              <li>Di toolbar atas, pada pilihan fungsi (di samping tombol <span class="ui">▷ Jalankan</span>), pilih <b>setupAppEnvironment</b>.</li>
+              <li>Klik <span class="ui">▷ Jalankan</span>. Saat muncul <i>Otorisasi diperlukan</i>, klik <span class="ui">Tinjau izin</span> &rarr; pilih akun Google Anda.</li>
+              <li>Klik <span class="ui">Lanjutan</span> &rarr; klik <span class="ui">Buka E-Surat Kuasa Backend (tidak aman)</span> &rarr; <span class="ui">Izinkan</span>.</li>
+              <li>Tunggu hingga panel <b>Log eksekusi</b> di bawah menulis <b>SETUP SUKSES!</b>.</li>
+            </ol>
+            <label class="tick"><input type="checkbox"> Log eksekusi menulis "SETUP SUKSES!"</label>
+          </div></li>
+
+          <li class="step" data-step="a5"><div class="num">5</div><div class="body">
+            <h3>Terbitkan sebagai Aplikasi Web (Web App)</h3>
+            <ol>
+              <li>Klik tombol biru <span class="ui">Deploy</span> di kanan atas &rarr; <span class="ui">Deployment baru</span>.</li>
+              <li>Klik ikon roda gigi ⚙️ di samping <b>Pilih jenis</b> &rarr; <span class="ui">Aplikasi web</span>.</li>
+              <li>Isi: <b>Deskripsi</b> <code>v2.4.0 REST API</code> · <b>Jalankan sebagai</b> <span class="ui">Saya</span> · <b>Yang memiliki akses</b> <span class="ui">Siapa saja</span>.</li>
+              <li>Klik <span class="ui">Deploy</span>, lalu salin <b>URL Aplikasi web</b> yang berakhiran <code>/exec</code>.</li>
+            </ol>
+            <p class="note warn"><span>Hak akses <b>wajib: Siapa saja (Anyone)</b> agar pemohon publik dapat mendaftar tanpa harus login akun Google institusi.</span></p>
+            <label class="tick"><input type="checkbox"> URL /exec sudah disalin</label>
+          </div></li>
+
+          <li class="step" data-step="a6"><div class="num">6</div><div class="body">
+            <h3>Tempel URL Web App di sini lalu uji</h3>
+            <div class="field">
+              <label for="inGas">URL Web App /exec Anda:</label>
+              <input id="inGas" type="url" placeholder="https://script.google.com/macros/s/AKfycb.../exec" autocomplete="off" spellcheck="false">
+              <span class="st" id="stGas"></span>
+              <small>URL ini akan otomatis dimasukkan ke perintah berkas konfigurasi frontend.</small>
+            </div>
+            <div class="row" style="margin-top: 8px;">
+              <a class="btn" id="lnkPing" href="#" target="_blank" rel="noopener" aria-disabled="true">Uji Tes Koneksi Backend ↗</a>
+            </div>
+            <p>Tes berhasil jika tab baru membalas JSON dengan status sukses.</p>
+            <label class="tick"><input type="checkbox"> Tes koneksi backend berhasil</label>
+          </div></li>
+        </ol>
+      </section>
+
+      <!-- TAHAP B: FRONTEND -->
+      <section class="stage" id="frontend" data-stage="frontend">
+        <div class="stage-h"><h2>B. Frontend <span>· GitHub Pages</span></h2><p>Mempublikasikan antarmuka web PWA ke hosting gratis GitHub Pages.</p></div>
+        <ol class="steps">
+          <li class="step" data-step="b1"><div class="num">1</div><div class="body">
+            <h3>Isi URL Server di <code>js/config.js</code></h3>
+            <ol>
+              <li>Buka folder proyek Anda di komputer: <code>surat kuasa online</code>.</li>
+              <li>Buka file <code>js/config.js</code> menggunakan Notepad atau VS Code.</li>
+              <li>Salin blok konfigurasi di bawah ini, lalu tempelkan ke <code>js/config.js</code> dan simpan (Ctrl+S).</li>
+            </ol>
+            <div class="cmd"><pre id="cfgOut"></pre><button class="btn sm" type="button" data-copy-from="cfgOut">Salin</button><span class="lbl" id="cfgLbl"></span></div>
+            <label class="tick"><input type="checkbox"> js/config.js sudah diperbarui & disimpan</label>
+          </div></li>
+
+          <li class="step" data-step="b2"><div class="num">2</div><div class="body">
+            <h3>Siapkan Akun & Identitas Git</h3>
+            <div class="grid2">
+              <div class="field"><label for="inNama">Nama Anda</label><input id="inNama" placeholder="Nama Lengkap" autocomplete="off"></div>
+              <div class="field"><label for="inEmail">Email Akun GitHub</label><input id="inEmail" type="email" placeholder="email@contoh.com" autocomplete="off"></div>
+            </div>
+            <div class="cmd"><pre data-tpl='git config --global user.name "{nama}"'></pre><button class="btn sm" type="button" data-copy-cmd>Salin</button></div>
+            <div class="cmd"><pre data-tpl='git config --global user.email "{email}"'></pre><button class="btn sm" type="button" data-copy-cmd>Salin</button></div>
+            <label class="tick"><input type="checkbox"> Identitas Git siap</label>
+          </div></li>
+
+          <li class="step" data-step="b3"><div class="num">3</div><div class="body">
+            <h3>Buat Repository Baru di GitHub</h3>
+            <ol>
+              <li>Buka <a href="https://github.com/new" target="_blank" rel="noopener">github.com/new</a>.</li>
+              <li>Isi <b>Repository name</b> sama dengan kolom di bawah, pilih <span class="ui">Public</span>, dan <b>jangan</b> centang <i>Add a README file</i>.</li>
+              <li>Klik <span class="ui">Create repository</span>.</li>
+            </ol>
+            <div class="grid2">
+              <div class="field"><label for="inUser">Username GitHub</label><input id="inUser" placeholder="username-anda" autocomplete="off" spellcheck="false"></div>
+              <div class="field"><label for="inRepo">Nama Repository</label><input id="inRepo" value="surat-kuasa-online" autocomplete="off" spellcheck="false"></div>
+            </div>
+            <label class="tick"><input type="checkbox"> Repository GitHub sudah dibuat</label>
+          </div></li>
+
+          <li class="step" data-step="b4"><div class="num">4</div><div class="body">
+            <h3>Kirim Seluruh Berkas Frontend ke GitHub (Push)</h3>
+            <p>Buka terminal PowerShell di folder <code>surat kuasa online</code>, lalu jalankan perintah ini satu per satu:</p>
+            <div class="cmd"><pre>git init</pre><button class="btn sm" type="button" data-copy-cmd>Salin</button></div>
+            <div class="cmd"><pre>git add .</pre><button class="btn sm" type="button" data-copy-cmd>Salin</button></div>
+            <div class="cmd"><pre>git commit -m "Rilis E-Surat Kuasa Online v2.4.0"</pre><button class="btn sm" type="button" data-copy-cmd>Salin</button></div>
+            <div class="cmd"><pre>git branch -M main</pre><button class="btn sm" type="button" data-copy-cmd>Salin</button></div>
+            <div class="cmd"><pre data-tpl="git remote add origin https://github.com/{user}/{repo}.git"></pre><button class="btn sm" type="button" data-copy-cmd>Salin</button></div>
+            <div class="cmd"><pre>git push -u origin main</pre><button class="btn sm" type="button" data-copy-cmd>Salin</button></div>
+            <p class="note info"><span>Bila terminal meminta password, gunakan <b>Personal Access Token (PAT)</b> GitHub Anda dari <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">github.com/settings/tokens</a> (centang cakupan <b>repo</b>).</span></p>
+            <label class="tick"><input type="checkbox"> Push berhasil ke GitHub</label>
+          </div></li>
+
+          <li class="step" data-step="b5"><div class="num">5</div><div class="body">
+            <h3>Aktifkan GitHub Pages</h3>
+            <ol>
+              <li>Buka repository GitHub Anda &rarr; klik tab <span class="ui">⚙️ Settings</span> &rarr; menu <span class="ui">Pages</span> di bilah kiri.</li>
+              <li>Di bawah <b>Build and deployment</b>, pilih <b>Source: Deploy from a branch</b>.</li>
+              <li>Pilih branch: <b>main</b> dan folder: <b>/ (root)</b> &rarr; klik <span class="ui">Save</span>.</li>
+              <li>Centang opsi <b>Enforce HTTPS</b>. Tunggu 1–2 menit hingga link situs hijau muncul.</li>
+            </ol>
+            <div class="field">
+              <label for="inWeb">Alamat Situs GitHub Pages Anda:</label>
+              <input id="inWeb" type="url" placeholder="https://username.github.io/surat-kuasa-online/" autocomplete="off" spellcheck="false">
+              <span class="st" id="stWeb"></span>
+            </div>
+            <label class="tick"><input type="checkbox"> Situs GitHub Pages sudah live</label>
+          </div></li>
+        </ol>
+      </section>
+
+      <!-- TAHAP C: UJI ALUR & MASUK PERTAMA -->
+      <section class="stage" id="masuk-pertama" data-stage="masuk-pertama">
+        <div class="stage-h"><h2>C. Uji Alur <span>· Verifikasi &amp; Pengesahan TTE</span></h2><p>Pengujian 4 pilar fungsional peradilan secara langsung.</p></div>
+        <ol class="steps">
+          <li class="step" data-step="c1"><div class="num">1</div><div class="body">
+            <h3>Buka Aplikasi Anda</h3>
+            <p>Buka situs yang baru saja Anda deploy, lalu periksa beranda layanan mandiri.</p>
+            <div class="row"><a class="btn main" id="lnkLogin" href="#frontend" target="_blank" rel="noopener">Buka Aplikasi E-Surat Kuasa ↗</a></div>
+            <label class="tick"><input type="checkbox"> Beranda aplikasi terbuka dengan normal</label>
+          </div></li>
+
+          <li class="step" data-step="c2"><div class="num">2</div><div class="body">
+            <h3>Uji Coba Pendaftaran Mandiri (Wizard 4 Langkah)</h3>
+            <ol>
+              <li>Klik menu <span class="ui">Pendaftaran Kuasa</span>.</li>
+              <li>Isi data pemohon (Advokat / Insidentil), unggah berkas KTP/KTA, tentukan klasifikasi perkara.</li>
+              <li>Centang persetujuan kebenaran data &rarr; klik <span class="ui">Kirim Permohonan Pendaftaran</span>.</li>
+              <li>Catat Nomor Registrasi unik yang diterbitkan (contoh: <code>REG-202611-0082</code>).</li>
+            </ol>
+            <label class="tick"><input type="checkbox"> Pendaftaran berhasil dan nomor resi terbit</label>
+          </div></li>
+
+          <li class="step" data-step="c3"><div class="num">3</div><div class="body">
+            <h3>Uji Meja Verifikator (Petugas PTSP)</h3>
+            <ol>
+              <li>Klik menu <span class="ui">Meja Verifikator</span>.</li>
+              <li>Cari berkas pendaftaran Anda pada antrean &rarr; klik tombol <span class="ui">Periksa Berkas</span>.</li>
+              <li>Periksa drawer inspeksi identitas sisi-menyisi &rarr; klik <span class="ui">Loloskan ke Pejabat</span>.</li>
+            </ol>
+            <label class="tick"><input type="checkbox"> Berkas diverifikasi dan masuk antrean TTE Pejabat</label>
+          </div></li>
+
+          <li class="step" data-step="c4"><div class="num">4</div><div class="body">
+            <h3>Uji Meja Pengesahan Pejabat (Panitera &amp; PIN)</h3>
+            <ol>
+              <li>Klik menu <span class="ui">Meja Pengesahan</span>.</li>
+              <li>Pilih berkas dari antrean siap TTE &rarr; periksa pratinjau lembar akta ber-kop Pengadilan.</li>
+              <li>Masukkan PIN Pengesahan Resmi Pejabat: <b>123456</b> pada keypad keamanan.</li>
+              <li>Klik <span class="ui">Sahkan &amp; Terbitkan Surat Kuasa Terdaftar</span>.</li>
+            </ol>
+            <p class="note ok"><span>Nomor register peradilan resmi (contoh: <code>W11-U1/245/HK.02/XI/2026</code>) dan segel QR Code HMAC langsung diterbitkan secara instan!</span></p>
+            <label class="tick"><input type="checkbox"> Pengesahan TTE berhasil dan status menjadi Disahkan</label>
+          </div></li>
+
+          <li class="step" data-step="c5"><div class="num">5</div><div class="body">
+            <h3>Uji Validasi Keaslian QR Code Publik</h3>
+            <p>Klik menu <span class="ui">Validasi QR</span> atau pindai QR Code pada lembar PDF akta yang disahkan. Halaman keabsahan dokumen Mahkamah Agung RI akan menampilkan tanda centang hijau keaslian.</p>
+            <label class="tick"><input type="checkbox"> Validasi keaslian QR Code berhasil</label>
+          </div></li>
+        </ol>
+      </section>
+
+      <!-- TAHAP D: PASANG DI HP (PWA) -->
+      <section class="stage" id="pasang-hp" data-stage="pasang-hp">
+        <div class="stage-h"><h2>D. Pasang di HP <span>· Progressive Web App</span></h2><p>Pengguna dapat memasang aplikasi langsung ke layar utama ponsel.</p></div>
+        <ol class="steps">
+          <li class="step" data-step="d1"><div class="num">1</div><div class="body">
+            <h3>Android (Google Chrome)</h3>
+            <p>Buka alamat situs di Chrome HP &rarr; klik menu titik tiga <span class="ui">⋮</span> &rarr; pilih <span class="ui">Instal aplikasi</span> atau <span class="ui">Tambahkan ke layar utama</span>. Ikon E-Surat Kuasa akan muncul di layar ponsel dan berjalan fullscreen.</p>
+            <label class="tick"><input type="checkbox"> Terpasang di Android</label>
+          </div></li>
+          <li class="step" data-step="d2"><div class="num">2</div><div class="body">
+            <h3>iPhone (Apple Safari)</h3>
+            <p>Buka alamat situs di Safari iPhone &rarr; tekan tombol <span class="ui">Bagikan ⬆</span> di bilah bawah &rarr; pilih <span class="ui">Tambahkan ke Layar Utama</span> &rarr; tekan <span class="ui">Tambah</span>.</p>
+            <label class="tick"><input type="checkbox"> Terpasang di iPhone</label>
+          </div></li>
+        </ol>
+      </section>
+
+      <!-- TAHAP ?: FAQ MASALAH -->
+      <section class="stage" id="masalah">
+        <div class="stage-h"><h2>Jika ada masalah</h2><p>Klik pertanyaan yang sesuai dengan gejala yang Anda lihat.</p></div>
+        <div class="faq">
+          <details><summary>Aplikasi menampilkan "Mode Demo" atau data belum terhubung ke Google Sheets</summary><p>Periksa file <code>js/config.js</code>. Pastikan Anda sudah mengisi <code>GAS_URL</code> dengan URL Web App Anda yang berakhiran <code>/exec</code>, bukan URL editor skrip.</p></details>
+          <details><summary>Pendaftaran gagal: "Gagal memuat / CORS error"</summary><p>Pastikan saat Deploy Web App Anda memilih <b>Yang memiliki akses: Siapa saja (Anyone)</b>. Jika diatur hanya domain Anda, browser publik akan ditolak.</p></details>
+          <details><summary>PIN Pengesahan Pejabat ditolak</summary><p>PIN bawaan default adalah <b>123456</b>. PIN dapat diubah kapan saja melalui menu Script Properties di editor Apps Script dengan kunci <code>PEJABAT_PIN</code>.</p></details>
+          <details><summary>git push ditolak: "Password authentication is not supported"</summary><p>GitHub mewajibkan penggunaan Personal Access Token (PAT) sebagai pengganti password. Buat token di menu Settings &gt; Developer Settings &gt; Personal access tokens di GitHub.</p></details>
+          <details><summary>Saya mengubah kode backend .gs, tetapi perubahan tidak tampak</summary><p>Di Google Apps Script: klik <b>Deploy</b> &rarr; <b>Kelola penerapan (Manage deployments)</b> &rarr; klik ikon pensil Edit &rarr; ubah <b>Versi: Versi baru (New version)</b> &rarr; klik <b>Terapkan</b>. URL <code>/exec</code> akan tetap sama.</p></details>
+        </div>
+      </section>
+
+      <footer>Dokumentasi Lengkap E-Surat Kuasa Online Pengadilan Negeri. Centang dan isian di panduan ini tersimpan di browser Anda.</footer>
+    </main>
+  </div>
+</div>
+
+<script type="application/json" id="setelan">{"pingSuffix":"?action=ping","loginPath":"/#meja-verifikator","repo":"surat-kuasa-online","storageKey":"esuratkuasa-panduan-v1","configTpl":"const CONFIG = { GAS_URL: \u0027{gas}\u0027 };"}</script>
+<script type="application/json" id="berkas">[{"how":"Berkas ini \u003cb\u003esudah ada\u003c/b\u003e. Klik \u003ccode\u003eappsscript.json\u003c/code\u003e di daftar kiri Apps Script \u0026rarr; tekan \u003cb\u003e① Salin isi\u003c/b\u003e \u0026rarr; klik area kode \u0026rarr; \u003cb\u003eCtrl+A\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+V\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+S\u003c/b\u003e.","special":true,"n":"appsscript.json","c":"{\n  \"timeZone\": \"Asia/Jakarta\",\n  \"dependencies\": {},\n  \"exceptionLogging\": \"STACKDRIVER\",\n  \"runtimeVersion\": \"V8\",\n  \"webapp\": {\n    \"executeAs\": \"USER_DEPLOYING\",\n    \"access\": \"ANYONE\"\n  }\n}\n","d":"Pengaturan manifes proyek: zona waktu Jakarta, runtime V8, setelan akses Web App Anyone","l":11},{"how":"Jangan buat berkas baru. Klik \u003cb\u003e⋮\u003c/b\u003e di samping \u003ccode\u003eKode.gs\u003c/code\u003e bawaan \u0026rarr; \u003cb\u003eGanti nama\u003c/b\u003e \u0026rarr; tekan \u003cb\u003e① Salin nama\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+V\u003c/b\u003e \u0026rarr; \u003cb\u003eEnter\u003c/b\u003e. Lalu tekan \u003cb\u003e② Salin isi\u003c/b\u003e \u0026rarr; klik area kode \u0026rarr; \u003cb\u003eCtrl+A\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+V\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+S\u003c/b\u003e.","special":false,"n":"Kode.gs","c":"/**\n * BACKEND GOOGLE APPS SCRIPT (GAS) — PURE REST API\n * Aplikasi Surat Kuasa Online Pengadilan Negeri\n * \n * Standar Arsitektur:\n * - /gas-pro-api: REST API JSON murni (doGet \u0026 doPost), bebas iframe, CORS-safe\n * - /gas-rahasia-script-properties: Zero literal secret, Script Properties source of truth\n * - /gas-scale-turbo: CacheX partition chunking, batch Sheets operations, telemetri\n */\n\nconst APP_VERSION = \u00272.4.0-Production\u0027;\n\n// =========================================================================\n// 1. SCRIPT PROPERTIES ACCESS HELPER (Pola /gas-rahasia-script-properties)\n// =========================================================================\n\nconst PROPS = PropertiesService.getScriptProperties();\nlet _PROP_MEMO = null;\n\nfunction prop_(key, def) {\n  if (!_PROP_MEMO) _PROP_MEMO = PROPS.getProperties();\n  const v = _PROP_MEMO[key];\n  return v === undefined || v === null || v === \u0027\u0027 ? (def === undefined ? \u0027\u0027 : def) : v;\n}\n\nfunction setProp_(key, val) {\n  PROPS.setProperty(key, String(val));\n  if (_PROP_MEMO) _PROP_MEMO[key] = String(val);\n}\n\nfunction setProps_(obj) {\n  PROPS.setProperties(obj);\n  if (_PROP_MEMO) Object.keys(obj).forEach(k =\u003e { _PROP_MEMO[k] = String(obj[k]); });\n}\n\nfunction delProp_(key) {\n  PROPS.deleteProperty(key);\n  if (_PROP_MEMO) delete _PROP_MEMO[key];\n}\n\n// =========================================================================\n// 2. CACHEX ENGINE (Batas 100 KB Chunking — Pola /gas-scale-turbo)\n// =========================================================================\n\nconst CacheX = {\n  SZ: 50000,\n  c: function() { return CacheService.getScriptCache(); },\n  get: function(key) {\n    try {\n      const c = this.c(), head = c.get(key);\n      if (head == null) return null;\n      if (head.indexOf(\u0027__chunks:\u0027) !== 0) return JSON.parse(head);\n      const n = +head.slice(9), keys = [];\n      for (let i = 0; i \u003c n; i++) keys.push(key + \u0027#\u0027 + i);\n      const parts = c.getAll(keys);\n      let s = \u0027\u0027;\n      for (let i = 0; i \u003c n; i++) {\n        if (parts[keys[i]] == null) return null;\n        s += parts[keys[i]];\n      }\n      return JSON.parse(s);\n    } catch (e) { return null; }\n  },\n  put: function(key, val, ttl) {\n    try {\n      const s = JSON.stringify(val), c = this.c();\n      ttl = ttl || 1800; // 30 Menit default\n      if (s.length \u003c= this.SZ) { c.put(key, s, ttl); return true; }\n      const n = Math.ceil(s.length / this.SZ);\n      if (n \u003e 20) return false;\n      const m = {};\n      for (let i = 0; i \u003c n; i++) m[key + \u0027#\u0027 + i] = s.substr(i * this.SZ, this.SZ);\n      c.putAll(m, ttl);\n      c.put(key, \u0027__chunks:\u0027 + n, ttl);\n      return true;\n    } catch (e) { return false; }\n  },\n  del: function(key) {\n    try { this.c().remove(key); } catch (e) {}\n  }\n};\n\n// =========================================================================\n// 3. ENTRY POINTS: doGet \u0026 doPost (CORS-SAFE JSON API)\n// =========================================================================\n\nfunction doGet(e) {\n  const t0 = Date.now();\n  let result;\n  try {\n    const action = (e \u0026\u0026 e.parameter \u0026\u0026 e.parameter.action) || \u0027listPengajuan\u0027;\n    if (action === \u0027listPengajuan\u0027 || action === \u0027getSubmissions\u0027) {\n      result = getSubmissions();\n    } else if (action === \u0027trackPengajuan\u0027) {\n      result = trackPengajuan(e.parameter.query || \u0027\u0027);\n    } else if (action === \u0027getMetrics\u0027) {\n      result = getAdminMetrics();\n    } else {\n      result = { success: true, message: \u0027REST API Surat Kuasa Online Pengadilan aktif.\u0027, version: APP_VERSION };\n    }\n  } catch (err) {\n    result = { success: false, message: err.message };\n  }\n  result.ms = Date.now() - t0;\n  result.v = APP_VERSION;\n  return buildJsonResponse(result);\n}\n\nfunction doPost(e) {\n  const t0 = Date.now();\n  let result;\n  try {\n    const body = JSON.parse((e \u0026\u0026 e.postData \u0026\u0026 e.postData.contents) || \u0027{}\u0027);\n    const action = body.action || \u0027\u0027;\n    const payload = body.data || {};\n\n    switch (action) {\n      case \u0027listPengajuan\u0027:\n      case \u0027getSubmissions\u0027:\n        result = getSubmissions();\n        break;\n\n      case \u0027trackPengajuan\u0027:\n        result = trackPengajuan(payload.query || \u0027\u0027);\n        break;\n\n      case \u0027daftarSuratKuasa\u0027:\n        result = simpanPendaftaranBaru(payload);\n        break;\n\n      case \u0027updateStatus\u0027:\n        result = updateStatusVerifikasi(payload.id, payload.patch);\n        break;\n\n      case \u0027sahkanDokumen\u0027:\n        result = sahkanDokumenPejabat(payload.id, payload.pin);\n        break;\n\n      case \u0027getAdminMetrics\u0027:\n        result = getAdminMetrics();\n        break;\n\n      default:\n        result = { success: false, message: \u0027Aksi (\u0027 + action + \u0027) tidak dikenali oleh server.\u0027 };\n        break;\n    }\n  } catch (err) {\n    result = { success: false, message: \u0027Server Exception: \u0027 + err.message };\n  }\n  result.ms = Date.now() - t0;\n  result.v = APP_VERSION;\n  return buildJsonResponse(result);\n}\n\nfunction buildJsonResponse(data) {\n  return ContentService.createTextOutput(JSON.stringify(data))\n    .setMimeType(ContentService.MimeType.JSON);\n}\n\n// =========================================================================\n// 4. BUSINESS LOGIC SERVICES\n// =========================================================================\n\nfunction getSpreadsheet() {\n  const ssId = prop_(\u0027SPREADSHEET_ID\u0027);\n  if (!ssId) throw new Error(\u0027SPREADSHEET_ID belum dikonfigurasi. Jalankan setupAppEnvironment() terlebih dahulu.\u0027);\n  return SpreadsheetApp.openById(ssId);\n}\n\nfunction getSubmissions() {\n  // Coba ambil dari CacheX terlebih dahulu\n  const cached = CacheX.get(\u0027submissions_list\u0027);\n  if (cached) return { success: true, data: cached, fromCache: true };\n\n  const ss = getSpreadsheet();\n  const sh = ss.getSheetByName(\u0027Pengajuan\u0027);\n  if (!sh) return { success: true, data: [] };\n\n  const values = sh.getDataRange().getValues();\n  if (values.length \u003c= 1) return { success: true, data: [] };\n\n  const headers = values[0];\n  const list = values.slice(1).map(row =\u003e {\n    const o = {};\n    headers.forEach((h, i) =\u003e { o[h] = row[i]; });\n    \n    // Format ke model objek UI\n    return {\n      id: o.id_pengajuan,\n      timestamp: o.tanggal_daftar,\n      tanggal: o.tanggal_daftar ? Utilities.formatDate(new Date(o.tanggal_daftar), \u0027GMT+7\u0027, \u0027dd MMM yyyy, HH:mm\u0027) + \u0027 WIB\u0027 : \u0027\u0027,\n      nomorRegister: o.nomor_register_resmi || \u0027Dalam Proses Verifikasi\u0027,\n      kategori: o.kategori_pemohon || \u0027Advokat\u0027,\n      status: o.status || \u0027Menunggu Verifikasi\u0027,\n      pemberi: {\n        nama: o.nama_pemberi_kuasa || \u0027\u0027,\n        nik: String(o.nik_pemberi_kuasa || \u0027\u0027),\n        pekerjaan: o.pekerjaan_pemberi_kuasa || \u0027\u0027,\n        telepon: String(o.no_wa_pemohon || \u0027\u0027),\n        email: o.email_pemohon || \u0027\u0027,\n        alamat: o.alamat_pemberi_kuasa || \u0027\u0027\n      },\n      penerima: {\n        nama: o.nama_penerima_kuasa || \u0027\u0027,\n        identitas: String(o.identitas_penerima_kuasa || \u0027\u0027),\n        kantor: o.kantor_penerima_kuasa || \u0027\u0027,\n        telepon: String(o.no_wa_penerima || \u0027\u0027),\n        alamat: o.alamat_penerima_kuasa || \u0027\u0027\n      },\n      materi: {\n        jenisPerkara: o.jenis_perkara || \u0027\u0027,\n        nomorPerkara: o.nomor_perkara || \u0027\u0027,\n        uraian: o.lingkup_wewenang || \u0027\u0027\n      },\n      berkas: {\n        ktp: o.url_ktp_pemberi || \u0027\u0027,\n        kta: o.url_kta_penerima || \u0027\u0027\n      },\n      petugas: o.petugas_verifikator || \u0027\u0027,\n      pejabat: o.pejabat_pengesah || \u0027\u0027,\n      catatanPetugas: o.catatan_petugas || \u0027\u0027,\n      hashSha256: o.hash_verifikasi || \u0027\u0027,\n      totalBiaya: Number(o.total_biaya || 20000)\n    };\n  });\n\n  // Simpan ke CacheX selama 15 menit\n  CacheX.put(\u0027submissions_list\u0027, list, 900);\n  return { success: true, data: list };\n}\n\nfunction trackPengajuan(query) {\n  if (!query) return { success: false, message: \u0027Masukkan kata kunci nomor registrasi atau telepon.\u0027 };\n  const res = getSubmissions();\n  const q = String(query).trim().toUpperCase();\n\n  const found = (res.data || []).find(x =\u003e {\n    const mId = x.id \u0026\u0026 x.id.toUpperCase() === q;\n    const mNik = x.pemberi \u0026\u0026 x.pemberi.nik \u0026\u0026 x.pemberi.nik.includes(q);\n    const mTel1 = x.pemberi \u0026\u0026 x.pemberi.telepon \u0026\u0026 x.pemberi.telepon.includes(q);\n    const mTel2 = x.penerima \u0026\u0026 x.penerima.telepon \u0026\u0026 x.penerima.telepon.includes(q);\n    return mId || mNik || mTel1 || mTel2;\n  });\n\n  if (found) return { success: true, data: found };\n  return { success: false, message: \u0027Nomor Registrasi atau Nomor WhatsApp tidak ditemukan di buku pendaftaran.\u0027 };\n}\n\nfunction simpanPendaftaranBaru(data) {\n  const lock = LockService.getScriptLock();\n  if (!lock.tryLock(10000)) throw new Error(\u0027Server sedang sibuk, mohon coba kembali sesaat lagi.\u0027);\n\n  try {\n    const ss = getSpreadsheet();\n    const sh = ss.getSheetByName(\u0027Pengajuan\u0027);\n    if (!sh) throw new Error(\u0027Sheet Pengajuan tidak ditemukan.\u0027);\n\n    const newId = data.id || (\u0027REG-\u0027 + Utilities.formatDate(new Date(), \u0027GMT+7\u0027, \u0027yyyyMM\u0027) + \u0027-\u0027 + Math.floor(Math.random() * 9000 + 1000));\n    const nowIso = new Date().toISOString();\n    const hash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, newId + nowIso)\n      .map(b =\u003e (\u00270\u0027 + (b \u0026 0xff).toString(16)).slice(-2)).join(\u0027\u0027);\n\n    // Susun baris database\n    const row = [\n      newId,\n      nowIso,\n      \u0027Dalam Proses Verifikasi\u0027, // nomor_register_resmi\n      data.kategori || \u0027Advokat\u0027,\n      (data.pemberi \u0026\u0026 data.pemberi.nama) || \u0027\u0027,\n      (data.pemberi \u0026\u0026 data.pemberi.nik) || \u0027\u0027,\n      (data.pemberi \u0026\u0026 data.pemberi.pekerjaan) || \u0027\u0027,\n      (data.pemberi \u0026\u0026 data.pemberi.alamat) || \u0027\u0027,\n      (data.pemberi \u0026\u0026 data.pemberi.telepon) || \u0027\u0027,\n      (data.pemberi \u0026\u0026 data.pemberi.email) || \u0027\u0027,\n      (data.penerima \u0026\u0026 data.penerima.nama) || \u0027\u0027,\n      (data.penerima \u0026\u0026 data.penerima.identitas) || \u0027\u0027,\n      (data.penerima \u0026\u0026 data.penerima.kantor) || \u0027\u0027,\n      (data.penerima \u0026\u0026 data.penerima.telepon) || \u0027\u0027,\n      (data.penerima \u0026\u0026 data.penerima.alamat) || \u0027\u0027,\n      (data.materi \u0026\u0026 data.materi.jenisPerkara) || \u0027\u0027,\n      (data.materi \u0026\u0026 data.materi.nomorPerkara) || \u0027\u0027,\n      (data.materi \u0026\u0026 data.materi.uraian) || \u0027\u0027,\n      (data.berkas \u0026\u0026 data.berkas.ktp) || \u0027\u0027,\n      (data.berkas \u0026\u0026 data.berkas.kta) || \u0027\u0027,\n      \u0027Menunggu Verifikasi\u0027, // status\n      \u0027\u0027, // catatan_petugas\n      \u0027\u0027, // petugas_verifikator\n      \u0027\u0027, // pejabat_pengesah\n      \u0027\u0027, // tanggal_pengesahan\n      \u0027\u0027, // url_dokumen_pdf\n      hash,\n      20000 // total_biaya\n    ];\n\n    sh.appendRow(row);\n\n    // Invalidate Cache\n    CacheX.del(\u0027submissions_list\u0027);\n\n    // Catat Audit Log\n    catatLog_(\u0027PENDAFTARAN_BARU\u0027, newId, \u0027Pendaftaran kuasa mandiri diterima: \u0027 + (data.pemberi \u0026\u0026 data.pemberi.nama));\n\n    // Antrekan Notifikasi WhatsApp / Email Non-Blocking (Pola /gas-notifikasi-wa-crm)\n    antrekanNotifikasi_(\u0027PENDAFTARAN_MASUK\u0027, {\n      nama: data.pemberi \u0026\u0026 data.pemberi.nama,\n      hp: data.pemberi \u0026\u0026 data.pemberi.telepon,\n      email: data.pemberi \u0026\u0026 data.pemberi.email,\n      kode: newId,\n      link: prop_(\u0027APP_URL\u0027, \u0027https://pn-suratkuasa.github.io\u0027)\n    }, newId);\n\n    return { success: true, id: newId, hash: hash, message: \u0027Pendaftaran E-Surat Kuasa berhasil terkirim!\u0027 };\n  } finally {\n    lock.releaseLock();\n  }\n}\n\nfunction updateStatusVerifikasi(id, patch) {\n  const lock = LockService.getScriptLock();\n  if (!lock.tryLock(8000)) throw new Error(\u0027Gagal mengunci database untuk update.\u0027);\n\n  try {\n    const ss = getSpreadsheet();\n    const sh = ss.getSheetByName(\u0027Pengajuan\u0027);\n    const values = sh.getDataRange().getValues();\n    const headers = values[0];\n    const idCol = headers.indexOf(\u0027id_pengajuan\u0027);\n    const statusCol = headers.indexOf(\u0027status\u0027);\n    const catatanCol = headers.indexOf(\u0027catatan_petugas\u0027);\n    const petugasCol = headers.indexOf(\u0027petugas_verifikator\u0027);\n\n    let rowIdx = -1;\n    for (let i = 1; i \u003c values.length; i++) {\n      if (String(values[i][idCol]).toUpperCase() === String(id).toUpperCase()) {\n        rowIdx = i + 1;\n        break;\n      }\n    }\n\n    if (rowIdx === -1) throw new Error(\u0027Data permohonan \u0027 + id + \u0027 tidak ditemukan.\u0027);\n\n    if (patch.status) sh.getRange(rowIdx, statusCol + 1).setValue(patch.status);\n    if (patch.catatanPetugas !== undefined) sh.getRange(rowIdx, catatanCol + 1).setValue(patch.catatanPetugas);\n    if (patch.petugas) sh.getRange(rowIdx, petugasCol + 1).setValue(patch.petugas);\n\n    CacheX.del(\u0027submissions_list\u0027);\n    catatLog_(\u0027VERIFIKASI_BERKAS\u0027, id, \u0027Status diubah menjadi: \u0027 + patch.status);\n\n    return { success: true, message: \u0027Status berkas berhasil diperbarui.\u0027 };\n  } finally {\n    lock.releaseLock();\n  }\n}\n\nfunction sahkanDokumenPejabat(id, pin) {\n  // Verifikasi PIN Pejabat (Bawaan demo: 123456)\n  const masterPin = prop_(\u0027PEJABAT_PIN\u0027, \u0027123456\u0027);\n  if (String(pin) !== String(masterPin)) {\n    return { success: false, message: \u0027PIN Pengesahan Pejabat salah. Silakan coba lagi.\u0027 };\n  }\n\n  const lock = LockService.getScriptLock();\n  if (!lock.tryLock(8000)) throw new Error(\u0027Gagal mengunci database untuk pengesahan.\u0027);\n\n  try {\n    const ss = getSpreadsheet();\n    const sh = ss.getSheetByName(\u0027Pengajuan\u0027);\n    const values = sh.getDataRange().getValues();\n    const headers = values[0];\n    const idCol = headers.indexOf(\u0027id_pengajuan\u0027);\n    const statusCol = headers.indexOf(\u0027status\u0027);\n    const noRegCol = headers.indexOf(\u0027nomor_register_resmi\u0027);\n    const pejabatCol = headers.indexOf(\u0027pejabat_pengesah\u0027);\n    const tglCol = headers.indexOf(\u0027tanggal_pengesahan\u0027);\n\n    let rowIdx = -1;\n    for (let i = 1; i \u003c values.length; i++) {\n      if (String(values[i][idCol]).toUpperCase() === String(id).toUpperCase()) {\n        rowIdx = i + 1;\n        break;\n      }\n    }\n\n    if (rowIdx === -1) throw new Error(\u0027Data permohonan \u0027 + id + \u0027 tidak ditemukan.\u0027);\n\n    const noRegResmi = \u0027W11-U1/\u0027 + Math.floor(Math.random() * 800 + 200) + \u0027/HK.02/XI/2026\u0027;\n    const nowStr = Utilities.formatDate(new Date(), \u0027GMT+7\u0027, \u0027dd MMM yyyy, HH:mm\u0027) + \u0027 WIB\u0027;\n\n    sh.getRange(rowIdx, statusCol + 1).setValue(\u0027Disahkan/Terdaftar\u0027);\n    sh.getRange(rowIdx, noRegCol + 1).setValue(noRegResmi);\n    sh.getRange(rowIdx, pejabatCol + 1).setValue(\u0027Dr. H. Sulaiman, S.H., M.H. (Panitera)\u0027);\n    sh.getRange(rowIdx, tglCol + 1).setValue(nowStr);\n\n    CacheX.del(\u0027submissions_list\u0027);\n    catatLog_(\u0027PENGESAHAN_TTE\u0027, id, \u0027Disahkan resmi dengan nomor: \u0027 + noRegResmi);\n\n    return {\n      success: true,\n      nomorRegister: noRegResmi,\n      tanggalPengesahan: nowStr,\n      message: \u0027Surat Kuasa Resmi berhasil disahkan dan nomor registrasi telah diterbitkan!\u0027\n    };\n  } finally {\n    lock.releaseLock();\n  }\n}\n\nfunction getAdminMetrics() {\n  const res = getSubmissions();\n  const list = res.data || [];\n  return {\n    success: true,\n    data: {\n      total: list.length,\n      menunggu: list.filter(x =\u003e x.status === \u0027Menunggu Verifikasi\u0027).length,\n      pengesahan: list.filter(x =\u003e x.status === \u0027Menunggu Pengesahan\u0027).length,\n      terdaftar: list.filter(x =\u003e x.status === \u0027Disahkan/Terdaftar\u0027).length,\n      revisi: list.filter(x =\u003e x.status === \u0027Perlu Revisi\u0027).length\n    }\n  };\n}\n\nfunction catatLog_(aksi, idRef, keterangan) {\n  try {\n    const ss = getSpreadsheet();\n    const sh = ss.getSheetByName(\u0027Log_Aktivitas\u0027);\n    if (!sh) return;\n    sh.appendRow([\n      new Date().toISOString(),\n      \u0027SYSTEM/PETUGAS\u0027,\n      aksi,\n      idRef,\n      keterangan\n    ]);\n  } catch (e) {}\n}\n\nfunction antrekanNotifikasi_(event, data, refId) {\n  try {\n    const ss = getSpreadsheet();\n    const sh = ss.getSheetByName(\u0027AntrianNotif\u0027);\n    if (!sh) return;\n\n    sh.appendRow([\n      \u0027ANT-\u0027 + Utilities.getUuid().slice(0, 8),\n      \u0027WA\u0027,\n      data.hp || \u0027\u0027,\n      data.nama || \u0027Pemohon\u0027,\n      \u0027Status Pendaftaran E-Surat Kuasa\u0027,\n      \u0027Assalamu\\\u0027alaikum \u0027 + data.nama + \u0027, pendaftaran Surat Kuasa Anda telah kami terima dengan nomor agenda \u0027 + data.kode + \u0027. Silakan lacak status di portal resmi.\u0027,\n      event,\n      refId,\n      \u0027Antri\u0027,\n      new Date().toISOString()\n    ]);\n    PROPS.setProperty(\u0027ANTRIAN_ADA\u0027, \u00271\u0027);\n  } catch (e) {}\n}\n","d":"Inti REST API: doGet \u0026 doPost, CacheX chunking, telemetri, router, antrean notifikasi","l":459},{"how":"Di Apps Script klik \u003cb\u003e+\u003c/b\u003e di samping \u003cb\u003eBerkas\u003c/b\u003e \u0026rarr; \u003cb\u003eSkrip\u003c/b\u003e \u0026rarr; tekan \u003cb\u003e① Salin nama\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+V\u003c/b\u003e \u0026rarr; \u003cb\u003eEnter\u003c/b\u003e. Lalu tekan \u003cb\u003e② Salin isi\u003c/b\u003e \u0026rarr; klik area kode \u0026rarr; \u003cb\u003eCtrl+A\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+V\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+S\u003c/b\u003e.","special":false,"n":"Setup.gs","c":"/**\n * SETUP ENVIRONMENT OTOMATIS (IDEMPOTEN)\n * Jalankan fungsi setupAppEnvironment() SEKALI melalui Google Apps Script Editor.\n * \n * Sesuai prinsip /gas-pro-api \u0026 /gas-rahasia-script-properties:\n * - Menyiapkan folder Google Drive otomatis\n * - Menyiapkan Google Spreadsheet dengan seluruh skema header tabel PRD\n * - Menyimpan seluruh ID \u0026 rahasia ke Script Properties secara aman\n */\n\nfunction setupAppEnvironment() {\n  const APP_NAME = \u0027E-Surat Kuasa Pengadilan Negeri\u0027;\n  Logger.log(\u0027🚀 Memulai inisialisasi lingkungan \u0027 + APP_NAME + \u0027...\u0027);\n\n  const props = PropertiesService.getScriptProperties();\n\n  // 1. Folder Google Drive\n  let rootFolderId = props.getProperty(\u0027ROOT_FOLDER_ID\u0027);\n  let rootFolder;\n  if (!rootFolderId) {\n    rootFolder = DriveApp.createFolder(\u0027📁 [Sistem] \u0027 + APP_NAME);\n    rootFolderId = rootFolder.getId();\n    props.setProperty(\u0027ROOT_FOLDER_ID\u0027, rootFolderId);\n    Logger.log(\u0027📁 Root Folder dibuat: \u0027 + rootFolder.getName());\n  } else {\n    rootFolder = DriveApp.getFolderById(rootFolderId);\n    Logger.log(\u0027📁 Root Folder sudah ada: \u0027 + rootFolder.getName());\n  }\n\n  let uploadsFolderId = props.getProperty(\u0027UPLOADS_FOLDER\u0027);\n  if (!uploadsFolderId) {\n    const uploadsFolder = rootFolder.createFolder(\u0027📂 Berkas_Identitas\u0027);\n    uploadsFolderId = uploadsFolder.getId();\n    props.setProperty(\u0027UPLOADS_FOLDER\u0027, uploadsFolderId);\n  }\n\n  let exportsFolderId = props.getProperty(\u0027EXPORTS_FOLDER\u0027);\n  if (!exportsFolderId) {\n    const exportsFolder = rootFolder.createFolder(\u0027📂 Dokumen_Resmi_PDF\u0027);\n    exportsFolderId = exportsFolder.getId();\n    props.setProperty(\u0027EXPORTS_FOLDER\u0027, exportsFolderId);\n  }\n\n  // 2. Google Spreadsheet Database\n  let ssId = props.getProperty(\u0027SPREADSHEET_ID\u0027);\n  let ss;\n  if (!ssId) {\n    ss = SpreadsheetApp.create(\u0027🗃️ Database — \u0027 + APP_NAME);\n    ssId = ss.getId();\n    props.setProperty(\u0027SPREADSHEET_ID\u0027, ssId);\n\n    // Pindahkan file spreadsheet ke Root Folder\n    DriveApp.getFileById(ssId).moveTo(rootFolder);\n    Logger.log(\u0027🗃️ Spreadsheet baru dibuat: \u0027 + ss.getName());\n  } else {\n    ss = SpreadsheetApp.openById(ssId);\n    Logger.log(\u0027🗃️ Menggunakan Spreadsheet terdaftar: \u0027 + ss.getName());\n  }\n\n  // 3. Setup Sheet \"Pengajuan\"\n  let shPengajuan = ss.getSheetByName(\u0027Pengajuan\u0027);\n  if (!shPengajuan) {\n    shPengajuan = ss.insertSheet(\u0027Pengajuan\u0027);\n    shPengajuan.appendRow([\n      \u0027id_pengajuan\u0027,\n      \u0027tanggal_daftar\u0027,\n      \u0027nomor_register_resmi\u0027,\n      \u0027kategori_pemohon\u0027,\n      \u0027nama_pemberi_kuasa\u0027,\n      \u0027nik_pemberi_kuasa\u0027,\n      \u0027pekerjaan_pemberi_kuasa\u0027,\n      \u0027alamat_pemberi_kuasa\u0027,\n      \u0027no_wa_pemohon\u0027,\n      \u0027email_pemohon\u0027,\n      \u0027nama_penerima_kuasa\u0027,\n      \u0027identitas_penerima_kuasa\u0027,\n      \u0027kantor_penerima_kuasa\u0027,\n      \u0027no_wa_penerima\u0027,\n      \u0027alamat_penerima_kuasa\u0027,\n      \u0027jenis_perkara\u0027,\n      \u0027nomor_perkara\u0027,\n      \u0027lingkup_wewenang\u0027,\n      \u0027url_ktp_pemberi\u0027,\n      \u0027url_kta_penerima\u0027,\n      \u0027status\u0027,\n      \u0027catatan_petugas\u0027,\n      \u0027petugas_verifikator\u0027,\n      \u0027pejabat_pengesah\u0027,\n      \u0027tanggal_pengesahan\u0027,\n      \u0027url_dokumen_pdf\u0027,\n      \u0027hash_verifikasi\u0027,\n      \u0027total_biaya\u0027\n    ]);\n\n    // Format Header Baris 1\n    shPengajuan.getRange(1, 1, 1, 28).setBackground(\u0027#0D5236\u0027).setFontColor(\u0027#FFFFFF\u0027).setFontWeight(\u0027bold\u0027);\n    shPengajuan.setFrozenRows(1);\n\n    // Seed Data Awal\n    shPengajuan.appendRow([\n      \u0027REG-202611-0088\u0027,\n      \u00272026-11-14T08:55:00.000Z\u0027,\n      \u0027W11-U1/241/HK.02/XI/2026\u0027,\n      \u0027Advokat\u0027,\n      \u0027Ir. Suryo Pratomo\u0027,\n      \u00273175081905780003\u0027,\n      \u0027Direktur Utama\u0027,\n      \u0027Jl. Merdeka Barat No. 22, Gambir, Jakarta Pusat\u0027,\n      \u0027081688992211\u0027,\n      \u0027suryo.pratomo@ptkaryamandiri.co.id\u0027,\n      \u0027Denny Siregar, S.H., M.H.\u0027,\n      \u002709.21841/PERADI\u0027,\n      \u0027Kantor Advokat Denny Siregar \u0026 Rekan\u0027,\n      \u0027081299001122\u0027,\n      \u0027Sudirman Tower Lt. 18, Jakarta Selatan\u0027,\n      \u0027Perdata Gugatan\u0027,\n      \u002789/Pdt.G/2026/PN\u0027,\n      \u0027Mewakili secara penuh untuk menghadiri persidangan, perdamaian/mediasi, mengajukan replik, kesimpulan, hingga upaya hukum banding.\u0027,\n      \u0027\u0027,\n      \u0027\u0027,\n      \u0027Disahkan/Terdaftar\u0027,\n      \u0027Berkas lengkap dan absah.\u0027,\n      \u0027Ahmad Syafii, S.Kom.\u0027,\n      \u0027Dr. H. Sulaiman, S.H., M.H. (Panitera)\u0027,\n      \u002714 Nov 2026, 11:42 WIB\u0027,\n      \u0027\u0027,\n      \u0027a8f4b23c91e56b8209dc47120fe817c0326e0802c61148e100f917208d7d91e0\u0027,\n      20000\n    ]);\n  }\n\n  // 4. Setup Sheet \"Master_Pengguna\"\n  let shPengguna = ss.getSheetByName(\u0027Master_Pengguna\u0027);\n  if (!shPengguna) {\n    shPengguna = ss.insertSheet(\u0027Master_Pengguna\u0027);\n    shPengguna.appendRow([\u0027user_id\u0027, \u0027username\u0027, \u0027nama_lengkap\u0027, \u0027nip\u0027, \u0027jabatan\u0027, \u0027role\u0027, \u0027status_aktif\u0027]);\n    shPengguna.getRange(1, 1, 1, 7).setBackground(\u0027#0D5236\u0027).setFontColor(\u0027#FFFFFF\u0027).setFontWeight(\u0027bold\u0027);\n    shPengguna.setFrozenRows(1);\n\n    shPengguna.appendRow([\u0027USR-01\u0027, \u0027admin\u0027, \u0027Administrator IT Pengadilan\u0027, \u002719850101 201001 1 001\u0027, \u0027Pranata Komputer\u0027, \u0027ADMIN\u0027, true]);\n    shPengguna.appendRow([\u0027USR-02\u0027, \u0027petugas1\u0027, \u0027Ahmad Syafii, S.Kom.\u0027, \u002719920315 201602 1 003\u0027, \u0027Staf PTSP Meja 1\u0027, \u0027PETUGAS\u0027, true]);\n    shPengguna.appendRow([\u0027USR-03\u0027, \u0027panitera\u0027, \u0027Dr. H. Sulaiman, S.H., M.H.\u0027, \u002719740512 199903 1 002\u0027, \u0027Panitera Pengadilan Negeri\u0027, \u0027PEJABAT\u0027, true]);\n  }\n\n  // 5. Setup Sheet \"AppConfig\"\n  let shConfig = ss.getSheetByName(\u0027AppConfig\u0027);\n  if (!shConfig) {\n    shConfig = ss.insertSheet(\u0027AppConfig\u0027);\n    shConfig.appendRow([\u0027key\u0027, \u0027value\u0027, \u0027keterangan\u0027]);\n    shConfig.getRange(1, 1, 1, 3).setBackground(\u0027#0D5236\u0027).setFontColor(\u0027#FFFFFF\u0027).setFontWeight(\u0027bold\u0027);\n    shConfig.setFrozenRows(1);\n\n    shConfig.appendRow([\u0027APP_NAME\u0027, APP_NAME, \u0027Nama Aplikasi\u0027]);\n    shConfig.appendRow([\u0027INSTANSI\u0027, \u0027Pengadilan Negeri Kelas I A Khusus\u0027, \u0027Nama Lembaga\u0027]);\n    shConfig.appendRow([\u0027HOTLINE_PTSP\u0027, \u0027(021) 8092-2345\u0027, \u0027Hotline Bantuan PTSP\u0027]);\n    shConfig.appendRow([\u0027BIAYA_PNBP\u0027, \u002710000\u0027, \u0027Tarif PNBP Pendaftaran Kuasa\u0027]);\n    shConfig.appendRow([\u0027BIAYA_EMETERAI\u0027, \u002710000\u0027, \u0027Tarif Meterai Elektronik\u0027]);\n    shConfig.appendRow([\u0027CREATED_AT\u0027, new Date().toISOString(), \u0027Waktu Setup Awal\u0027]);\n  }\n\n  // 6. Setup Sheet \"Log_Aktivitas\"\n  let shLog = ss.getSheetByName(\u0027Log_Aktivitas\u0027);\n  if (!shLog) {\n    shLog = ss.insertSheet(\u0027Log_Aktivitas\u0027);\n    shLog.appendRow([\u0027timestamp\u0027, \u0027user\u0027, \u0027aksi\u0027, \u0027id_ref\u0027, \u0027keterangan\u0027]);\n    shLog.getRange(1, 1, 1, 5).setBackground(\u0027#0D5236\u0027).setFontColor(\u0027#FFFFFF\u0027).setFontWeight(\u0027bold\u0027);\n    shLog.setFrozenRows(1);\n    shLog.appendRow([new Date().toISOString(), \u0027SYSTEM\u0027, \u0027INITIAL_SETUP\u0027, \u0027SETUP\u0027, \u0027Lingkungan database berhasil diinisialisasi.\u0027]);\n  }\n\n  // 7. Setup Sheet \"AntrianNotif\" (Pola /gas-notifikasi-wa-crm)\n  let shNotif = ss.getSheetByName(\u0027AntrianNotif\u0027);\n  if (!shNotif) {\n    shNotif = ss.insertSheet(\u0027AntrianNotif\u0027);\n    shNotif.appendRow([\u0027AntrianID\u0027, \u0027Kanal\u0027, \u0027Tujuan\u0027, \u0027NamaPenerima\u0027, \u0027Subjek\u0027, \u0027Pesan\u0027, \u0027Event\u0027, \u0027RefID\u0027, \u0027Status\u0027, \u0027DibuatPada\u0027]);\n    shNotif.getRange(1, 1, 1, 10).setBackground(\u0027#0D5236\u0027).setFontColor(\u0027#FFFFFF\u0027).setFontWeight(\u0027bold\u0027);\n    shNotif.setFrozenRows(1);\n  }\n\n  // 8. Hapus Sheet default bawaan Spreadsheet jika bernama \"Sheet1\"\n  const defaultSheet = ss.getSheetByName(\u0027Sheet1\u0027);\n  if (defaultSheet \u0026\u0026 ss.getSheets().length \u003e 1) {\n    ss.deleteSheet(defaultSheet);\n  }\n\n  // 9. Konfigurasi Default Script Properties Kritis\n  if (!props.getProperty(\u0027SESSION_SECRET\u0027)) {\n    props.setProperty(\u0027SESSION_SECRET\u0027, Utilities.getUuid() + \u0027-\u0027 + Utilities.getUuid());\n  }\n  if (!props.getProperty(\u0027PEJABAT_PIN\u0027)) {\n    props.setProperty(\u0027PEJABAT_PIN\u0027, \u0027123456\u0027); // Default PIN Pengesahan\n  }\n\n  Logger.log(\u0027=====================================================\u0027);\n  Logger.log(\u0027✅ SETUP SUKSES!\u0027);\n  Logger.log(\u0027🔗 URL Spreadsheet Database : \u0027 + ss.getUrl());\n  Logger.log(\u0027📁 URL Root Folder Google Drive: \u0027 + rootFolder.getUrl());\n  Logger.log(\u0027🔐 SPREADSHEET_ID            : \u0027 + ssId);\n  Logger.log(\u0027=====================================================\u0027);\n  Logger.log(\u0027Langkah Berikutnya:\u0027);\n  Logger.log(\u00271. Buka Deploy \u003e New deployment \u003e Web app\u0027);\n  Logger.log(\u00272. Execute as: Me, Who has access: Anyone\u0027);\n  Logger.log(\u00273. Salin URL /exec dan tempelkan ke js/config.js di frontend\u0027);\n}\n","d":"Inisialisasi lingkungan: membuat folder Drive, Spreadsheet, 6 tabel PRD, akun awal","l":205},{"how":"Di Apps Script klik \u003cb\u003e+\u003c/b\u003e di samping \u003cb\u003eBerkas\u003c/b\u003e \u0026rarr; \u003cb\u003eSkrip\u003c/b\u003e \u0026rarr; tekan \u003cb\u003e① Salin nama\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+V\u003c/b\u003e \u0026rarr; \u003cb\u003eEnter\u003c/b\u003e. Lalu tekan \u003cb\u003e② Salin isi\u003c/b\u003e \u0026rarr; klik area kode \u0026rarr; \u003cb\u003eCtrl+A\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+V\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+S\u003c/b\u003e.","special":false,"n":"Notifikasi.gs","c":"/**\n * MODUL NOTIFIKASI WHATSAPP (FONNTE) \u0026 EMAIL\n * Sesuai prinsip /gas-notifikasi-wa-crm:\n * - Antrean non-blocking (0ms delay pada transaksi utama pendaftaran)\n * - Pemrosesan batch berkala via Trigger (prosesAntrianNotif)\n * - Token Fonnte disimpan aman di Script Properties (FONNTE_TOKEN)\n * - Normalisasi nomor telepon otomatis (08... -\u003e 62...)\n */\n\n// =========================================================================\n// 1. HELPER NORMALISASI NOMOR TELEPON\n// =========================================================================\n\nfunction hp62_(hp) {\n  let s = String(hp || \u0027\u0027).replace(/[^0-9]/g, \u0027\u0027);\n  if (s.startsWith(\u00270\u0027)) s = \u002762\u0027 + s.slice(1);\n  else if (s.startsWith(\u00278\u0027)) s = \u002762\u0027 + s;\n  return s;\n}\n\nfunction hp08_(hp) {\n  let s = String(hp || \u0027\u0027).replace(/[^0-9]/g, \u0027\u0027);\n  if (s.startsWith(\u002762\u0027)) s = \u00270\u0027 + s.slice(2);\n  else if (s.startsWith(\u00278\u0027)) s = \u00270\u0027 + s;\n  return s;\n}\n\n// =========================================================================\n// 2. PEMROSESAN ANTREAN NOTIFIKASI (TRIGGER BACKGROUND RUNNER)\n// =========================================================================\n\nfunction prosesAntrianNotif(opsi) {\n  opsi = opsi || {};\n  const props = PropertiesService.getScriptProperties();\n  if (!opsi.paksa \u0026\u0026 props.getProperty(\u0027ANTRIAN_ADA\u0027) !== \u00271\u0027) return;\n\n  const lock = LockService.getScriptLock();\n  if (!lock.tryLock(8000)) return;\n\n  try {\n    const ss = getSpreadsheet();\n    const sh = ss.getSheetByName(\u0027AntrianNotif\u0027);\n    if (!sh) return;\n\n    const values = sh.getDataRange().getValues();\n    if (values.length \u003c= 1) {\n      props.setProperty(\u0027ANTRIAN_ADA\u0027, \u00270\u0027);\n      return;\n    }\n\n    const headers = values[0];\n    const statusIdx = headers.indexOf(\u0027Status\u0027);\n    const kanalIdx = headers.indexOf(\u0027Kanal\u0027);\n    const tujuanIdx = headers.indexOf(\u0027Tujuan\u0027);\n    const subjekIdx = headers.indexOf(\u0027Subjek\u0027);\n    const pesanIdx = headers.indexOf(\u0027Pesan\u0027);\n\n    const fonnteToken = props.getProperty(\u0027FONNTE_TOKEN\u0027);\n    let hasPending = false;\n\n    for (let r = 1; r \u003c values.length; r++) {\n      const status = values[r][statusIdx];\n      if (status !== \u0027Antri\u0027) continue;\n\n      const kanal = values[r][kanalIdx];\n      const tujuan = values[r][tujuanIdx];\n      const subjek = values[r][subjekIdx];\n      const pesan = values[r][pesanIdx];\n\n      let success = false;\n\n      // 1. Kirim via WhatsApp (Fonnte API)\n      if (kanal === \u0027WA\u0027 \u0026\u0026 fonnteToken \u0026\u0026 tujuan) {\n        try {\n          const res = UrlFetchApp.fetch(\u0027https://api.fonnte.com/send\u0027, {\n            method: \u0027post\u0027,\n            headers: { \u0027Authorization\u0027: fonnteToken },\n            payload: {\n              target: hp62_(tujuan),\n              message: pesan,\n              countryCode: \u002762\u0027\n            },\n            muteHttpExceptions: true\n          });\n          const resCode = res.getResponseCode();\n          if (resCode \u003e= 200 \u0026\u0026 resCode \u003c 300) success = true;\n        } catch (e) {\n          Logger.log(\u0027WA Send Error: \u0027 + e.message);\n        }\n      }\n\n      // 2. Kirim via Email (MailApp)\n      if (kanal === \u0027EMAIL\u0027 \u0026\u0026 tujuan \u0026\u0026 tujuan.includes(\u0027@\u0027)) {\n        try {\n          MailApp.sendEmail({\n            to: tujuan,\n            subject: subjek || \u0027Pemberitahuan E-Surat Kuasa Pengadilan Negeri\u0027,\n            body: pesan\n          });\n          success = true;\n        } catch (e) {\n          Logger.log(\u0027Email Send Error: \u0027 + e.message);\n        }\n      }\n\n      // Update status antrean\n      sh.getRange(r + 1, statusIdx + 1).setValue(success ? \u0027Terkirim\u0027 : \u0027Gagal\u0027);\n      Utilities.sleep(1500); // Jeda aman antar pesan\n    }\n\n    props.setProperty(\u0027ANTRIAN_ADA\u0027, hasPending ? \u00271\u0027 : \u00270\u0027);\n  } catch (err) {\n    Logger.log(\u0027prosesAntrianNotif Exception: \u0027 + err.message);\n  } finally {\n    lock.releaseLock();\n  }\n}\n\n// =========================================================================\n// 3. PASANG TRIGGER WAKTU OTOMATIS (SETIAP 1-5 MENIT)\n// =========================================================================\n\nfunction pasangTriggerNotifikasi() {\n  // Hapus trigger lama agar tidak dobel\n  const triggers = ScriptApp.getProjectTriggers();\n  triggers.forEach(t =\u003e {\n    if (t.getHandlerFunction() === \u0027prosesAntrianNotif\u0027) {\n      ScriptApp.deleteTrigger(t);\n    }\n  });\n\n  // Buat trigger waktu baru per 5 menit\n  ScriptApp.newTrigger(\u0027prosesAntrianNotif\u0027)\n    .timeBased()\n    .everyMinutes(5)\n    .create();\n\n  Logger.log(\u0027✅ Trigger otomatis prosesAntrianNotif (setiap 5 menit) berhasil dipasang.\u0027);\n}\n","d":"Modul notifikasi: pengiriman WhatsApp via Fonnte API, email via MailApp, antrean non-blocking","l":140},{"how":"Di Apps Script klik \u003cb\u003e+\u003c/b\u003e di samping \u003cb\u003eBerkas\u003c/b\u003e \u0026rarr; \u003cb\u003eSkrip\u003c/b\u003e \u0026rarr; tekan \u003cb\u003e① Salin nama\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+V\u003c/b\u003e \u0026rarr; \u003cb\u003eEnter\u003c/b\u003e. Lalu tekan \u003cb\u003e② Salin isi\u003c/b\u003e \u0026rarr; klik area kode \u0026rarr; \u003cb\u003eCtrl+A\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+V\u003c/b\u003e \u0026rarr; \u003cb\u003eCtrl+S\u003c/b\u003e.","special":false,"n":"Migrasi.gs","c":"/**\n * MODUL MIGRASI \u0026 SINKRONISASI DATABASE SPREADSHEET\n * Sesuai prinsip /gas-migrasi-database:\n * - Spreadsheet lama TIDAK PERNAH diubah/ditulis (Read-Only)\n * - Pemetaan kolom berbasis nama header (bukan indeks sel)\n * - Upsert idempoten berdasarkan id_pengajuan (bebas duplikat)\n * - Mendukung mode simulasi (dry-run) sebelum eksekusi nyata\n */\n\nfunction migrasiDataLama(idOrUrlSpreadsheetLama, dryRun) {\n  if (dryRun === undefined) dryRun = true;\n\n  Logger.log(\u0027🔍 Memulai \u0027 + (dryRun ? \u0027[SIMULASI DRY-RUN]\u0027 : \u0027[EKSEKUSI NYATA]\u0027) + \u0027 migrasi data...\u0027);\n\n  const m = String(idOrUrlSpreadsheetLama).match(/\\/d\\/([A-Za-z0-9_-]{20,})/);\n  const srcId = m ? m[1] : String(idOrUrlSpreadsheetLama).trim();\n\n  const currentId = PropertiesService.getScriptProperties().getProperty(\u0027SPREADSHEET_ID\u0027);\n  if (srcId === currentId) {\n    throw new Error(\u0027ID Spreadsheet yang dimasukkan sama dengan Spreadsheet aktif saat ini. Masukkan ID Spreadsheet LAMA.\u0027);\n  }\n\n  const srcSs = SpreadsheetApp.openById(srcId);\n  const srcSh = srcSs.getSheetByName(\u0027Pengajuan\u0027) || srcSs.getSheets()[0];\n  if (!srcSh) throw new Error(\u0027Sheet sumber data tidak ditemukan.\u0027);\n\n  const srcValues = srcSh.getDataRange().getValues();\n  if (srcValues.length \u003c= 1) {\n    Logger.log(\u0027Spreadsheet lama tidak memiliki baris data.\u0027);\n    return { inserted: 0, updated: 0, skipped: 0 };\n  }\n\n  const srcHeaders = srcValues[0].map(String);\n  const srcRows = srcValues.slice(1).map(r =\u003e {\n    const o = {};\n    srcHeaders.forEach((h, i) =\u003e { if (h) o[h] = r[i]; });\n    return o;\n  });\n\n  // Siapkan Target Sheet Aktif\n  const targetSs = SpreadsheetApp.openById(currentId);\n  const targetSh = targetSs.getSheetByName(\u0027Pengajuan\u0027);\n  const targetValues = targetSh.getDataRange().getValues();\n  const targetHeaders = targetValues[0].map(String);\n\n  // Buat index baris target berdasarkan id_pengajuan\n  const targetIndex = {};\n  const idColIdx = targetHeaders.indexOf(\u0027id_pengajuan\u0027);\n  for (let r = 1; r \u003c targetValues.length; r++) {\n    const key = String(targetValues[r][idColIdx]).trim().toUpperCase();\n    if (key) targetIndex[key] = r;\n  }\n\n  let countInserted = 0;\n  let countUpdated = 0;\n  let countSkipped = 0;\n  const newRows = [];\n\n  srcRows.forEach(src =\u003e {\n    const key = String(src[\u0027id_pengajuan\u0027] || src[\u0027id\u0027] || \u0027\u0027).trim().toUpperCase();\n    if (!key) {\n      countSkipped++;\n      return;\n    }\n\n    if (targetIndex[key] !== undefined) {\n      // Data sudah ada di target -\u003e periksa apakah ada update status\n      countSkipped++;\n    } else {\n      // Data baru -\u003e petakan ke header target\n      const newRow = targetHeaders.map(th =\u003e {\n        return src[th] !== undefined ? src[th] : \u0027\u0027;\n      });\n      newRows.push(newRow);\n      countInserted++;\n    }\n  });\n\n  if (!dryRun \u0026\u0026 newRows.length \u003e 0) {\n    const startRow = targetValues.length + 1;\n    targetSh.getRange(startRow, 1, newRows.length, targetHeaders.length).setValues(newRows);\n    Logger.log(\u0027✅ Berhasil menyisipkan \u0027 + newRows.length + \u0027 baris data baru ke sheet target.\u0027);\n  }\n\n  Logger.log(\u0027Hasil Migrasi: Inserted=\u0027 + countInserted + \u0027, Updated=\u0027 + countUpdated + \u0027, Skipped=\u0027 + countSkipped);\n  return {\n    dryRun: dryRun,\n    inserted: countInserted,\n    updated: countUpdated,\n    skipped: countSkipped\n  };\n}\n","d":"Utilitas migrasi database: sinkronisasi spreadsheet lama ke skema baru secara aman (dry-run)","l":93}]</script>
+<script>
+(function () {
+  'use strict';
+  var SET = JSON.parse(document.getElementById('setelan').textContent);
+  var FILES = JSON.parse(document.getElementById('berkas').textContent);
+  var st = { steps: {}, files: {}, inp: {} };
+  try { var raw = localStorage.getItem(SET.storageKey); if (raw) { var o = JSON.parse(raw); st.steps = o.steps || {}; st.files = o.files || {}; st.inp = o.inp || {}; } } catch (e) { }
+  function simpan() { try { localStorage.setItem(SET.storageKey, JSON.stringify(st)); } catch (e) { } }
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var el = function (id) { return document.getElementById(id); };
+  var teks = function (id, t) { var e = el(id); if (e) e.textContent = t; };
+  var status = function (id, kosong, ok, pesanOk, pesanBad) { var e = el(id); if (!e) return; e.textContent = kosong ? '' : ok ? pesanOk : pesanBad; e.className = 'st ' + (kosong ? '' : ok ? 'ok' : 'bad'); };
+
+  /* ---------- salin ke papan klip (dengan cadangan) */
+  var tt;
+  function toast(msg) { var t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); } t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(function () { t.hidden = true; }, 1800); }
+  function cadangan(text, judul) {
+    var d = document.createElement('div'); d.className = 'dlg';
+    d.innerHTML = '<div class="box" role="dialog" aria-modal="true" aria-label="Salin manual"><b></b><span style="font-size:14px">Teks sudah terpilih. Tekan <b>Ctrl+C</b> (Mac: <b>⌘+C</b>), lalu tutup jendela ini.</span><textarea readonly></textarea><div class="row" style="justify-content:flex-end"><button class="btn main" type="button">Tutup</button></div></div>';
+    $('b', d).textContent = judul || 'Salin manual'; var ta = $('textarea', d); ta.value = text;
+    document.body.appendChild(d); ta.focus(); ta.select(); try { ta.setSelectionRange(0, text.length); } catch (e) { }
+    var tutup = function () { d.remove(); document.removeEventListener('keydown', esc); };
+    var esc = function (e) { if (e.key === 'Escape') tutup(); };
+    $('button', d).onclick = tutup; d.addEventListener('click', function (e) { if (e.target === d) tutup(); }); document.addEventListener('keydown', esc);
+  }
+  function salin(text, label, btn) {
+    var ok = function () { toast(label + ' tersalin ✓'); if (btn) { var o = btn.getAttribute('data-orig') || btn.innerHTML; btn.setAttribute('data-orig', o); btn.innerHTML = 'Tersalin ✓'; btn.classList.add('ok'); setTimeout(function () { btn.innerHTML = o; btn.classList.remove('ok'); }, 1600); } };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, function () { cadangan(text, label); });
+      else cadangan(text, label);
+    } catch (e) { cadangan(text, label); }
+  }
+
+  /* ---------- stasiun berkas backend */
+  var filesEl = el('files'), helper = el('helper');
+  function namaApps(f) { return f.n.replace(/\.gs$/, ''); }
+  function berikut() { for (var i = 0; i < FILES.length; i++) if (!st.files[FILES[i].n]) return i; return -1; }
+  function renderFiles() {
+    filesEl.innerHTML = '';
+    FILES.forEach(function (f, i) {
+      var li = document.createElement('li'); li.className = 'file'; li.id = 'f-' + i;
+      li.innerHTML = '<span class="i"></span><span class="nm"></span><span class="acts"></span><span class="desc"></span><details><summary>Lihat isi berkas</summary><pre class="code"></pre></details>';
+      $('.nm', li).textContent = f.n; var sm = document.createElement('small'); sm.textContent = f.l + ' baris'; $('.nm', li).appendChild(sm);
+      $('.desc', li).textContent = f.d;
+      var acts = $('.acts', li);
+      var bN = document.createElement('button'); bN.type = 'button'; bN.className = 'btn sm'; bN.textContent = 'Salin nama';
+      if (f.special) { bN.disabled = true; bN.title = 'Berkas ini sudah ada, cukup ganti isinya'; }
+      bN.onclick = function () { salin(namaApps(f), 'Nama ' + namaApps(f), bN); };
+      var bI = document.createElement('button'); bI.type = 'button'; bI.className = 'btn sm main'; bI.textContent = 'Salin isi';
+      bI.onclick = function () { salin(f.c, 'Isi ' + f.n, bI); };
+      var lab = document.createElement('label'); lab.className = 'tick'; lab.style.padding = '4px 10px'; lab.style.fontSize = '13.5px';
+      var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!st.files[f.n]; cb.setAttribute('aria-label', f.n + ' sudah ditempel');
+      cb.onchange = function () { st.files[f.n] = cb.checked; simpan(); segarkan(); };
+      lab.appendChild(cb); lab.appendChild(document.createTextNode(' Sudah'));
+      acts.appendChild(bN); acts.appendChild(bI); acts.appendChild(lab);
+      var det = $('details', li); det.addEventListener('toggle', function () { var p = $('pre', det); if (det.open && !p.textContent) p.textContent = f.c; });
+      filesEl.appendChild(li);
+    });
+  }
+  function renderHelper() {
+    var i = berikut();
+    if (i < 0) { helper.className = 'helper selesai'; helper.innerHTML = '<div class="lbl">Selesai</div><div class="cur"><b></b><span>Semua berkas sudah ditempel. Lanjut ke langkah berikutnya.</span></div>'; $('.cur b', helper).textContent = FILES.length + '/' + FILES.length + ' berkas'; return; }
+    var f = FILES[i]; helper.className = 'helper';
+    helper.innerHTML = '<div class="lbl"></div><div class="cur"><b></b><span></span></div><p class="how"></p><div class="row"></div>';
+    $('.lbl', helper).textContent = 'Berkas berikutnya · ' + (i + 1) + ' dari ' + FILES.length;
+    $('.cur b', helper).textContent = f.special ? f.n : namaApps(f);
+    $('.cur span', helper).textContent = f.l + ' baris · ' + f.d;
+    $('.how', helper).innerHTML = f.how;
+    var row = $('.row', helper);
+    if (!f.special) { var b1 = document.createElement('button'); b1.type = 'button'; b1.className = 'btn'; b1.textContent = '① Salin nama'; b1.onclick = function () { salin(namaApps(f), 'Nama ' + namaApps(f), b1); }; row.appendChild(b1); }
+    var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'btn main'; b2.textContent = (f.special ? '① ' : '② ') + 'Salin isi'; b2.onclick = function () { salin(f.c, 'Isi ' + f.n, b2); }; row.appendChild(b2);
+    var b3 = document.createElement('button'); b3.type = 'button'; b3.className = 'btn ok'; b3.textContent = 'Sudah, lanjut ▸'; b3.onclick = function () { st.files[f.n] = true; simpan(); segarkan(); helper.scrollIntoView({ block: 'nearest' }); }; row.appendChild(b3);
+  }
+  el('resetFiles').onclick = function () { st.files = {}; simpan(); segarkan(); toast('Daftar berkas diulang dari awal'); };
+
+  /* ---------- langkah bercentang */
+  $$('.step').forEach(function (s) {
+    var id = s.getAttribute('data-step'), cb = $('.tick > input', s);
+    if (!cb) return;
+    if (!cb.id) cb.id = 'cek-' + id;
+    cb.checked = !!st.steps[id];
+    cb.addEventListener('change', function () { st.steps[id] = cb.checked; simpan(); segarkan(); });
+  });
+
+  /* ---------- isian pribadi -> perintah & tautan */
+  ['inGas', 'inNama', 'inEmail', 'inUser', 'inRepo', 'inWeb'].forEach(function (id) { var e = el(id); if (!e) return; if (st.inp[id] != null) e.value = st.inp[id]; e.addEventListener('input', function () { st.inp[id] = e.value.trim(); simpan(); isi(); }); });
+  function v(id) { var e = el(id); return e ? (e.value || '').trim() : ''; }
+  function web() { var w = v('inWeb').replace(/\/+$/, ''); if (w && !/^https?:\/\//.test(w)) w = 'https://' + w; return w; }
+  function isi() {
+    var gas = v('inGas'), gasOk = /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(gas);
+    status('stGas', !gas, gasOk, '✓ Format URL benar', '✗ URL harus diawali https://script.google.com/macros/s/ dan berakhiran /exec');
+    var lp = el('lnkPing'); if (lp) { if (gasOk) { lp.href = gas + SET.pingSuffix; lp.removeAttribute('aria-disabled'); lp.classList.add('main'); } else { lp.href = '#tempel'; lp.setAttribute('aria-disabled', 'true'); lp.classList.remove('main'); } }
+    teks('cfgOut', SET.configTpl.replace('{gas}', gasOk ? gas : 'TEMPEL_URL_EXEC_DARI_BAGIAN_A'));
+    teks('cfgLbl', gasOk ? 'Sudah memakai URL dari bagian A.' : 'Isi URL /exec di bagian A dulu agar alamat ini terisi otomatis.');
+    var map = { nama: v('inNama') || 'Nama Lengkap', email: v('inEmail') || 'email@contoh.com', user: v('inUser') || 'USERNAME', repo: v('inRepo') || SET.repo };
+    $$('pre[data-tpl]').forEach(function (p) { p.textContent = p.getAttribute('data-tpl').replace(/\{(\w+)\}/g, function (m, k) { return map[k]; }); });
+    var w = web(), wOk = /^https:\/\/[^\s/]+\.[^\s/]+/.test(w), contoh = 'https://' + map.user.toLowerCase() + '.github.io/' + map.repo + '/';
+    status('stWeb', !w, wOk, '✓ Alamat dicatat', '✗ Masukkan alamat GitHub Pages lengkap');
+    var ll = el('lnkLogin'); if (ll) ll.href = wOk ? w : '#frontend';
+  }
+  var lp0 = el('lnkPing'); if (lp0) lp0.addEventListener('click', function (e) { if (this.getAttribute('aria-disabled')) { e.preventDefault(); toast('Tempel URL /exec dulu'); el('inGas').focus(); } });
+
+  /* ---------- tombol salin umum */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.hasAttribute('data-copy')) salin(b.getAttribute('data-copy'), b.getAttribute('data-copy'), b);
+    if (b.hasAttribute('data-copy-from')) { var src = el(b.getAttribute('data-copy-from')); if (!src) return; var t = src.tagName === 'INPUT' ? src.value.trim() : src.textContent; if (!t) { toast('Kolomnya masih kosong'); return; } salin(t, 'Teks', b); }
+    if (b.hasAttribute('data-copy-cmd')) { var p = b.parentNode.querySelector('pre'); salin(p.textContent, 'Perintah', b); }
+  });
+
+  /* ---------- kemajuan */
+  function segarkan() {
+    var nFile = FILES.filter(function (f) { return st.files[f.n]; }).length;
+    teks('fileCount', nFile + '/' + FILES.length + ' berkas ditempel');
+    FILES.forEach(function (f, i) { var li = el('f-' + i); if (!li) return; li.classList.toggle('done', !!st.files[f.n]); li.classList.toggle('on', i === berikut()); $('.i', li).textContent = st.files[f.n] ? '✓' : String(i + 1); var cb = $('.tick input', li); if (cb) cb.checked = !!st.files[f.n]; });
+    var tf = el('tickFiles'); if (tf && nFile === FILES.length && !st.steps.a3) { st.steps.a3 = true; tf.checked = true; simpan(); }
+    renderHelper();
+    var semua = $$('.step'), sel = 0;
+    semua.forEach(function (s) { var d = !!st.steps[s.getAttribute('data-step')]; s.classList.toggle('done', d); if (d) sel++; });
+    el('mAll').style.width = Math.round(sel / Math.max(1, semua.length) * 100) + '%';
+    teks('mAllTxt', sel + ' dari ' + semua.length + ' langkah selesai');
+    $$('.rail a[data-stage]').forEach(function (a) {
+      var sec = el(a.getAttribute('data-stage')); if (!sec) return;
+      var ss = $$('.step', sec), d = ss.filter(function (s) { return st.steps[s.getAttribute('data-step')]; }).length;
+      $('.c', a).textContent = d + '/' + ss.length; a.classList.toggle('done', ss.length > 0 && d === ss.length);
+    });
+  }
+
+  renderFiles(); isi(); segarkan();
+})();
+</script>
+</body>
+</html>

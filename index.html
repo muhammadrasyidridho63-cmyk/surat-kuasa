@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>E-Surat Kuasa Online — Pengadilan Negeri</title>
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="./manifest.json"/>
+  <meta name="theme-color" content="#003923"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <link rel="apple-touch-icon" href="./icon-192.png"/>
+
+  <!-- Google Fonts: Inter & Plus Jakarta Sans + Material Symbols Outlined -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#f9f9ff",
+            "surface-dim": "#d3daef",
+            "surface-bright": "#f9f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f1f3ff",
+            "surface-container": "#e9edff",
+            "surface-container-high": "#e1e8fd",
+            "surface-container-highest": "#dce2f7",
+            "on-surface": "#141b2b",
+            "on-surface-variant": "#404943",
+            "primary": "#003923",
+            "on-primary": "#ffffff",
+            "primary-container": "#0d5236",
+            "on-primary-container": "#84c4a0",
+            "primary-fixed": "#aff1cb",
+            "primary-fixed-dim": "#94d4b0",
+            "on-primary-fixed-variant": "#0b5135",
+            "secondary": "#7e5700",
+            "on-secondary": "#ffffff",
+            "secondary-container": "#fdc668",
+            "on-secondary-container": "#765100",
+            "secondary-fixed": "#ffdead",
+            "secondary-fixed-dim": "#f4bd61",
+            "tertiary": "#561f21",
+            "tertiary-container": "#723536",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a",
+            "outline": "#707972",
+            "outline-variant": "#bfc9c1"
+          },
+          fontFamily: {
+            display: ["Plus Jakarta Sans", "sans-serif"],
+            headline: ["Plus Jakarta Sans", "sans-serif"],
+            body: ["Inter", "sans-serif"]
+          },
+          spacing: {
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2rem",
+            "gutter": "1.5rem"
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="./css/style.css"/>
+</head>
+
+<body class="bg-surface font-body text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- ========================================================================= -->
+  <!-- TOP STICKY NAVBAR -->
+  <!-- ========================================================================= -->
+  <header class="fixed top-0 left-0 right-0 h-16 bg-primary text-on-primary z-50 shadow-[0_1px_8px_rgba(0,0,0,0.08)]">
+    <div class="max-w-7xl mx-auto h-full px-space-md sm:px-space-lg flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#beranda-dan-lacak" data-path="beranda-dan-lacak" class="flex items-center gap-space-md cursor-pointer">
+        <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-secondary-container shadow-sm flex-shrink-0">
+          <span class="material-symbols-outlined text-2xl">balance</span>
+        </div>
+        <div class="flex flex-col justify-center">
+          <div class="flex items-center gap-space-xs">
+            <span class="font-headline font-bold text-base sm:text-lg tracking-wide text-on-primary">PENGADILAN NEGERI</span>
+            <span class="px-space-xs py-0.5 rounded-full bg-secondary text-on-secondary text-[10px] font-bold uppercase tracking-wider">Resmi</span>
+          </div>
+          <span class="text-xs text-on-primary-container leading-none">Layanan E-Surat Kuasa Online</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center gap-6">
+        <a class="text-sm text-secondary-container font-semibold hover:text-on-primary transition-colors cursor-pointer" data-path="beranda-dan-lacak" href="#beranda-dan-lacak">Beranda &amp; Lacak</a>
+        <a class="text-sm text-on-primary-container hover:text-on-primary transition-colors cursor-pointer" data-path="pendaftaran-kuasa" href="#pendaftaran-kuasa">Pendaftaran Kuasa</a>
+        <a class="text-sm text-on-primary-container hover:text-on-primary transition-colors cursor-pointer" data-path="meja-verifikator" href="#meja-verifikator">Meja Verifikator</a>
+        <a class="text-sm text-on-primary-container hover:text-on-primary transition-colors cursor-pointer" data-path="meja-pengesahan" href="#meja-pengesahan">Meja Pengesahan</a>
+        <a class="text-sm text-on-primary-container hover:text-on-primary transition-colors cursor-pointer" data-path="dashboard-admin" href="#dashboard-admin">Dashboard Admin</a>
+        <a class="text-sm text-on-primary-container hover:text-on-primary transition-colors cursor-pointer" data-path="validasi-qr-dokumen" href="#validasi-qr-dokumen">Validasi QR</a>
+      </nav>
+
+      <!-- Right Action Tools -->
+      <div class="flex items-center gap-3">
+        <!-- PWA Install Button -->
+        <button id="btnPwaInstall" onclick="triggerPwaInstall()" class="hidden px-3 py-1.5 rounded-lg bg-secondary text-on-secondary text-xs font-semibold hover:bg-secondary-fixed transition-all items-center gap-1.5 shadow-sm">
+          <span class="material-symbols-outlined text-sm">install_mobile</span>
+          <span class="hidden sm:inline">Pasang Aplikasi</span>
+        </button>
+
+        <!-- PTSP Hotline -->
+        <div class="hidden lg:flex items-center gap-space-sm px-space-md py-1.5 rounded-lg bg-primary-container text-on-primary">
+          <span class="material-symbols-outlined text-secondary-container text-lg">support_agent</span>
+          <div class="text-left">
+            <p class="text-[10px] text-on-primary-container leading-none">Bantuan PTSP</p>
+            <p class="text-xs font-semibold text-on-primary leading-tight">Aktif</p>
+          </div>
+        </div>
+
+        <!-- Official Avatar Profile -->
+        <div class="flex items-center gap-2 pl-2 border-l border-primary-container">
+          <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs ring-2 ring-primary-container">
+            PN
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN CONTAINER (ROUTER VIEWS) -->
+  <!-- ========================================================================= -->
+  <main class="w-full min-h-screen pt-16 flex-1 flex flex-col">
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 1: BERANDA & LACAK MANDIRI -->
+    <!-- ======================================================================= -->
+    <section id="view-beranda-dan-lacak" class="w-full flex flex-col">
+      <div class="relative w-full overflow-hidden bg-gradient-to-b from-surface-container-high/40 via-surface to-surface pb-space-xl">
+        <div class="max-w-7xl mx-auto px-space-md sm:px-space-lg pt-8 sm:pt-12">
+          
+          <!-- Hero Header -->
+          <div class="flex flex-col items-center text-center max-w-4xl mx-auto">
+            <div class="inline-flex items-center gap-space-sm px-4 py-1.5 rounded-full bg-surface-container text-primary shadow-sm mb-6">
+              <span class="material-symbols-outlined text-secondary text-base">verified</span>
+              <span class="text-xs uppercase tracking-wider font-semibold text-primary">Layanan Resmi Pelayanan Terpadu Satu Pintu (PTSP) Pengadilan Negeri</span>
+            </div>
+            
+            <h1 class="font-display font-extrabold text-3xl sm:text-5xl text-on-surface tracking-tight mb-4">
+              Pendaftaran &amp; Legalisasi <br class="hidden sm:inline"/><span class="text-primary-container bg-gradient-to-r from-primary to-primary-container bg-clip-text text-transparent">Surat Kuasa Elektronik</span>
+            </h1>
+            
+            <p class="text-base sm:text-lg text-on-surface-variant max-w-2xl leading-relaxed mb-8">
+              Layanan mandiri pendaftaran surat kuasa perdata, pidana, dan permohonan secara daring bagi Advokat dan Masyarakat Umum tanpa perlu antre fisik di loket PTSP pengadilan.
+            </p>
+
+            <!-- 4 Statistic Counters -->
+            <div class="w-full grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-xl bg-surface-container-lowest shadow-sm mb-12">
+              <div class="flex flex-col items-center justify-center p-3 rounded-lg bg-surface-container-low">
+                <span class="font-display text-2xl sm:text-3xl text-primary font-bold">1.200+</span>
+                <span class="text-xs text-on-surface-variant text-center mt-1">Kuasa Terdaftar Resmi</span>
+              </div>
+              <div class="flex flex-col items-center justify-center p-3 rounded-lg bg-surface-container-low">
+                <span class="font-display text-2xl sm:text-3xl text-secondary font-bold">100%</span>
+                <span class="text-xs text-on-surface-variant text-center mt-1">Bebas Antrean Fisik</span>
+              </div>
+              <div class="flex flex-col items-center justify-center p-3 rounded-lg bg-surface-container-low">
+                <div class="flex items-center gap-1 text-primary">
+                  <span class="material-symbols-outlined text-xl">security</span>
+                  <span class="font-display text-2xl sm:text-3xl font-bold">HMAC</span>
+                </div>
+                <span class="text-xs text-on-surface-variant text-center mt-1">QR Validasi Keaslian</span>
+              </div>
+              <div class="flex flex-col items-center justify-center p-3 rounded-lg bg-surface-container-low">
+                <span class="font-display text-2xl sm:text-3xl text-primary-container font-bold">&lt; 24 Jam</span>
+                <span class="text-xs text-on-surface-variant text-center mt-1">Rata-rata Verifikasi</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dual Action Hub -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch mb-12">
+            
+            <!-- Card 1: Pendaftaran Baru -->
+            <div class="lg:col-span-6 flex flex-col justify-between p-space-lg rounded-xl bg-surface-container-lowest shadow-md relative overflow-hidden group border border-surface-container">
+              <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-secondary"></div>
+              <div>
+                <div class="flex items-center justify-between gap-4 mb-4">
+                  <div class="w-12 h-12 rounded-xl bg-primary text-secondary-container flex items-center justify-center shadow-inner">
+                    <span class="material-symbols-outlined text-2xl">post_add</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-xs font-semibold uppercase">Advokat</span>
+                    <span class="px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant text-xs font-semibold uppercase">Insidentil</span>
+                  </div>
+                </div>
+                <h2 class="font-headline text-xl sm:text-2xl font-bold text-on-surface mb-2">Pendaftaran Baru Surat Kuasa</h2>
+                <p class="text-sm text-on-surface-variant mb-6 leading-relaxed">
+                  Unggah berkas <em>Surat Kuasa Khusus</em> atau <em>Insidentil</em>, lampiran identitas KTP/KTA, dan dapatkan legalisasi digital terverifikasi langsung oleh Panitera Pengadilan.
+                </p>
+                <div class="space-y-3 mb-8">
+                  <div class="flex items-center gap-3 p-3 rounded-lg bg-surface-container-low text-xs text-on-surface">
+                    <span class="material-symbols-outlined text-primary text-xl">token</span>
+                    <span>Dukungan Materai Elektronik (<em>e-Meterai</em>) terintegrasi resmi Peruri.</span>
+                  </div>
+                  <div class="flex items-center gap-3 p-3 rounded-lg bg-surface-container-low text-xs text-on-surface">
+                    <span class="material-symbols-outlined text-primary text-xl">mark_email_read</span>
+                    <span>Penerbitan Akta Kuasa Digital dengan Barcode Register instan.</span>
+                  </div>
+                </div>
+              </div>
+              <a href="#pendaftaran-kuasa" data-path="pendaftaran-kuasa" class="inline-flex items-center justify-between w-full px-5 py-3.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary transition-all duration-200 group-hover:shadow-lg cursor-pointer">
+                <span class="font-semibold text-sm tracking-wide">Mulai Daftarkan Kuasa</span>
+                <span class="material-symbols-outlined text-xl text-secondary-container transition-transform group-hover:translate-x-1">arrow_forward</span>
+              </a>
+            </div>
+
+            <!-- Card 2: Lacak Cepat -->
+            <div class="lg:col-span-6 flex flex-col justify-between p-space-lg rounded-xl bg-surface-container-lowest shadow-md relative overflow-hidden border border-surface-container">
+              <div class="absolute top-0 left-0 right-0 h-1.5 bg-secondary"></div>
+              <div>
+                <div class="flex items-center justify-between gap-4 mb-4">
+                  <div class="w-12 h-12 rounded-xl bg-secondary text-on-secondary flex items-center justify-center shadow-inner">
+                    <span class="material-symbols-outlined text-2xl">track_changes</span>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant text-xs font-semibold uppercase">Lacak Cepat</span>
+                </div>
+                <h2 class="font-headline text-xl sm:text-2xl font-bold text-on-surface mb-2">Lacak Status Pengajuan Mandiri</h2>
+                <p class="text-sm text-on-surface-variant mb-6 leading-relaxed">
+                  Pantau langsung posisi tahapan verifikasi dokumen, pengecekan keabsahan dokumen kuasa, hingga jadwal pengesahan pejabat terkait.
+                </p>
+                <form id="trackingForm" class="space-y-4 mb-6">
+                  <div>
+                    <label class="block text-xs font-bold text-on-surface mb-1.5" for="regIdInput">Nomor Registrasi / WhatsApp Pemohon</label>
+                    <div class="relative">
+                      <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">search</span>
+                      <input class="w-full pl-11 pr-4 py-3 rounded-lg bg-surface-container-low text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all" id="regIdInput" placeholder="Contoh: REG-202611-0082 atau 0812xxxx" type="text" value="REG-202611-0082"/>
+                    </div>
+                    <p class="text-[11px] text-on-surface-variant mt-1.5">Gunakan kode registrasi 13 digit yang diterima via SMS/WhatsApp.</p>
+                  </div>
+                  <button class="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary text-sm font-semibold transition-colors shadow-sm cursor-pointer" type="submit">
+                    <span class="material-symbols-outlined text-lg">manage_search</span>
+                    <span>Cari Berkas Pendaftaran</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-Time Tracking Search Result Container -->
+          <div id="searchResultBox" class="hidden mb-12"></div>
+
+          <!-- Keunggulan Layanan -->
+          <div class="text-center max-w-3xl mx-auto mb-8">
+            <span class="text-xs uppercase tracking-wider font-bold text-secondary">Standar Pelayanan Prima</span>
+            <h3 class="font-display text-2xl font-bold text-on-surface mt-1">Keunggulan Layanan Elektronik</h3>
+            <p class="text-sm text-on-surface-variant mt-1">Menjamin transparansi, kepastian hukum, dan efisiensi waktu operasional persidangan.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="p-5 rounded-xl bg-surface-container-lowest border border-surface-container shadow-sm">
+              <div class="w-10 h-10 rounded-lg bg-primary-container text-secondary-container flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-2xl">update</span>
+              </div>
+              <h4 class="font-bold text-base text-on-surface mb-1">Proses Cepat &amp; Terpantau 24/7</h4>
+              <p class="text-xs text-on-surface-variant leading-relaxed">Pengajuan dapat dilakukan kapan saja tanpa perlu datang fisik ke kantor pengadilan. Notifikasi langsung masuk ke nomor WhatsApp.</p>
+            </div>
+
+            <div class="p-5 rounded-xl bg-surface-container-lowest border border-surface-container shadow-sm">
+              <div class="w-10 h-10 rounded-lg bg-secondary text-on-secondary flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-2xl">qr_code_2</span>
+              </div>
+              <h4 class="font-bold text-base text-on-surface mb-1">QR Code Keaslian Dokumen</h4>
+              <p class="text-xs text-on-surface-variant leading-relaxed">Setiap lembar akta registrasi dibubuhi kode QR ber-HMAC kriptografi. Majelis Hakim dan pihak lawan dapat memindai langsung saat sidang.</p>
+            </div>
+
+            <div class="p-5 rounded-xl bg-surface-container-lowest border border-surface-container shadow-sm">
+              <div class="w-10 h-10 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-2xl">menu_book</span>
+              </div>
+              <h4 class="font-bold text-base text-on-surface mb-1">Integrasi Resmi Buku Register</h4>
+              <p class="text-xs text-on-surface-variant leading-relaxed">Nomor pendaftaran terkoneksi secara sinkron ke dalam Buku Register Akta Surat Kuasa Kepaniteraan Hukum dan terarsip aman.</p>
+            </div>
+          </div>
+
+          <!-- Bottom Banner: Buka Validator QR -->
+          <div class="p-6 rounded-xl bg-primary text-on-primary flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg mb-12">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl bg-secondary text-on-secondary flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-2xl">qr_code_scanner</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-lg">Ingin Memeriksa Keaslian Akta Kuasa yang Anda Pegang?</h4>
+                <p class="text-xs text-on-primary-container">Gunakan alat pemindai kamera atau masukkan kode verifikasi QR untuk mengecek riwayat registrasi pengadilan.</p>
+              </div>
+            </div>
+            <a href="#validasi-qr-dokumen" data-path="validasi-qr-dokumen" class="px-5 py-3 rounded-lg bg-secondary hover:bg-secondary-fixed text-on-secondary font-bold text-sm flex items-center gap-2 flex-shrink-0 transition-colors cursor-pointer">
+              <span class="material-symbols-outlined text-lg">verified</span>
+              <span>Buka Validator QR</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 2: MULTI-STEP REGISTRATION WIZARD -->
+    <!-- ======================================================================= -->
+    <section id="view-pendaftaran-kuasa" class="hidden w-full flex-1 bg-surface py-8">
+      <div class="max-w-7xl mx-auto px-space-md sm:px-space-lg">
+        
+        <!-- Header & Stepper Card -->
+        <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-surface-container">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11px] font-bold uppercase">Formulir Mandiri</span>
+                <span class="text-xs text-outline">Layanan Kepaniteraan Hukum</span>
+              </div>
+              <h2 class="font-headline text-2xl font-bold text-on-surface mt-1">Pendaftaran Permohonan E-Surat Kuasa</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="navigateTo('beranda-dan-lacak')" class="px-3.5 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-xs font-semibold text-on-surface transition-colors flex items-center gap-1.5 cursor-pointer">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                <span>Kembali ke Beranda</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stepper 4 Langkah -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
+            <div onclick="goWizardStep(1)" class="flex items-center gap-3 cursor-pointer">
+              <div id="stepBadge1" class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-sm font-bold shadow-md ring-4 ring-secondary-container/40">01</div>
+              <div class="flex flex-col">
+                <span class="text-[10px] uppercase font-bold text-outline">Langkah 01</span>
+                <span class="font-semibold text-xs text-on-surface">Data Pemohon</span>
+              </div>
+            </div>
+
+            <div onclick="goWizardStep(2)" class="flex items-center gap-3 cursor-pointer">
+              <div id="stepBadge2" class="w-10 h-10 rounded-full bg-surface-container-high text-outline flex items-center justify-center text-sm font-bold">02</div>
+              <div class="flex flex-col">
+                <span class="text-[10px] uppercase font-bold text-outline">Langkah 02</span>
+                <span class="font-semibold text-xs text-on-surface">Penerima &amp; Berkas</span>
+              </div>
+            </div>
+
+            <div onclick="goWizardStep(3)" class="flex items-center gap-3 cursor-pointer">
+              <div id="stepBadge3" class="w-10 h-10 rounded-full bg-surface-container-high text-outline flex items-center justify-center text-sm font-bold">03</div>
+              <div class="flex flex-col">
+                <span class="text-[10px] uppercase font-bold text-outline">Langkah 03</span>
+                <span class="font-semibold text-xs text-on-surface">Materi &amp; Klausul</span>
+              </div>
+            </div>
+
+            <div onclick="goWizardStep(4)" class="flex items-center gap-3 cursor-pointer">
+              <div id="stepBadge4" class="w-10 h-10 rounded-full bg-surface-container-high text-outline flex items-center justify-center text-sm font-bold">04</div>
+              <div class="flex flex-col">
+                <span class="text-[10px] uppercase font-bold text-outline">Langkah 04</span>
+                <span class="font-semibold text-xs text-on-surface">Tinjauan &amp; Kirim</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress Line -->
+          <div class="w-full bg-surface-container h-1.5 rounded-full mt-4 overflow-hidden">
+            <div id="wizardProgressBar" class="bg-gradient-to-r from-primary-container via-secondary to-secondary-container h-full w-[25%] rounded-full transition-all duration-300"></div>
+          </div>
+        </div>
+
+        <!-- Form Layout Grid (8 Col Form + 4 Col Sticky Cost Summary) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- LEFT: Form Area (8 cols) -->
+          <div class="lg:col-span-8 flex flex-col gap-6">
+            
+            <!-- STEP 1 PANE -->
+            <div id="wizardStepPane1" class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container space-y-6">
+              <div class="pb-4 border-b border-surface-container">
+                <span class="text-[11px] font-bold text-secondary uppercase tracking-wide">BAGIAN 01 • IDENTITAS PEMBERI KUASA</span>
+                <h3 class="font-headline text-lg font-bold text-on-surface mt-1">Data Pemberi Kuasa (Prinsipal)</h3>
+                <p class="text-xs text-on-surface-variant">Pilih kategori permohonan dan masukkan identitas kependudukan pemohon secara lengkap.</p>
+              </div>
+
+              <!-- Category Pills -->
+              <div>
+                <label class="block text-xs font-bold text-on-surface mb-2">Kategori Kuasa Yang Diberikan</label>
+                <div class="flex items-center gap-3">
+                  <button type="button" id="btnCatAdvokat" onclick="setWizardCategory('Advokat')" class="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-primary text-on-primary shadow-sm transition-all cursor-pointer">
+                    Advokat / Penasihat Hukum
+                  </button>
+                  <button type="button" id="btnCatInsidentil" onclick="setWizardCategory('Insidentil')" class="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all cursor-pointer">
+                    Kuasa Insidentil (Keluarga)
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-on-surface mb-1">Nama Lengkap Pemberi Kuasa *</label>
+                  <input id="wzNamaPemberi" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Sesuai KTP (contoh: Bambang Sudarmono, S.T.)" value="Bambang Sudarmono, S.T."/>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-on-surface mb-1">NIK (Nomor Induk Kependudukan) *</label>
+                  <input id="wzNikPemberi" type="text" maxlength="16" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="16 digit NIK" value="3174082209840002"/>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-on-surface mb-1">Pekerjaan / Profesi</label>
+                  <input id="wzPekerjaanPemberi" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Wiraswasta / Karyawan" value="Wiraswasta / Direktur"/>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-on-surface mb-1">Nomor WhatsApp Aktif *</label>
+                  <input id="wzWaPemberi" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0812xxxx (Untuk notifikasi status)" value="081298457721"/>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-on-surface mb-1">Alamat Email Pemohon</label>
+                  <input id="wzEmailPemberi" type="email" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="nama@email.com" value="bambang.sudarmono@gmail.com"/>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-on-surface mb-1">Alamat Domisili Lengkap *</label>
+                  <textarea id="wzAlamatPemberi" rows="2" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Alamat jalan, RT/RW, Kelurahan, Kecamatan, Kota">Jl. Melati Indah No. 14, RT 03/05, Kebayoran Baru, Jakarta Selatan</textarea>
+                </div>
+              </div>
+
+              <div class="flex justify-end pt-4 border-t border-surface-container">
+                <button type="button" onclick="goWizardStep(2)" class="px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-semibold text-sm flex items-center gap-2 cursor-pointer">
+                  <span>Lanjut ke Langkah 2: Penerima Kuasa</span>
+                  <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 2 PANE -->
+            <div id="wizardStepPane2" class="hidden bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container space-y-6">
+              <div class="pb-4 border-b border-surface-container">
+                <span class="text-[11px] font-bold text-secondary uppercase tracking-wide">BAGIAN 02 • DATA PENERIMA KUASA &amp; UNGGAH BERKAS</span>
+                <h3 class="font-headline text-lg font-bold text-on-surface mt-1">Identitas Penerima Kuasa &amp; Legalitas</h3>
+                <p class="text-xs text-on-surface-variant">Pastikan data pengenal advokat atau penerima kuasa insidentil sesuai kartu pengenal resmi.</p>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-on-surface mb-1">Nama Lengkap Penerima Kuasa *</label>
+                  <input id="wzNamaPenerima" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Nama Advokat / Penerima Kuasa" value="Dewi Kartika, S.H., M.H. &amp; Partners"/>
+                </div>
+                <div>
+                  <label id="labelKtaField" class="block text-xs font-bold text-on-surface mb-1">Nomor KTA Advokat / Organisasi *</label>
+                  <input id="wzKtaPenerima" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Contoh: 16.0452/ADV-JKT (PERADI/KAI)" value="16.0452/ADV-JKT"/>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-on-surface mb-1">Nama Kantor Hukum / Asosiasi</label>
+                  <input id="wzKantorPenerima" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Nama Law Firm" value="Kartika &amp; Associates Law Office"/>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-on-surface mb-1">Nomor Kontak Penerima Kuasa</label>
+                  <input id="wzWaPenerima" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0811xxxx" value="08119283771"/>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-on-surface mb-1">Domisili Kantor / Alamat Penerima</label>
+                  <textarea id="wzAlamatPenerima" rows="2" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary">Gedung Menara Batavia Lt. 12, Jl. KH Mas Mansyur Kav. 126, Jakarta Pusat</textarea>
+                </div>
+              </div>
+
+              <!-- Upload Berkas Dropzone -->
+              <div class="pt-4 border-t border-surface-container">
+                <h4 class="text-xs font-bold text-on-surface mb-3 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-base">cloud_upload</span>
+                  Unggah Dokumen Berkas Pendukung (Kompresi Otomatis Klien)
+                </h4>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <!-- Upload KTP -->
+                  <div class="p-4 rounded-xl border border-dashed border-primary/40 bg-surface-container-low/50 flex flex-col items-center text-center">
+                    <span class="material-symbols-outlined text-3xl text-primary mb-1">badge</span>
+                    <span class="font-bold text-xs text-on-surface">Scan/Foto KTP Pemberi Kuasa</span>
+                    <span class="text-[10px] text-outline mb-3">Maksimal 5 MB • JPG/PNG</span>
+                    <label class="px-3.5 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-semibold cursor-pointer hover:bg-primary-container transition-colors">
+                      Pilih Foto KTP
+                      <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(this, 'ktp')"/>
+                    </label>
+                    <span id="uploadBadge_ktp" class="mt-2 text-[10px] text-outline">Gunakan berkas contoh otomatis jika dilewati</span>
+                  </div>
+
+                  <!-- Upload KTA -->
+                  <div class="p-4 rounded-xl border border-dashed border-secondary/40 bg-surface-container-low/50 flex flex-col items-center text-center">
+                    <span class="material-symbols-outlined text-3xl text-secondary mb-1">contact_mail</span>
+                    <span class="font-bold text-xs text-on-surface">Scan KTA Advokat / Berita Acara Sumpah</span>
+                    <span class="text-[10px] text-outline mb-3">Maksimal 5 MB • JPG/PNG</span>
+                    <label class="px-3.5 py-1.5 rounded-lg bg-secondary text-on-secondary text-xs font-semibold cursor-pointer hover:bg-secondary-fixed transition-colors">
+                      Pilih Berkas KTA
+                      <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(this, 'kta')"/>
+                    </label>
+                    <span id="uploadBadge_kta" class="mt-2 text-[10px] text-outline">Gunakan berkas contoh otomatis jika dilewati</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-between pt-4 border-t border-surface-container">
+                <button type="button" onclick="goWizardStep(1)" class="px-4 py-2 rounded-lg bg-surface-container text-xs font-semibold text-on-surface cursor-pointer">
+                  Kembali
+                </button>
+                <button type="button" onclick="goWizardStep(3)" class="px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-semibold text-sm flex items-center gap-2 cursor-pointer">
+                  <span>Lanjut ke Langkah 3: Materi Kuasa</span>
+                  <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 3 PANE -->
+            <div id="wizardStepPane3" class="hidden bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container space-y-6">
+              <div class="pb-4 border-b border-surface-container">
+                <span class="text-[11px] font-bold text-secondary uppercase tracking-wide">BAGIAN 03 • MATERI &amp; RUANG LINGKUP KUASA</span>
+                <h3 class="font-headline text-lg font-bold text-on-surface mt-1">Keperluan &amp; Klausul Pemberian Kuasa</h3>
+                <p class="text-xs text-on-surface-variant">Tentukan ruang lingkup wewenang hukum sesuai ketentuan Pasal 123 HIR / Pasal 147 R.Bg.</p>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-on-surface mb-1">Klasifikasi / Jenis Perkara *</label>
+                  <select id="wzJenisPerkara" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="Perdata Gugatan" selected>Perdata Gugatan</option>
+                    <option value="Perdata Permohonan">Perdata Permohonan</option>
+                    <option value="Pidana Umum">Pidana Umum</option>
+                    <option value="Pidana Khusus / Tipikor">Pidana Khusus / Tipikor</option>
+                    <option value="Perselisihan Hubungan Industrial (PHI)">Perselisihan Hubungan Industrial (PHI)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-on-surface mb-1">Nomor Perkara (Jika sudah teregister)</label>
+                  <input id="wzNoPerkara" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Contoh: 89/Pdt.G/2026/PN" value="89/Pdt.G/2026/PN.Jkt.Pst"/>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-on-surface mb-1">Ringkasan Wewenang / Uraian Keperluan Kuasa *</label>
+                  <textarea id="wzUraianKuasa" rows="4" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Tuliskan wewenang yang diberikan secara spesifik...">Mewakili, mendampingi, dan membela hak hukum Pemberi Kuasa dalam perkara gugatan Perbuatan Melawan Hukum (PMH) atas sengketa tanah dan bangunan di wilayah hukum Pengadilan Negeri.</textarea>
+                </div>
+              </div>
+
+              <div class="flex justify-between pt-4 border-t border-surface-container">
+                <button type="button" onclick="goWizardStep(2)" class="px-4 py-2 rounded-lg bg-surface-container text-xs font-semibold text-on-surface cursor-pointer">
+                  Kembali
+                </button>
+                <button type="button" onclick="goWizardStep(4)" class="px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-semibold text-sm flex items-center gap-2 cursor-pointer">
+                  <span>Lanjut ke Langkah 4: Tinjauan Akhir</span>
+                  <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 4 PANE -->
+            <div id="wizardStepPane4" class="hidden bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container space-y-6">
+              <div class="pb-4 border-b border-surface-container">
+                <span class="text-[11px] font-bold text-secondary uppercase tracking-wide">BAGIAN 04 • TINJAUAN AKHIR &amp; PERNYATAAN</span>
+                <h3 class="font-headline text-lg font-bold text-on-surface mt-1">Konfirmasi &amp; Pengiriman Permohonan</h3>
+                <p class="text-xs text-on-surface-variant">Periksa kembali ringkasan data sebelum diteruskan ke meja verifikator PTSP.</p>
+              </div>
+
+              <!-- Container Review -->
+              <div id="wizardStep4Summary" class="space-y-4"></div>
+
+              <!-- E-Meterai Info Box -->
+              <div class="p-4 rounded-xl bg-surface-container flex items-start gap-3">
+                <span class="material-symbols-outlined text-secondary text-2xl">verified</span>
+                <div>
+                  <h5 class="text-xs font-bold text-on-surface">Pemberitahuan Meterai Elektronik (e-Meterai PERURI)</h5>
+                  <p class="text-xs text-on-surface-variant mt-0.5">Pengenaan meterai Rp10.000,- akan dilakukan secara otomatis melalui integrasi sistem POS/Peruri. Anda tidak perlu menempelkan meterai fisik pada form isian ini.</p>
+                </div>
+              </div>
+
+              <!-- Pernyataan Kebenaran Data -->
+              <div class="p-4 rounded-xl border border-secondary/30 bg-secondary-container/10">
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input id="wzAgreeCheck" type="checkbox" checked class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary"/>
+                  <span class="text-xs text-on-surface leading-relaxed">
+                    Saya menyatakan dengan sebenarnya bahwa seluruh data dan dokumen identitas yang saya masukkan adalah benar, sah, dan dapat dipertanggungjawabkan secara hukum sesuai peraturan perundang-undangan.
+                  </span>
+                </label>
+              </div>
+
+              <div class="flex justify-between pt-4 border-t border-surface-container">
+                <button type="button" onclick="goWizardStep(3)" class="px-4 py-2 rounded-lg bg-surface-container text-xs font-semibold text-on-surface cursor-pointer">
+                  Kembali
+                </button>
+                <button type="button" id="btnSubmitWizard" onclick="submitWizardRegistration()" class="px-6 py-3 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-bold text-sm flex items-center gap-2 shadow-md cursor-pointer">
+                  <span>Kirim Permohonan Pendaftaran</span>
+                  <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT: Sticky Contextual Cost Summary Sidebar (4 cols) -->
+          <div class="lg:col-span-4 flex flex-col gap-6 sticky top-24">
+            <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container">
+              <div class="flex items-center justify-between pb-3 border-b border-surface-container mb-4">
+                <span class="text-xs font-bold uppercase tracking-wider text-outline">Rincian Biaya Layanan</span>
+                <span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold">TERKUNCI</span>
+              </div>
+
+              <div class="space-y-3 text-xs text-on-surface-variant">
+                <div class="flex justify-between">
+                  <span>Biaya PNBP Pendaftaran Kuasa</span>
+                  <span class="font-bold text-on-surface">Rp10.000,-</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Meterai Elektronik (1 Lembar)</span>
+                  <span class="font-bold text-on-surface">Rp10.000,-</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Biaya Redaksi &amp; Legalisasi Digital</span>
+                  <span class="font-bold text-primary">GRATIS (Rp0)</span>
+                </div>
+              </div>
+
+              <div class="mt-4 pt-4 border-t border-surface-container flex items-center justify-between">
+                <div>
+                  <span class="block text-xs font-bold text-on-surface">Total Estimasi Bayar</span>
+                  <span class="text-[10px] text-outline">Via SIMPONI / QRIS / VA</span>
+                </div>
+                <span class="font-display text-xl font-bold text-secondary">Rp20.000,-</span>
+              </div>
+            </div>
+
+            <!-- Info Box Bantuan -->
+            <div class="bg-surface-container-low p-5 rounded-xl border border-surface-container">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="material-symbols-outlined text-secondary text-lg">support_agent</span>
+                <span class="text-xs font-bold text-on-surface">Pusat Bantuan PTSP</span>
+              </div>
+              <p class="text-xs text-on-surface-variant leading-relaxed mb-3">Butuh bantuan pengisian formulir? Petugas Meja Informasi Hukum Pengadilan Negeri siap melayani Anda.</p>
+              <a href="https://wa.me/628119283771" target="_blank" class="w-full py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-xs font-semibold text-primary flex items-center justify-center gap-1.5 transition-colors">
+                <span class="material-symbols-outlined text-base">chat</span>
+                <span>WhatsApp Asisten PTSP</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 3: MEJA VERIFIKATOR (STAF PTSP KEPANITERAAN) -->
+    <!-- ======================================================================= -->
+    <section id="view-meja-verifikator" class="hidden w-full flex-1 bg-surface py-8">
+      <div class="max-w-7xl mx-auto px-space-md sm:px-space-lg">
+        
+        <!-- Header Meja Kerja -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-surface-container mb-6">
+          <div>
+            <div class="flex items-center gap-2 text-xs text-outline">
+              <span>Layanan Kepaniteraan Hukum</span>
+              <span class="material-symbols-outlined text-xs">chevron_right</span>
+              <span>Loket PTSP Mandiri</span>
+              <span class="material-symbols-outlined text-xs">chevron_right</span>
+              <span class="text-primary font-bold">Verifikasi Cepat</span>
+            </div>
+            <h2 class="font-headline text-2xl font-bold text-on-surface mt-1">Meja Verifikasi Antrean Pendaftaran Surat Kuasa</h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container text-xs text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-sm">badge</span>
+              <span class="font-bold">Ahmad Syafii</span> (Staf Meja 1 PTSP)
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 KPI Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-surface-container">
+            <span class="text-xs text-on-surface-variant font-medium">Total Masuk Hari Ini</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="kpiVerifTotal" class="font-display text-2xl font-bold text-on-surface">04</span>
+              <span class="text-[10px] text-primary flex items-center"><span class="material-symbols-outlined text-xs">trending_up</span> Real-time</span>
+            </div>
+          </div>
+          <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-surface-container">
+            <span class="text-xs text-secondary-fixed-variant font-medium">Menunggu Verifikasi</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="kpiVerifMenunggu" class="font-display text-2xl font-bold text-secondary">01</span>
+              <span class="text-[10px] text-secondary font-bold">Prioritas Loket</span>
+            </div>
+          </div>
+          <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-surface-container">
+            <span class="text-xs text-tertiary font-medium">Butuh Revisi / Perbaikan</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="kpiVerifRevisi" class="font-display text-2xl font-bold text-tertiary">01</span>
+              <span class="text-[10px] text-tertiary">Menunggu Respons</span>
+            </div>
+          </div>
+          <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-surface-container">
+            <span class="text-xs text-primary font-medium">Diteruskan ke Pejabat</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="kpiVerifPejabat" class="font-display text-2xl font-bold text-primary">02</span>
+              <span class="text-[10px] text-primary font-bold">Siap TTE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Card with Filter Tabs -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container overflow-hidden">
+          <div class="p-4 border-b border-surface-container flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+              <button onclick="setVerifikatorFilter('Semua')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer">Semua</button>
+              <button onclick="setVerifikatorFilter('Menunggu')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-secondary-fixed text-on-secondary-fixed-variant hover:opacity-90 transition-opacity cursor-pointer">Menunggu</button>
+              <button onclick="setVerifikatorFilter('Revisi')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container-high text-tertiary hover:opacity-90 transition-opacity cursor-pointer">Perlu Revisi</button>
+              <button onclick="setVerifikatorFilter('Lolos')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary-fixed text-on-primary-fixed-variant hover:opacity-90 transition-opacity cursor-pointer">Diteruskan</button>
+            </div>
+            <div class="text-xs text-outline font-medium">Klik "Periksa Berkas" untuk membuka lembar inspeksi identitas</div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-surface-container-low text-[11px] uppercase tracking-wider text-outline border-b border-surface-container">
+                  <th class="px-space-md py-3 font-bold">No. Agenda / Waktu</th>
+                  <th class="px-space-md py-3 font-bold">Pihak Berperkara</th>
+                  <th class="px-space-md py-3 font-bold">Kategori</th>
+                  <th class="px-space-md py-3 font-bold">Status</th>
+                  <th class="px-space-md py-3 font-bold text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="verifikatorTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 4: MEJA PENGESAHAN PEJABAT (TTE & PIN) -->
+    <!-- ======================================================================= -->
+    <section id="view-meja-pengesahan" class="hidden w-full flex-1 bg-surface py-8">
+      <div class="max-w-7xl mx-auto px-space-md sm:px-space-lg">
+        
+        <!-- Header Pejabat -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-surface-container mb-6">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold uppercase">Akses Yurisdiksi Khusus</span>
+              <span class="text-xs text-outline">Token MA-RI Aktif</span>
+            </div>
+            <h2 class="font-headline text-2xl font-bold text-on-surface mt-1">Portal Eksekutif TTE &amp; Akta Terdaftar</h2>
+            <p class="text-xs text-on-surface-variant">Pejabat Pengesah: <strong>Dr. H. Sulaiman, S.H., M.H.</strong> (Panitera Pengadilan Negeri)</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="pengesahanCountBadge" class="px-3 py-1.5 rounded-lg bg-secondary-container text-on-secondary-container font-bold text-xs">
+              0 Berkas Memerlukan TTE
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- LEFT: Antrean Menunggu Pengesahan (4 cols) -->
+          <div class="lg:col-span-4 flex flex-col gap-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-outline">Antrean Berkas Siap TTE</span>
+            <div id="pengesahanQueueContainer" class="space-y-3"></div>
+          </div>
+
+          <!-- RIGHT: Pratinjau Dokumen & Keypad PIN (8 cols) -->
+          <div class="lg:col-span-8 flex flex-col gap-6">
+            
+            <!-- Certificate Preview Card -->
+            <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container">
+              <div class="flex items-center justify-between pb-4 border-b border-surface-container mb-4">
+                <span class="text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-base text-primary">description</span>
+                  Pratinjau Lembar Akta Pendaftaran Kuasa Resmi
+                </span>
+                <button onclick="printCertificate()" class="px-3 py-1 rounded-lg bg-surface-container text-xs font-semibold text-on-surface hover:bg-surface-container-high transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">print</span>
+                  <span>Cetak Draf</span>
+                </button>
+              </div>
+
+              <div id="certificatePreviewPane" class="min-h-[380px]"></div>
+            </div>
+
+            <!-- PIN Keypad & Approval Execution -->
+            <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container">
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div>
+                  <h4 class="font-bold text-base text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary text-xl">lock</span>
+                    Otorisasi &amp; Pembubuhan Pengesahan Elektronik
+                  </h4>
+                  <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                    Masukkan 6-digit PIN Pengesahan Resmi Pejabat untuk mengunci data register dan menerbitkan QR Code HMAC dokumen.
+                  </p>
+                  
+                  <!-- PIN Bullet Dots -->
+                  <div class="flex items-center gap-2.5 my-4">
+                    <div id="pinDot1" class="w-3 h-3 rounded-full bg-surface-container-highest transition-all"></div>
+                    <div id="pinDot2" class="w-3 h-3 rounded-full bg-surface-container-highest transition-all"></div>
+                    <div id="pinDot3" class="w-3 h-3 rounded-full bg-surface-container-highest transition-all"></div>
+                    <div id="pinDot4" class="w-3 h-3 rounded-full bg-surface-container-highest transition-all"></div>
+                    <div id="pinDot5" class="w-3 h-3 rounded-full bg-surface-container-highest transition-all"></div>
+                    <div id="pinDot6" class="w-3 h-3 rounded-full bg-surface-container-highest transition-all"></div>
+                    <button onclick="clearPin()" class="ml-2 text-xs text-outline hover:text-error transition-colors">Reset</button>
+                  </div>
+
+                  <p class="text-[11px] text-outline">PIN Bawaan Demo: <strong>123456</strong></p>
+                </div>
+
+                <!-- Numerical Keypad -->
+                <div class="flex flex-col items-center">
+                  <div class="grid grid-cols-3 gap-2 w-48">
+                    <button onclick="pressPin('1')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-sm text-on-surface transition-colors cursor-pointer">1</button>
+                    <button onclick="pressPin('2')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-sm text-on-surface transition-colors cursor-pointer">2</button>
+                    <button onclick="pressPin('3')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-sm text-on-surface transition-colors cursor-pointer">3</button>
+                    <button onclick="pressPin('4')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-sm text-on-surface transition-colors cursor-pointer">4</button>
+                    <button onclick="pressPin('5')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-sm text-on-surface transition-colors cursor-pointer">5</button>
+                    <button onclick="pressPin('6')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-sm text-on-surface transition-colors cursor-pointer">6</button>
+                    <button onclick="pressPin('7')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-sm text-on-surface transition-colors cursor-pointer">7</button>
+                    <button onclick="pressPin('8')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-sm text-on-surface transition-colors cursor-pointer">8</button>
+                    <button onclick="pressPin('9')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-sm text-on-surface transition-colors cursor-pointer">9</button>
+                    <button onclick="clearPin()" class="h-10 rounded-lg bg-surface-container-high hover:bg-error-container font-bold text-xs text-error transition-colors cursor-pointer">C</button>
+                    <button onclick="pressPin('0')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-sm text-on-surface transition-colors cursor-pointer">0</button>
+                    <button onclick="pressPin('0')" class="h-10 rounded-lg bg-surface-container-low hover:bg-surface-container font-bold text-xs text-outline transition-colors cursor-pointer">00</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 pt-4 border-t border-surface-container">
+                <button id="btnExecuteApproval" onclick="executeOfficialApproval()" class="w-full py-3.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer">
+                  <span class="material-symbols-outlined text-lg">verified</span>
+                  <span>Sahkan &amp; Terbitkan Surat Kuasa Terdaftar</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 5: EXECUTIVE ADMIN DASHBOARD & ANALYTICS -->
+    <!-- ======================================================================= -->
+    <section id="view-dashboard-admin" class="hidden w-full flex-1 bg-surface py-8">
+      <div class="max-w-7xl mx-auto px-space-md sm:px-space-lg">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-surface-container mb-6">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11px] font-bold uppercase">Pusat Kendali</span>
+              <span class="text-xs text-outline">Manajemen E-Surat Kuasa</span>
+            </div>
+            <h2 class="font-headline text-2xl font-bold text-on-surface mt-1">Dashboard Admin &amp; Analitik Peradilan</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="exportDataToExcel()" class="px-3.5 py-2 rounded-lg bg-primary text-on-primary font-semibold text-xs flex items-center gap-1.5 hover:bg-primary-container transition-colors cursor-pointer">
+              <span class="material-symbols-outlined text-sm">file_download</span>
+              <span>Ekspor ke Excel</span>
+            </button>
+            <button onclick="window.print()" class="px-3.5 py-2 rounded-lg bg-surface-container text-on-surface font-semibold text-xs flex items-center gap-1.5 hover:bg-surface-container-high transition-colors cursor-pointer">
+              <span class="material-symbols-outlined text-sm">print</span>
+              <span>Cetak Buku Register</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Metric Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm border border-surface-container">
+            <span class="text-xs text-outline font-bold uppercase">Total Pendaftaran</span>
+            <span id="admMetricTotal" class="font-display text-3xl font-bold text-on-surface block mt-2">1,248</span>
+            <span class="text-[11px] text-primary flex items-center gap-1 mt-1 font-semibold">
+              <span class="material-symbols-outlined text-xs">trending_up</span> +12% bulan ini
+            </span>
+          </div>
+
+          <div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm border border-surface-container">
+            <span class="text-xs text-outline font-bold uppercase">Menunggu Verifikasi</span>
+            <span id="admMetricMenunggu" class="font-display text-3xl font-bold text-secondary block mt-2">18</span>
+            <span class="text-[11px] text-secondary font-semibold mt-1 block">Prioritas staf loket</span>
+          </div>
+
+          <div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm border border-surface-container">
+            <span class="text-xs text-outline font-bold uppercase">Siap Disahkan (TTE)</span>
+            <span id="admMetricPengesahan" class="font-display text-3xl font-bold text-primary-container block mt-2">07</span>
+            <span class="text-[11px] text-primary-container font-semibold mt-1 block">Meja Panitera</span>
+          </div>
+
+          <div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm border border-surface-container">
+            <span class="text-xs text-outline font-bold uppercase">Kuasa Terdaftar Sah</span>
+            <span id="admMetricTerdaftar" class="font-display text-3xl font-bold text-primary block mt-2">1,223</span>
+            <span class="text-[11px] text-primary font-semibold mt-1 block">Ber-QR Code Aktif</span>
+          </div>
+        </div>
+
+        <!-- Visual Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          
+          <!-- Monthly Trend (8 cols) -->
+          <div class="lg:col-span-8 bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container">
+            <h4 class="font-bold text-sm text-on-surface mb-1">Tren Pendaftaran Surat Kuasa Bulanan (2026)</h4>
+            <p class="text-xs text-on-surface-variant mb-4">Volume permohonan surat kuasa perdata &amp; pidana yang terbit resmi.</p>
+            
+            <!-- SVG Bar Chart -->
+            <div class="w-full h-48 flex items-end gap-3 pt-4 border-b border-surface-container">
+              <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                <div class="w-full bg-primary/20 hover:bg-primary rounded-t transition-all h-[45%]"></div>
+                <span class="text-[10px] text-outline">Jul</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                <div class="w-full bg-primary/20 hover:bg-primary rounded-t transition-all h-[55%]"></div>
+                <span class="text-[10px] text-outline">Agu</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                <div class="w-full bg-primary/20 hover:bg-primary rounded-t transition-all h-[68%]"></div>
+                <span class="text-[10px] text-outline">Sep</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                <div class="w-full bg-primary/20 hover:bg-primary rounded-t transition-all h-[82%]"></div>
+                <span class="text-[10px] text-outline">Okt</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                <div class="w-full bg-primary rounded-t transition-all h-[95%]"></div>
+                <span class="text-[10px] text-primary font-bold">Nov</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                <div class="w-full bg-surface-container-high rounded-t transition-all h-[30%]"></div>
+                <span class="text-[10px] text-outline">Des (Est)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Demographics Donut (4 cols) -->
+          <div class="lg:col-span-4 bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-sm text-on-surface mb-1">Demografi Kategori Pemohon</h4>
+              <p class="text-xs text-on-surface-variant mb-4">Perbandingan permohonan Advokat vs Insidentil.</p>
+              
+              <div class="flex items-center justify-center py-4">
+                <div class="relative w-32 h-32 rounded-full border-8 border-primary flex items-center justify-center">
+                  <div class="text-center">
+                    <span class="font-display font-bold text-lg text-primary">82%</span>
+                    <span class="text-[9px] block text-outline">Advokat</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2 text-xs pt-4 border-t border-surface-container">
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-primary"></span> Advokat Resmi</span>
+                <span class="font-bold">82%</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-secondary"></span> Kuasa Insidentil</span>
+                <span class="font-bold">18%</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Master Data Table -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container overflow-hidden">
+          <div class="p-4 border-b border-surface-container flex items-center justify-between">
+            <h4 class="font-bold text-sm text-on-surface">Buku Induk Register Surat Kuasa</h4>
+            <span class="text-xs text-outline">Data tersinkronisasi otomatis dengan Google Sheets</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-surface-container-low text-[11px] uppercase tracking-wider text-outline border-b border-surface-container">
+                  <th class="px-4 py-3 font-bold">No. Register</th>
+                  <th class="px-4 py-3 font-bold">Tanggal</th>
+                  <th class="px-4 py-3 font-bold">Pemberi Kuasa</th>
+                  <th class="px-4 py-3 font-bold">Penerima Kuasa</th>
+                  <th class="px-4 py-3 font-bold">Kategori</th>
+                  <th class="px-4 py-3 font-bold">Status</th>
+                  <th class="px-4 py-3 font-bold text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="adminMasterTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 6: VALIDASI QR DOKUMEN PUBLIK -->
+    <!-- ======================================================================= -->
+    <section id="view-validasi-qr-dokumen" class="hidden w-full flex-1 bg-surface py-8">
+      <div class="max-w-3xl mx-auto px-space-md sm:px-space-lg">
+        
+        <!-- Header Validasi MA-RI -->
+        <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container mb-6 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-primary text-secondary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-2xl">balance</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-headline font-bold text-base text-on-surface">MAHKAMAH AGUNG RI</span>
+                <span class="px-2 py-0.5 rounded-full bg-secondary text-on-secondary text-[10px] font-bold uppercase">Resmi</span>
+              </div>
+              <p class="text-xs text-on-surface-variant">Sistem Registrasi Elektronik Surat Kuasa Pengadilan Negeri</p>
+            </div>
+          </div>
+          <span class="hidden sm:inline px-3 py-1 rounded-full bg-surface-container text-xs text-primary font-semibold">
+            PORTAL VERIFIKASI KEASLIAN
+          </span>
+        </div>
+
+        <!-- Authenticity Banner -->
+        <div class="bg-primary-container text-on-primary p-6 rounded-xl shadow-md mb-6 flex items-center gap-4">
+          <div class="w-14 h-14 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-3xl">verified</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold uppercase">Terverifikasi &amp; Berintegritas</span>
+              <span class="text-xs text-primary-fixed-dim">• Real-Time Match</span>
+            </div>
+            <h3 class="font-headline text-xl font-bold">DOKUMEN ASLI &amp; TERDAFTAR RESMI</h3>
+            <p class="text-xs text-primary-fixed-dim mt-0.5 leading-relaxed">
+              Dokumen Surat Kuasa ini secara sah terdaftar pada Buku Register Elektronik Kepaniteraan Hukum Pengadilan Negeri dan telah dibubuhi Pengesahan Elektronik resmi (BSrE BSSN).
+            </p>
+          </div>
+        </div>
+
+        <!-- Verification Detail Card -->
+        <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container space-y-6">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-container gap-2">
+            <div>
+              <span class="text-xs text-outline font-bold uppercase">Nomor Register Perkara / Legalisasi</span>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span id="qrValidRegNo" class="font-mono text-base font-bold text-primary">W11-U1/245/HK.02/XI/2026</span>
+                <button onclick="copyText(document.getElementById('qrValidRegNo').textContent)" class="p-1 rounded text-outline hover:text-primary transition-colors" title="Salin Nomor">
+                  <span class="material-symbols-outlined text-sm">content_copy</span>
+                </button>
+              </div>
+            </div>
+            <div>
+              <span class="text-xs text-outline font-bold uppercase">Kode Validasi QR</span>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span id="qrValidCode" class="font-mono text-xs font-bold text-on-surface">REG-202611-0088</span>
+                <span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold">AKTIF &amp; BERLAKU</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-3.5 rounded-xl bg-surface-container-low">
+              <span class="text-[10px] text-outline font-bold uppercase block mb-1">Pihak Pemberi Kuasa (Prinsipal)</span>
+              <div id="qrValidPemberi" class="text-sm"></div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-surface-container-low">
+              <span class="text-[10px] text-outline font-bold uppercase block mb-1">Pihak Penerima Kuasa (Advokat)</span>
+              <div id="qrValidPenerima" class="text-sm"></div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-surface-container-low">
+              <span class="text-[10px] text-outline font-bold uppercase block mb-1">Klasifikasi &amp; Hubungan Perkara</span>
+              <div id="qrValidPerkara" class="text-sm"></div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-surface-container-low">
+              <span class="text-[10px] text-outline font-bold uppercase block mb-1">Pejabat Pengesah (Panitera)</span>
+              <div id="qrValidPejabat" class="text-sm"></div>
+            </div>
+          </div>
+
+          <!-- Cryptographic SHA-256 HMAC Fingerprint -->
+          <div class="p-4 rounded-xl bg-surface-container text-xs">
+            <span class="text-[10px] text-outline font-bold uppercase block mb-1">Integritas Dokumen Digital (SHA-256 HMAC):</span>
+            <div class="flex items-center gap-2">
+              <span id="qrValidHash" class="font-mono text-[11px] text-primary break-all">a8f4b23c91e56b8209dc47120fe817c0326e0802c61148e100f917208d7d91e0</span>
+              <button onclick="copyText(document.getElementById('qrValidHash').textContent)" class="p-1 rounded text-outline hover:text-primary transition-colors flex-shrink-0" title="Salin Hash">
+                <span class="material-symbols-outlined text-sm">content_copy</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-surface-container">
+            <button onclick="openCertificateModal('REG-202611-0088')" class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer">
+              <span class="material-symbols-outlined text-base">download</span>
+              <span>Unduh Salinan Dokumen PDF Resmi</span>
+            </button>
+            <span class="text-[11px] text-outline flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm text-primary">lock</span>
+              SSL 256-Bit Encrypted Verification
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- FOOTER -->
+  <!-- ========================================================================= -->
+  <footer class="w-full bg-surface-container-low border-t border-surface-container py-6 text-on-surface-variant text-xs">
+    <div class="max-w-7xl mx-auto px-space-md sm:px-space-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-base">account_balance</span>
+        <span>Republik Indonesia • Mahkamah Agung RI • Pengadilan Negeri</span>
+      </div>
+      <p>&copy; 2026 Pelayanan Terpadu Satu Pintu (PTSP) Pengadilan Negeri. Hak Cipta Dilindungi Undang-Undang.</p>
+    </div>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: DOCUMENT INSPECTION SLIDE-OVER DRAWER (FOR VERIFIKATOR) -->
+  <!-- ========================================================================= -->
+  <div id="inspectOverlay" onclick="closeInspectDrawer()" class="hidden fixed inset-0 bg-black/50 z-50 transition-opacity"></div>
+  <aside id="inspectDrawer" class="hidden fixed top-0 right-0 bottom-0 w-full max-w-xl bg-surface-container-lowest shadow-2xl z-50 flex flex-col animate-slide-over">
+    <div class="p-4 border-b border-surface-container flex items-center justify-between bg-primary text-on-primary">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-xl">fact_check</span>
+        <h3 class="font-bold text-sm">Inspeksi Berkas &amp; Dokumen</h3>
+        <span id="insId" class="text-xs font-mono font-bold text-secondary-container"></span>
+      </div>
+      <button onclick="closeInspectDrawer()" class="p-1 rounded hover:bg-primary-container text-on-primary transition-colors cursor-pointer">
+        <span class="material-symbols-outlined text-xl">close</span>
+      </button>
+    </div>
+
+    <div class="p-5 flex-1 overflow-y-auto space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-outline font-bold">Status Berkas:</span>
+        <span id="insStatus" class="px-2 py-0.5 rounded-full text-xs font-bold"></span>
+      </div>
+
+      <!-- Applicant Details -->
+      <div class="p-3.5 rounded-xl bg-surface-container-low text-xs space-y-1.5">
+        <div><span class="font-bold text-outline">Pemberi Kuasa:</span> <span id="insPemohonNama" class="font-bold text-on-surface"></span> (<span id="insPemohonNik"></span>)</div>
+        <div><span class="font-bold text-outline">Penerima Kuasa:</span> <span id="insPenerimaNama" class="font-bold text-on-surface"></span> (ID: <span id="insPenerimaKta"></span>)</div>
+        <div><span class="font-bold text-outline">Perkara:</span> <span id="insPerkara"></span></div>
+      </div>
+
+      <!-- Document Preview Viewer -->
+      <div class="border border-surface-container rounded-xl overflow-hidden bg-black/5 relative">
+        <div class="p-2 bg-surface-container-low border-b border-surface-container flex items-center justify-between text-xs font-bold">
+          <span>Pratinjau KTP / KTA Advokat</span>
+          <div class="flex items-center gap-1">
+            <button onclick="zoomInspectDoc(-15)" class="p-1 rounded hover:bg-surface-container text-outline" title="Zoom Out"><span class="material-symbols-outlined text-sm">zoom_out</span></button>
+            <button onclick="zoomInspectDoc(15)" class="p-1 rounded hover:bg-surface-container text-outline" title="Zoom In"><span class="material-symbols-outlined text-sm">zoom_in</span></button>
+            <button onclick="rotateInspectDoc()" class="p-1 rounded hover:bg-surface-container text-outline" title="Rotate"><span class="material-symbols-outlined text-sm">rotate_right</span></button>
+          </div>
+        </div>
+        <div class="h-64 flex items-center justify-center p-2 overflow-hidden bg-surface-container-high/30">
+          <img id="inspectDocImage" src="" alt="Pratinjau Berkas" class="max-h-full max-w-full object-contain transition-transform duration-200"/>
+        </div>
+      </div>
+
+      <!-- Catatan Verifikator Form -->
+      <div>
+        <label class="block text-xs font-bold text-on-surface mb-1">Catatan Petugas (Wajib diisi bila meminta revisi / tolak):</label>
+        <textarea id="insCatatanInput" rows="3" class="w-full px-3 py-2 rounded-lg bg-surface-container-low text-xs border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Tuliskan catatan perbaikan atau alasan kelengkapan berkas..."></textarea>
+      </div>
+    </div>
+
+    <!-- Actions Footer -->
+    <div class="p-4 border-t border-surface-container bg-surface-container-low flex flex-col sm:flex-row items-center gap-2">
+      <button onclick="actionVerifikator('tolak')" class="w-full sm:w-auto px-3 py-2 rounded-lg text-xs font-bold text-error hover:bg-error-container/50 transition-colors cursor-pointer">
+        Tolak Berkas
+      </button>
+      <button onclick="actionVerifikator('revisi')" class="w-full sm:w-auto px-3.5 py-2 rounded-lg bg-surface-container-high text-xs font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer">
+        Minta Revisi
+      </button>
+      <button onclick="actionVerifikator('lolos')" class="w-full sm:flex-1 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+        <span class="material-symbols-outlined text-sm">verified</span>
+        <span>Loloskan ke Pejabat</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: REGISTRATION SUCCESS DIALOG -->
+  <!-- ========================================================================= -->
+  <div id="successRegisterModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-surface-container-lowest max-w-md w-full p-6 rounded-2xl shadow-2xl border border-surface-container text-center animate-fade-in">
+      <div class="w-16 h-16 mx-auto rounded-full bg-primary text-secondary-container flex items-center justify-center mb-4 shadow-md">
+        <span class="material-symbols-outlined text-3xl">mark_email_read</span>
+      </div>
+      <h3 class="font-headline text-xl font-bold text-on-surface mb-1">Pendaftaran Berhasil Dikirim!</h3>
+      <p class="text-xs text-on-surface-variant mb-4">Berkas Anda telah masuk ke dalam antrean verifikasi Petugas PTSP.</p>
+      
+      <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container mb-4">
+        <span class="text-[10px] uppercase font-bold text-outline block">Nomor Registrasi Anda:</span>
+        <span id="successRegCode" class="font-mono text-xl font-bold text-primary block mt-0.5">REG-202611-XXXX</span>
+        <p class="text-[11px] text-on-surface-variant mt-1.5">Simpan nomor ini untuk melacak perkembangan status surat kuasa Anda.</p>
+      </div>
+
+      <button onclick="closeSuccessModal()" class="w-full py-3 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-bold text-xs transition-colors cursor-pointer">
+        Tutup &amp; Lacak Permohonan
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: PRINTABLE CERTIFICATE MODAL -->
+  <!-- ========================================================================= -->
+  <div id="certificateModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-surface-container-lowest max-w-3xl w-full p-6 rounded-2xl shadow-2xl border border-surface-container my-8 animate-fade-in flex flex-col">
+      <div class="flex items-center justify-between pb-4 border-b border-surface-container mb-4">
+        <span class="text-xs font-bold text-primary flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-lg">verified</span>
+          Dokumen Akta Surat Kuasa Terdaftar
+        </span>
+        <div class="flex items-center gap-2">
+          <button onclick="printCertificate()" class="px-3.5 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-semibold flex items-center gap-1 hover:bg-primary-container transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-sm">print</span>
+            <span>Cetak / Unduh PDF</span>
+          </button>
+          <button onclick="closeCertificateModal()" class="p-1 rounded text-outline hover:text-on-surface transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="certificateModalContent" class="overflow-y-auto max-h-[70vh]"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <!-- ========================================================================= -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none *:pointer-events-auto"></div>
+
+  <!-- Application Logic Scripts -->
+  <script src="./js/config.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

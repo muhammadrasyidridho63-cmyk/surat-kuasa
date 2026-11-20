@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+
+<html lang="id"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-container-highest":"#dce2f7","on-secondary-fixed-variant":"#604100","tertiary-fixed-dim":"#ffb3b2","surface-variant":"#dce2f7","tertiary":"#561f21","on-surface":"#141b2b","surface-container-high":"#e1e8fd","outline-variant":"#bfc9c1","on-secondary-fixed":"#281900","surface-dim":"#d3daef","on-background":"#141b2b","on-error-container":"#93000a","on-surface-variant":"#404943","surface-container-lowest":"#ffffff","inverse-surface":"#293040","on-tertiary-container":"#f4a09f","on-tertiary-fixed":"#3a090d","tertiary-container":"#723536","secondary-fixed":"#ffdead","on-primary":"#ffffff","surface-bright":"#f9f9ff","surface-container-low":"#f1f3ff","primary-fixed":"#aff1cb","error-container":"#ffdad6","secondary-fixed-dim":"#f4bd61","on-tertiary":"#ffffff","background":"#f9f9ff","secondary":"#7e5700","primary-container":"#0d5236","secondary-container":"#fdc668","surface-container":"#e9edff","primary-fixed-dim":"#94d4b0","on-primary-fixed-variant":"#0b5135","surface":"#f9f9ff","outline":"#707972","surface-tint":"#2b6a4c","inverse-on-surface":"#edf0ff","tertiary-fixed":"#ffdad9","on-secondary":"#ffffff","primary":"#003923","on-tertiary-fixed-variant":"#713435","on-error":"#ffffff","on-secondary-container":"#765100","on-primary-container":"#84c4a0","on-primary-fixed":"#002112","error":"#ba1a1a","inverse-primary":"#94d4b0"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-md":"1rem",margin:"2rem",gutter:"1.5rem","space-lg":"1.5rem","gutter-mobile":"1rem","space-xl":"2rem","margin-mobile":"1rem","space-xs":"0.25rem","space-sm":"0.5rem"},fontFamily:{"headline-sm":["Plus Jakarta Sans"],"label-lg":["Inter"],"label-sm":["Inter"],"headline-lg-mobile":["Plus Jakarta Sans"],"title-md":["Plus Jakarta Sans"],"label-md":["Inter"],"body-md":["Inter"],"headline-md":["Plus Jakarta Sans"],"body-lg":["Inter"],"headline-lg":["Plus Jakarta Sans"],display:["Plus Jakarta Sans"],"body-sm":["Inter"]},fontSize:{"headline-sm":["20px",{lineHeight:"28px",letterSpacing:"-0.01em",fontWeight:"600"}],"label-lg":["14px",{lineHeight:"20px",letterSpacing:"0.01em",fontWeight:"500"}],"label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.04em",fontWeight:"600"}],"headline-lg-mobile":["26px",{lineHeight:"34px",letterSpacing:"-0.015em",fontWeight:"700"}],"title-md":["16px",{lineHeight:"24px",letterSpacing:"-0.005em",fontWeight:"600"}],"label-md":["12px",{lineHeight:"16px",letterSpacing:"0.02em",fontWeight:"500"}],"body-md":["14px",{lineHeight:"20px",letterSpacing:"0em",fontWeight:"400"}],"headline-md":["24px",{lineHeight:"32px",letterSpacing:"-0.015em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"24px",letterSpacing:"0em",fontWeight:"400"}],"headline-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"700"}],display:["40px",{lineHeight:"48px",letterSpacing:"-0.02em",fontWeight:"700"}],"body-sm":["12px",{lineHeight:"16px",letterSpacing:"0em",fontWeight:"400"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 h-16 bg-primary text-on-primary z-50 shadow-[0_1px_8px_rgba(0,0,0,0.08)]"><div class="w-full h-full px-space-lg flex items-center justify-between"><div class="flex items-center gap-space-md"><div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-secondary-container shadow-[0_1px_3px_0_rgba(17,24,39,0.04)]"><span class="material-symbols-outlined text-2xl">balance</span></div><div class="flex flex-col justify-center"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm tracking-wide text-on-primary">PENGADILAN NEGERI</span><span class="px-space-xs py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-wider">E-Katalog</span></div><span class="font-label-sm text-label-sm text-on-primary-container">Layanan E-Surat Kuasa Online Terpadu</span></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center gap-space-sm px-space-md py-1.5 rounded-lg bg-primary-container text-on-primary"><span class="material-symbols-outlined text-secondary-container text-lg">support_agent</span><div class="text-left"><p class="font-label-sm text-label-sm text-on-primary-container leading-none">Layanan PTSP</p><p class="font-label-md text-label-md font-semibold text-on-primary leading-tight">(021) 8092-2345</p></div></div><button class="relative p-2 rounded-lg text-on-primary hover:bg-primary-container transition-colors" type="button"><span class="material-symbols-outlined text-xl">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary-container"></span></button><div class="flex items-center gap-space-sm pl-space-sm border-l border-primary-container"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/ALJJyrCjMTKD_HCEyHCBZK5u8H0z6d8NF9fe_l71jYfdcDS2WRfd8gPvcndVMQ0xo0Y5C4i19woUrGzjdzkzvqsRDxuSDzbgE-9HWWec0ImfC7JifmPiqprfNdTZ5xwdhNSkxwmGGtT5wjwCSRWRNhUrUwGT7PYfxJccLqEg9uZ-1Vif0baXKDmxOtrCKXtjWY_C08HQ2DhOZ8JG8Rd8FTDtUcF48zRGBh5HpsT7Z8Hf0Zk"/><div class="hidden lg:flex flex-col text-left"><span class="font-label-md text-label-md font-semibold text-on-primary leading-tight">Panitera Muda Perdata</span><span class="font-label-sm text-label-sm text-on-primary-container">NIP. 19820412 200801 1 002</span></div></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-72 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex flex-col justify-between p-space-md"><div class="flex flex-col gap-space-md"><div class="px-space-sm pt-space-xs"><span class="font-label-sm text-label-sm font-semibold uppercase tracking-wider text-outline">Menu Layanan Peradilan</span></div><nav class="flex flex-col gap-1" data-active-classes="bg-primary-container text-on-primary font-semibold rounded-lg shadow-sm"><a class="flex items-center gap-space-md px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="beranda-dan-lacak" href="#"><span class="material-symbols-outlined text-xl">travel_explore</span><span>Beranda &amp; Lacak</span></a><a class="flex items-center gap-space-md px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="pendaftaran-kuasa" href="#"><span class="material-symbols-outlined text-xl">post_add</span><span>Pendaftaran Kuasa</span></a><a aria-current="page" class="flex items-center gap-space-md px-space-md py-2.5 transition-all bg-primary-container text-on-primary font-semibold rounded-lg shadow-sm" data-path="meja-verifikator" href="#"><span class="material-symbols-outlined text-xl">rule</span><span>Meja Verifikator</span></a><a class="flex items-center gap-space-md px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="meja-pengesahan" href="#"><span class="material-symbols-outlined text-xl">verified_user</span><span>Meja Pengesahan</span></a><a class="flex items-center gap-space-md px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="dashboard-admin" href="#"><span class="material-symbols-outlined text-xl">analytics</span><span>Dashboard Admin</span></a><a class="flex items-center gap-space-md px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="validasi-qr-dokumen" href="#"><span class="material-symbols-outlined text-xl">qr_code_scanner</span><span>Validasi QR Dokumen</span></a></nav></div><div class="flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container-highest"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-secondary text-lg">gavel</span><span class="font-label-md text-label-md font-semibold text-on-surface">Statuta Peradilan</span></div><p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Otentikasi &amp; legalisasi Surat Kuasa sesuai regulasi Mahkamah Agung RI.</p></div></aside><div class="pl-72"><main class="w-full min-h-screen pt-16 bg-surface"><div class="flex flex-col w-full">
+<div class="px-space-xl py-space-lg flex flex-col gap-space-lg max-w-[1520px] mx-auto w-full">
+<!-- Header Meja Kerja & Sesi Petugas PTSP -->
+<section class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-md pb-space-xs">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-md text-label-md">
+<span class="font-medium text-on-surface">Layanan Kepaniteraan Hukum</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span>Loket PTSP Mandiri</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-semibold">Verifikasi Cepat</span>
+</div>
+<div class="flex items-center gap-space-sm mt-0.5">
+<div class="w-2.5 h-8 rounded-full bg-primary"></div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Meja Verifikasi Antrean Pendaftaran Surat Kuasa</h1>
+</div>
+</div>
+<div class="flex items-center flex-wrap gap-space-sm bg-surface-container-lowest px-space-md py-2.5 rounded-xl shadow-sm">
+<div class="flex items-center gap-space-sm">
+<div class="relative">
+<img class="w-9 h-9 rounded-full object-cover" data-alt="Official Indonesian court registrar passport photo with formal black judicial batik attire and polite warm smile, clean white studio background, high resolution profile shot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfARzQIoY0s7_ZxzLLUq0JaGF7LbvMlWpD-9SRy_TCbIaeGDkAtSt73A6i83G_bPY94n4ZAT6CbFOtQhPb5ARnpUymx-HwvvfU3N8Dh_-GccQ_XhFAc3KQ-0H4wDCRP-6Xo9w4DeVt8SA4v81SXjkPDUoKiW0pwO5KB9SMpYytw-pjTraIqMJPPpjycjXZrmtFrNY54HoJwvTZo38EKQzNpj0Q9_uhAty_bVp01A"/>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-primary-fixed-dim ring-2 ring-surface-container-lowest"></span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface leading-tight">Ahmad Syafii</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Staf PTSP Meja 1 (Perdata)</span>
+</div>
+</div>
+<div class="h-6 w-px bg-surface-container-highest mx-1"></div>
+<div class="flex items-center gap-2 px-space-sm py-1 rounded-lg bg-surface-container">
+<span class="material-symbols-outlined text-secondary text-base">timer</span>
+<div class="text-left font-label-sm text-label-sm">
+<span class="text-on-surface-variant">Kuota Harian: </span>
+<span class="font-bold text-on-surface">48/50</span>
+<span class="text-on-surface-variant"> Diproses</span>
+</div>
+</div>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-lg">refresh</span>
+</button>
+</div>
+</section>
+<!-- Stat Ringkasan Cepat Antrean -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant font-medium">Total Masuk Hari Ini</span>
+<span class="font-display text-display text-on-surface mt-1 leading-none">28</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-primary">trending_up</span> +6 permohonan baru
+          </span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">inbox_customize</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-secondary-fixed-variant font-medium">Menunggu Verifikasi</span>
+<span class="font-display text-display text-secondary mt-1 leading-none">12</span>
+<span class="font-label-sm text-label-sm text-on-secondary-fixed-variant mt-1.5 flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed-dim animate-pulse"></span> Prioritas antrean loket
+          </span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-secondary-container/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-2xl">pending_actions</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant font-medium">Butuh Revisi / Perbaikan</span>
+<span class="font-display text-display text-tertiary-container mt-1 leading-none">04</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-tertiary">error</span> Menunggu respons advokat
+          </span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-2xl">rule_settings</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant font-medium">Diteruskan ke Pejabat</span>
+<span class="font-display text-display text-primary-container mt-1 leading-none">12</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-primary-container">verified</span> Siap tanda tangan TTE
+          </span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-primary-fixed/40 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-2xl">approval_delegation</span>
+</div>
+</div>
+</section>
+<!-- Work Area: Split Screen (Queue Table & Side-by-Side Review Pane) -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+<!-- Kolom Kiri: Tabel Antrean (xl:col-span-7) -->
+<section class="xl:col-span-7 flex flex-col gap-space-md">
+<!-- Filter & Search Panel -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between flex-wrap gap-space-sm">
+<div class="flex items-center gap-1.5 p-1 bg-surface-container-low rounded-lg font-label-md text-label-md">
+<button class="px-space-md py-1.5 rounded-md text-on-surface-variant hover:text-on-surface transition-colors" type="button">Semua</button>
+<button class="px-space-md py-1.5 rounded-md bg-primary-container text-on-primary font-semibold shadow-sm flex items-center gap-1.5" type="button">
+<span>Menunggu</span>
+<span class="w-5 h-5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm flex items-center justify-center font-bold">12</span>
+</button>
+<button class="px-space-md py-1.5 rounded-md text-on-surface-variant hover:text-on-surface transition-colors" type="button">Perlu Revisi (4)</button>
+<button class="px-space-md py-1.5 rounded-md text-on-surface-variant hover:text-on-surface transition-colors" type="button">Lolos (12)</button>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-sm text-secondary">sort</span>
+<span>Terbaru Dahulu</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-sm items-center">
+<div class="md:col-span-6 relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-lg">search</span>
+<input class="w-full pl-9 pr-space-md py-2 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container/20" placeholder="Cari no agenda, pemohon, atau advokat..." type="text"/>
+</div>
+<div class="md:col-span-3">
+<select class="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none">
+<option>Semua Kategori</option>
+<option>Kuasa Advokat</option>
+<option>Kuasa Insidentil</option>
+<option>Kuasa Instansi / BUMN</option>
+</select>
+</div>
+<div class="md:col-span-3">
+<button class="w-full flex items-center justify-center gap-1.5 px-space-sm py-2 bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md rounded-lg transition-colors" type="button">
+<span class="material-symbols-outlined text-base">calendar_today</span>
+<span>14 Nov 2026</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Tabel Antrean Verifikasi -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-md text-body-md">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-3.5 px-space-md font-semibold">No. Agenda / Waktu</th>
+<th class="py-3.5 px-space-md font-semibold">Pihak Berperkara</th>
+<th class="py-3.5 px-space-md font-semibold">Tipe &amp; Lampiran</th>
+<th class="py-3.5 px-space-md font-semibold">Status Status</th>
+<th class="py-3.5 px-space-md font-semibold text-right">Aksi Meja</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- Baris 1: ACTIVE / INSPECTING -->
+<tr class="bg-primary-container/5 hover:bg-primary-container/10 transition-colors">
+<td class="py-3.5 px-space-md">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary-fixed animate-ping"></div>
+<div class="flex flex-col">
+<span class="font-semibold text-primary font-title-md text-title-md">REG-202611-0091</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">schedule</span> 10:15 WIB
+                        </span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Hendra Wijaya</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Advokat: Aulia Rahma, S.H.</span>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary font-medium">
+<span class="material-symbols-outlined text-xs">gavel</span> Advokat PERADI
+                      </span>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> KTP
+                        <span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> KTA
+                        <span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> BA Sumpah
+                      </div>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed/50 text-secondary font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-xs">hourglass_top</span>
+                      Menunggu Verifikasi
+                    </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button class="inline-flex items-center gap-1.5 px-space-md py-1.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md font-medium shadow-sm hover:bg-primary transition-all" type="button">
+<span>Periksa</span>
+<span class="material-symbols-outlined text-sm">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Baris 2: BUTUH REVISI -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface font-title-md text-title-md">REG-202611-0090</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">schedule</span> 09:40 WIB
+                      </span>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Siti Aminah</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Kuasa: M. Rizky (Keluarga)</span>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-secondary font-medium">
+<span class="material-symbols-outlined text-xs">family_restroom</span> Kuasa Insidentil
+                      </span>
+<span class="font-label-sm text-label-sm text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">warning</span> KTP Buram &amp; Kartu Keluarga (-)
+                      </span>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-xs text-outline">sync_problem</span>
+                      Perlu Revisi
+                    </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button class="inline-flex items-center gap-1.5 px-space-md py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-medium transition-all" type="button">
+<span>Tinjau Catatan</span>
+<span class="material-symbols-outlined text-sm">edit_note</span>
+</button>
+</td>
+</tr>
+<!-- Baris 3: LOLOS / DITERUSKAN -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface font-title-md text-title-md">REG-202611-0089</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">schedule</span> 09:10 WIB
+                      </span>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">PT Karya Mandiri Sejahtera</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Direktur: Joko Santoso</span>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary-container font-medium">
+<span class="material-symbols-outlined text-xs">domain</span> Badan Hukum
+                      </span>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> NIB
+                        <span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> Akta Notaris
+                        <span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> Surat Kuasa
+                      </div>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary-fixed/60 text-primary-container font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-xs">check_circle</span>
+                      Diteruskan Pejabat
+                    </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<span class="font-label-sm text-label-sm text-outline px-space-sm py-1">Selesai Diverifikasi</span>
+</td>
+</tr>
+<!-- Baris 4: MENUNGGU -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface font-title-md text-title-md">REG-202611-0088</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">schedule</span> 08:55 WIB
+                      </span>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Bambang Irawan</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Advokat: Dwi Hartono, S.H.</span>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary font-medium">
+<span class="material-symbols-outlined text-xs">gavel</span> Advokat KAI
+                      </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Berkas Dokumen (3 File)</span>
+</div>
+</td>
+<td class="py-3.5 px-space-md">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed/50 text-secondary font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-xs">hourglass_top</span>
+                      Menunggu
+                    </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button class="inline-flex items-center gap-1 px-space-sm py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-all" type="button">
+<span>Buka</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Ringan -->
+<div class="px-space-md py-3 bg-surface-container-low flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Menampilkan 1-4 dari 28 berkas</span>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container disabled:opacity-50" type="button">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<span class="px-2 font-bold text-on-surface">1</span>
+<button class="p-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Panduan Singkat SOP Meja Verifikasi -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-start gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-xl">policy</span>
+</div>
+<div class="flex flex-col gap-0.5">
+<h2 class="font-title-md text-title-md text-on-surface">Standar Operasional Meja Verifikator PTSP</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Pastikan kesesuaian Nomor Identitas Advokat pada direktori Mahkamah Agung / Organisasi Advokat. Untuk Surat Kuasa Khusus Perdata, wewenang mediasi, banding, dan kasasi wajib tercantum secara tegas sesuai Surat Edaran Mahkamah Agung (SEMA).
+            </p>
+</div>
+</div>
+</section>
+<!-- Kolom Kanan: Integrated Slide-Over / Split Inspection Drawer (xl:col-span-5) -->
+<section class="xl:col-span-5 sticky top-20 flex flex-col gap-space-md">
+<div class="bg-surface-container-lowest rounded-xl shadow-md overflow-hidden flex flex-col">
+<!-- Inspection Header -->
+<div class="px-space-md py-space-sm bg-primary-container text-on-primary flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary-container">inventory</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-primary">REG-202611-0091</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm font-semibold">SK-Khusus</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-primary-container">Pemohon: Hendra Wijaya • Pengadilan Negeri Surabaya</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1.5 rounded-lg hover:bg-primary text-on-primary-container hover:text-on-primary transition-colors" title="Layar Penuh" type="button">
+<span class="material-symbols-outlined text-lg">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- Document Tabs Preview Bar -->
+<div class="bg-surface-container-low px-space-md pt-2 flex items-center gap-1 overflow-x-auto">
+<button class="px-space-md py-2 rounded-t-lg bg-surface-container-lowest font-label-md text-label-md font-semibold text-primary shadow-sm flex items-center gap-1.5 shrink-0" type="button">
+<span class="material-symbols-outlined text-base">description</span>
+<span>Draf Surat Kuasa</span>
+</button>
+<button class="px-space-md py-2 rounded-t-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md font-medium flex items-center gap-1.5 shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-base">badge</span>
+<span>KTP Pemberi Kuasa</span>
+</button>
+<button class="px-space-md py-2 rounded-t-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md font-medium flex items-center gap-1.5 shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-base">contact_page</span>
+<span>KTA Advokat PERADI</span>
+</button>
+</div>
+<!-- Document Viewer Area with Interactive Controls -->
+<div class="relative bg-surface-container p-space-md flex flex-col items-center justify-center min-h-[360px] overflow-hidden">
+<!-- Toolbar Overlay -->
+<div class="absolute top-4 right-4 z-10 flex items-center gap-1 bg-inverse-surface/85 text-inverse-on-surface p-1 rounded-lg backdrop-blur shadow-md">
+<button class="p-1 rounded hover:bg-inverse-surface transition-colors" title="Perbesar" type="button">
+<span class="material-symbols-outlined text-base">zoom_in</span>
+</button>
+<button class="p-1 rounded hover:bg-inverse-surface transition-colors" title="Perkecil" type="button">
+<span class="material-symbols-outlined text-base">zoom_out</span>
+</button>
+<button class="p-1 rounded hover:bg-inverse-surface transition-colors" title="Putar 90 Derajat" type="button">
+<span class="material-symbols-outlined text-base">rotate_right</span>
+</button>
+<div class="h-4 w-px bg-outline mx-0.5"></div>
+<button class="p-1 rounded hover:bg-inverse-surface transition-colors" title="Unduh Asli" type="button">
+<span class="material-symbols-outlined text-base">download</span>
+</button>
+</div>
+<!-- Authentic Legal Document Canvas Representation -->
+<div class="w-full max-w-[420px] bg-surface-container-lowest p-space-lg rounded shadow-md flex flex-col gap-3 font-body-sm text-body-sm text-on-surface transition-transform duration-200">
+<!-- Judicial Letterhead Stamp Header -->
+<div class="flex items-center justify-between pb-2 bg-surface-container-low px-2 py-1 rounded">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-secondary-container">
+<span class="material-symbols-outlined text-xs">balance</span>
+</div>
+<span class="font-label-sm text-label-sm font-bold text-primary">SURAT KUASA KHUSUS</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">PN.SBY-2026/Pdt.G</span>
+</div>
+<div class="space-y-1.5 leading-relaxed text-on-surface">
+<p class="font-medium text-xs text-on-surface-variant uppercase tracking-wider">Yang bertanda tangan di bawah ini:</p>
+<div class="bg-surface-container-low/50 p-2 rounded flex flex-col gap-0.5">
+<span class="font-bold text-on-surface">Hendra Wijaya (Pemberi Kuasa)</span>
+<span class="text-on-surface-variant text-xs">NIK: 3578201204880003 • Surabaya, Jawa Timur</span>
+</div>
+<p class="font-medium text-xs text-on-surface-variant uppercase tracking-wider pt-1">Dengan ini memberi kuasa penuh kepada:</p>
+<div class="bg-surface-container-low/50 p-2 rounded flex flex-col gap-0.5">
+<span class="font-bold text-primary">Aulia Rahma, S.H., M.H. (Penerima Kuasa)</span>
+<span class="text-on-surface-variant text-xs">NIA PERADI: 14.02981 / DPC PERADI Surabaya</span>
+</div>
+<div class="text-xs text-on-surface-variant line-clamp-3 pt-1">
+                  Untuk dan atas nama Pemberi Kuasa mewakili dalam perkara Gugatan Perdata Perbuatan Melawan Hukum di Pengadilan Negeri Surabaya terhadap Tergugat...
+                </div>
+</div>
+<!-- Meterai Elektronik Box Indicator -->
+<div class="mt-2 pt-2 flex items-center justify-between bg-surface-container-low p-2 rounded">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded bg-secondary-fixed/40 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-sm">verified</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm font-semibold text-secondary">E-Meterai Rp10.000 Terpasang</span>
+<span class="text-[10px] text-on-surface-variant font-mono">SN: MET-2026-9812-7718-44</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-primary-container font-bold">SAH</span>
+</div>
+</div>
+<!-- Preview Badging Indicator -->
+<div class="mt-3 flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-xs text-primary">security</span>
+<span>Dokumen diamankan dengan SHA-256 Checksum</span>
+</div>
+</div>
+<!-- Checklist Verifikasi Legal PTSP -->
+<div class="p-space-md flex flex-col gap-space-sm bg-surface-container-lowest">
+<span class="font-title-md text-title-md text-on-surface flex items-center justify-between">
+<span>Lembar Uji Kelayakan Berkas</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-primary-fixed/40 text-primary-container font-semibold">3/3 Valid</span>
+</span>
+<div class="space-y-2">
+<label class="flex items-start gap-space-sm p-2 rounded-lg bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors">
+<input checked="" class="mt-1 w-4 h-4 rounded text-primary-container focus:ring-primary" type="checkbox"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Validasi Identitas KTP Pemohon (Disdukcapil)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">NIK 3578201204880003 aktif dan identitas sesuai KTP digital.</span>
+</div>
+</label>
+<label class="flex items-start gap-space-sm p-2 rounded-lg bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors">
+<input checked="" class="mt-1 w-4 h-4 rounded text-primary-container focus:ring-primary" type="checkbox"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Keabsahan KTA &amp; Berita Acara Sumpah Advokat</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Masa berlaku KTA PERADI aktif sampai 31 Desember 2028.</span>
+</div>
+</label>
+<label class="flex items-start gap-space-sm p-2 rounded-lg bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors">
+<input checked="" class="mt-1 w-4 h-4 rounded text-primary-container focus:ring-primary" type="checkbox"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Klausul Khusus Sesuai Regulasi Peradilan</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Kewenangan mediasi, pengakuan, dan perdamaian tercantum spesifik.</span>
+</div>
+</label>
+</div>
+<!-- Catatan Petugas Input Box -->
+<div class="flex flex-col gap-1.5 mt-2">
+<label class="font-label-md text-label-md font-semibold text-on-surface flex items-center justify-between">
+<span>Catatan Verifikator (Wajib diisi bila revisi)</span>
+<span class="font-label-sm text-label-sm text-outline font-normal">Maksimal 250 karakter</span>
+</label>
+<textarea class="w-full p-space-sm bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-container/20 placeholder:text-outline" placeholder="Tuliskan catatan detail jika ada lampiran yang perlu diperbaiki oleh pemohon..." rows="2"></textarea>
+</div>
+</div>
+<!-- Action Bar Footer -->
+<div class="p-space-md bg-surface-container-low flex flex-col gap-space-sm">
+<div class="grid grid-cols-2 gap-space-sm">
+<button class="w-full py-2 px-space-sm rounded-lg bg-surface-container-lowest hover:bg-error-container text-error font-label-md text-label-md font-semibold shadow-sm transition-colors flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-base">cancel</span>
+<span>Tolak Berkas</span>
+</button>
+<button class="w-full py-2 px-space-sm rounded-lg bg-surface-container-highest hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold shadow-sm transition-colors flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-base">assignment_return</span>
+<span>Minta Revisi</span>
+</button>
+</div>
+<button class="w-full py-3 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-semibold shadow-md transition-all flex items-center justify-center gap-2 group" type="button">
+<span class="material-symbols-outlined text-secondary-container">verified_user</span>
+<span>Lolos Verifikasi &amp; Teruskan ke Pejabat</span>
+<span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div></main></div></body></html>
