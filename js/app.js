@@ -1041,57 +1041,14 @@ function setWizardCategory(cat) {
 }
 
 function goWizardStep(step) {
-  // Validasi langkah sebelum lanjut
-  if (step > wizardStep) {
-    if (wizardStep === 1 && !validateWizardStep1()) return;
-    if (wizardStep === 2 && !validateWizardStep2()) return;
-    if (wizardStep === 3 && !validateWizardStep3()) return;
-  }
-
-  wizardStep = step;
-
-  // Toggle view langkah
-  for (let i = 1; i <= 4; i++) {
-    const pane = document.getElementById(`wizardStepPane${i}`);
-    if (pane) {
-      if (i === step) pane.classList.remove('hidden');
-      else pane.classList.add('hidden');
-    }
-  }
-
-  // Update stepper indicator header
-  updateWizardStepperUI(step);
-
-  // Jika langkah 4, render preview ringkasan
-  if (step === 4) {
-    renderWizardStep4Review();
-  }
-
+  // Seluruh proses pendaftaran sekarang langsung dipusatkan di 1 formulir terpadu (Langkah 1)
+  const pane = document.getElementById('wizardStepPane1');
+  if (pane) pane.classList.remove('hidden');
   window.scrollTo({ top: 120, behavior: 'smooth' });
 }
 
 function updateWizardStepperUI(step) {
-  const progressBar = document.getElementById('wizardProgressBar');
-  if (progressBar) {
-    const percentages = { 1: '25%', 2: '50%', 3: '75%', 4: '100%' };
-    progressBar.style.width = percentages[step] || '25%';
-  }
-
-  for (let i = 1; i <= 4; i++) {
-    const stepBadge = document.getElementById(`stepBadge${i}`);
-    if (stepBadge) {
-      if (i < step) {
-        stepBadge.className = 'w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center text-sm font-bold shadow-sm';
-        stepBadge.innerHTML = '<span class="material-symbols-outlined text-lg">check</span>';
-      } else if (i === step) {
-        stepBadge.className = 'w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-sm font-bold shadow-md ring-4 ring-secondary-container/40';
-        stepBadge.textContent = `0${i}`;
-      } else {
-        stepBadge.className = 'w-10 h-10 rounded-full bg-surface-container-high text-outline flex items-center justify-center text-sm font-bold';
-        stepBadge.textContent = `0${i}`;
-      }
-    }
-  }
+  // Tidak diperlukan lagi karena multi-step 2, 3, dan 4 telah dihapus
 }
 
 function validateWizardStep1() {
@@ -1313,11 +1270,68 @@ function handleFileUpload(input, type) {
 }
 
 async function submitWizardRegistration() {
+  const nama = document.getElementById('wzNamaPemberi').value.trim();
+  const nik = document.getElementById('wzNikPemberi').value.trim();
+  const wa = document.getElementById('wzWaPemberi').value.trim();
+  const alamat = document.getElementById('wzAlamatPemberi').value.trim();
+  const pekerjaan = document.getElementById('wzPekerjaanPemberi') ? document.getElementById('wzPekerjaanPemberi').value.trim() : 'Wiraswasta';
+  const email = document.getElementById('wzEmailPemberi') ? document.getElementById('wzEmailPemberi').value.trim() : `${nik}@mail.com`;
+
+  if (!nama || !nik || !wa || !alamat) {
+    showToast('Harap lengkapi seluruh kolom identitas pemberi kuasa.', 'warning');
+    return;
+  }
+  if (nik.length < 16) {
+    showToast('Nomor NIK harus 16 digit.', 'warning');
+    return;
+  }
+
   const agree = document.getElementById('wzAgreeCheck');
   if (agree && !agree.checked) {
     showToast('Silakan centang pernyataan kebenaran data terlebih dahulu.', 'warning');
     return;
   }
+
+  // Fallback dokumen untuk demonstrasi jika dilewati
+  const demoImages = {
+    ktp_pemberi: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
+    ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+    kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+    bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
+    surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+    bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80'
+  };
+
+  ['ktp_pemberi', 'ktp_penerima', 'kta_penerima', 'bas_penerima', 'surat_kuasa', 'bukti_pnbp'].forEach(k => {
+    if (!wizardData.berkas[k]) {
+      wizardData.berkas[k] = demoImages[k];
+    }
+  });
+  wizardData.berkas.ktp = wizardData.berkas.ktp_pemberi;
+  wizardData.berkas.kta = wizardData.berkas.kta_penerima;
+
+  wizardData.pemberi = {
+    nama,
+    nik,
+    pekerjaan,
+    telepon: wa,
+    email,
+    alamat
+  };
+
+  wizardData.penerima = {
+    nama: wizardData.kategori === 'Advokat' ? 'Advokat Penerima Kuasa (Terlampir pada Berkas)' : 'Penerima Kuasa Insidentil (Terlampir pada Berkas)',
+    identitas: 'Sesuai KTA/BAS/KTP Terlampir',
+    kantor: 'Sesuai Naskah Surat Kuasa',
+    telepon: wa,
+    alamat: alamat
+  };
+
+  wizardData.materi = {
+    jenisPerkara: 'Sesuai Naskah Surat Kuasa',
+    nomorPerkara: 'Dalam Proses Registrasi',
+    uraian: 'Pemberian kuasa sebagaimana termaktub dalam naskah Surat Kuasa terlampir.'
+  };
 
   const btnSubmit = document.getElementById('btnSubmitWizard');
   if (btnSubmit) {
@@ -1351,7 +1365,7 @@ async function submitWizardRegistration() {
 
   if (btnSubmit) {
     btnSubmit.disabled = false;
-    btnSubmit.innerHTML = 'Kirim Permohonan Pendaftaran <span class="material-symbols-outlined text-lg">arrow_forward</span>';
+    btnSubmit.innerHTML = '<span>Kirim Permohonan Pendaftaran</span><span class="material-symbols-outlined text-lg">arrow_forward</span>';
   }
 
   if (res.success) {
