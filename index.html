@@ -509,154 +509,103 @@
           </div>
         </div>
 
-        <!-- Form Layout Grid (8 Col Form + 4 Col Sticky Cost Summary) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Form Area (Maksimal Lebar Terpusat & Rapi) -->
+        <div class="max-w-4xl mx-auto flex flex-col gap-6">
           
-          <!-- LEFT: Form Area (8 cols) -->
-          <div class="lg:col-span-8 flex flex-col gap-6">
-            
-            <!-- STEP 1 PANE (SATU-SATUNYA FORMULIR PENDAFTARAN) -->
-            <div id="wizardStepPane1" class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container space-y-6">
-              <div class="pb-4 border-b border-surface-container">
-                <span class="text-[11px] font-bold text-secondary uppercase tracking-wide">BAGIAN 01 • PILIH KATEGORI &amp; IDENTITAS PEMOHON</span>
-                <h3 class="font-headline text-lg font-bold text-on-surface mt-1">Data Permohonan Surat Kuasa</h3>
-                <p class="text-xs text-on-surface-variant">Pilih kategori permohonan yang sesuai, lalu masukkan nama pemohon dan nomor WhatsApp aktif.</p>
-              </div>
+          <!-- FORMULIR PENDAFTARAN UTAMA -->
+          <div id="wizardStepPane1" class="bg-surface-container-lowest p-6 sm:p-8 rounded-xl shadow-sm border border-surface-container space-y-6">
+            <div class="pb-4 border-b border-surface-container">
+              <span class="text-[11px] font-bold text-secondary uppercase tracking-wide">BAGIAN 01 • PILIH KATEGORI &amp; IDENTITAS PEMOHON</span>
+              <h3 class="font-headline text-lg font-bold text-on-surface mt-1">Data Permohonan Surat Kuasa</h3>
+              <p class="text-xs text-on-surface-variant">Pilih kategori permohonan yang sesuai, lalu masukkan nama pemohon dan nomor WhatsApp aktif.</p>
+            </div>
 
-              <!-- 3 Kategori Kuasa (Advokat / Kuasa Hukum, Kuasa Instansi Pemerintah, Kuasa Insidentil) -->
+            <!-- 3 Kategori Kuasa (Advokat / Kuasa Hukum, Kuasa Instansi Pemerintah, Kuasa Insidentil) -->
+            <div>
+              <label class="block text-xs font-bold text-on-surface mb-2">Kategori Kuasa Yang Diberikan (Pilih Salah Satu) *</label>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <button type="button" id="btnCatAdvokat" onclick="setWizardCategory('Advokat')" class="py-3 px-3 rounded-xl text-xs sm:text-sm font-bold bg-primary text-on-primary shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer text-center">
+                  <span class="material-symbols-outlined text-base">gavel</span>
+                  <span>1. Advokat / Kuasa Hukum</span>
+                </button>
+                <button type="button" id="btnCatInstansi" onclick="setWizardCategory('Instansi')" class="py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all flex items-center justify-center gap-2 cursor-pointer text-center">
+                  <span class="material-symbols-outlined text-base">account_balance</span>
+                  <span>2. Kuasa Instansi Pemerintah</span>
+                </button>
+                <button type="button" id="btnCatInsidentil" onclick="setWizardCategory('Insidentil')" class="py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all flex items-center justify-center gap-2 cursor-pointer text-center">
+                  <span class="material-symbols-outlined text-base">family_restroom</span>
+                  <span>3. Kuasa Insidentil</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Form Input: HANYA Nama & Nomor WhatsApp Sesuai Permintaan -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-bold text-on-surface mb-2">Kategori Kuasa Yang Diberikan (Pilih Salah Satu) *</label>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  <button type="button" id="btnCatAdvokat" onclick="setWizardCategory('Advokat')" class="py-3 px-3 rounded-xl text-xs sm:text-sm font-bold bg-primary text-on-primary shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer text-center">
-                    <span class="material-symbols-outlined text-base">gavel</span>
-                    <span>1. Advokat / Kuasa Hukum</span>
-                  </button>
-                  <button type="button" id="btnCatInstansi" onclick="setWizardCategory('Instansi')" class="py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all flex items-center justify-center gap-2 cursor-pointer text-center">
-                    <span class="material-symbols-outlined text-base">account_balance</span>
-                    <span>2. Kuasa Instansi Pemerintah</span>
-                  </button>
-                  <button type="button" id="btnCatInsidentil" onclick="setWizardCategory('Insidentil')" class="py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all flex items-center justify-center gap-2 cursor-pointer text-center">
-                    <span class="material-symbols-outlined text-base">family_restroom</span>
-                    <span>3. Kuasa Insidentil</span>
-                  </button>
-                </div>
+                <label class="block text-xs font-bold text-on-surface mb-1">Nama Pemohon / Pemberi Kuasa *</label>
+                <input id="wzNamaPemberi" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Contoh: Bambang Sudarmono, S.T." value="Bambang Sudarmono, S.T."/>
+                <p class="text-[11px] text-outline mt-1">Nama lengkap sesuai identitas pemohon / pemberi kuasa.</p>
               </div>
-
-              <!-- Form Input: HANYA Nama & Nomor WhatsApp Sesuai Permintaan -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-bold text-on-surface mb-1">Nama Pemohon / Pemberi Kuasa *</label>
-                  <input id="wzNamaPemberi" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Contoh: Bambang Sudarmono, S.T." value="Bambang Sudarmono, S.T."/>
-                  <p class="text-[11px] text-outline mt-1">Nama lengkap sesuai identitas pemohon / pemberi kuasa.</p>
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-on-surface mb-1">Nomor WhatsApp Aktif *</label>
-                  <input id="wzWaPemberi" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Contoh: 081298457721" value="081298457721"/>
-                  <p class="text-[11px] text-outline mt-1">Untuk menerima kode pendaftaran &amp; notifikasi hasil verifikasi.</p>
-                </div>
-              </div>
-
-              <!-- Nilai bawaan tersembunyi untuk integritas database -->
-              <input type="hidden" id="wzNikPemberi" value="3174082209840002"/>
-              <input type="hidden" id="wzPekerjaanPemberi" value="Pemohon Kuasa"/>
-              <input type="hidden" id="wzEmailPemberi" value="pemohon@layanan.go.id"/>
-              <input type="hidden" id="wzAlamatPemberi" value="Sesuai Berkas Identitas Terlampir"/>
-
-              <!-- Bagian 2: Unggah Berkas Persyaratan Sesuai Kategori Pilihan -->
-              <div class="pt-6 border-t border-surface-container">
-                <div class="pb-3 mb-3 border-b border-surface-container flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <span class="text-[11px] font-bold text-secondary uppercase tracking-wide">BAGIAN 02 • UNGGAH BERKAS PERSYARATAN</span>
-                    <h4 class="font-headline text-base font-bold text-on-surface mt-0.5 flex items-center gap-2">
-                      <span class="material-symbols-outlined text-primary text-base">cloud_upload</span>
-                      Unggah Dokumen Berkas Pendukung (Kompresi Otomatis Klien)
-                    </h4>
-                  </div>
-                  <span id="uploadCategoryBadge" class="text-[11px] font-semibold text-outline">Wajib 5 Dokumen Persyaratan</span>
-                </div>
-                
-                <!-- Dynamic Upload Cards Container -->
-                <div id="uploadCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                  <!-- Dihasilkan dinamis oleh renderUploadCards(cat) di app.js -->
-                </div>
-              </div>
-
-              <!-- E-Meterai & PNBP Info Box -->
-              <div class="p-4 rounded-xl bg-surface-container flex items-start gap-3">
-                <span class="material-symbols-outlined text-secondary text-2xl">verified</span>
-                <div>
-                  <h5 class="text-xs font-bold text-on-surface">Pemberitahuan Meterai Elektronik &amp; Leges PNBP Pengadilan</h5>
-                  <p class="text-xs text-on-surface-variant mt-0.5">Pengenaan PNBP Rp10.000,- dan meterai Rp10.000,- diverifikasi langsung oleh Kepaniteraan Hukum. Pastikan dokumen Surat Kuasa asli telah ditandatangani dan dibubuhi meterai.</p>
-                </div>
-              </div>
-
-              <!-- Pernyataan Kebenaran Data -->
-              <div class="p-4 rounded-xl border border-secondary/30 bg-secondary-container/10">
-                <label class="flex items-start gap-3 cursor-pointer">
-                  <input id="wzAgreeCheck" type="checkbox" checked class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary"/>
-                  <span class="text-xs text-on-surface leading-relaxed">
-                    Saya menyatakan dengan sebenarnya bahwa seluruh data identitas dan dokumen persyaratan yang saya unggah adalah benar, sah, dan dapat dipertanggungjawabkan secara hukum sesuai peraturan perundang-undangan.
-                  </span>
-                </label>
-              </div>
-
-              <!-- Tombol Kirim Pendaftaran Langsung -->
-              <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-surface-container">
-                <button type="button" onclick="navigateTo('beranda-dan-lacak')" class="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-surface-container text-xs font-semibold text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer">
-                  Batal
-                </button>
-                <button type="button" id="btnSubmitWizard" onclick="submitWizardRegistration()" class="w-full sm:w-auto px-7 py-3 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer">
-                  <span>Kirim Permohonan Pendaftaran</span>
-                  <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                </button>
+              <div>
+                <label class="block text-xs font-bold text-on-surface mb-1">Nomor WhatsApp Aktif *</label>
+                <input id="wzWaPemberi" type="text" class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low text-sm border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Contoh: 081298457721" value="081298457721"/>
+                <p class="text-[11px] text-outline mt-1">Untuk menerima kode pendaftaran &amp; notifikasi hasil verifikasi.</p>
               </div>
             </div>
 
-          </div>
+            <!-- Nilai bawaan tersembunyi untuk integritas database -->
+            <input type="hidden" id="wzNikPemberi" value="3174082209840002"/>
+            <input type="hidden" id="wzPekerjaanPemberi" value="Pemohon Kuasa"/>
+            <input type="hidden" id="wzEmailPemberi" value="pemohon@layanan.go.id"/>
+            <input type="hidden" id="wzAlamatPemberi" value="Sesuai Berkas Identitas Terlampir"/>
 
-          <!-- RIGHT: Sticky Contextual Cost Summary Sidebar (4 cols) -->
-          <div class="lg:col-span-4 flex flex-col gap-6 sticky top-24">
-            <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-container">
-              <div class="flex items-center justify-between pb-3 border-b border-surface-container mb-4">
-                <span class="text-xs font-bold uppercase tracking-wider text-outline">Rincian Biaya Layanan</span>
-                <span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold">TERKUNCI</span>
-              </div>
-
-              <div class="space-y-3 text-xs text-on-surface-variant">
-                <div class="flex justify-between">
-                  <span>Biaya PNBP Pendaftaran Kuasa</span>
-                  <span class="font-bold text-on-surface">Rp10.000,-</span>
-                </div>
-                <div class="flex justify-between">
-                  <span>Meterai Elektronik (1 Lembar)</span>
-                  <span class="font-bold text-on-surface">Rp10.000,-</span>
-                </div>
-                <div class="flex justify-between">
-                  <span>Biaya Redaksi &amp; Legalisasi Digital</span>
-                  <span class="font-bold text-primary">GRATIS (Rp0)</span>
-                </div>
-              </div>
-
-              <div class="mt-4 pt-4 border-t border-surface-container flex items-center justify-between">
+            <!-- Bagian 2: Unggah Berkas Persyaratan Sesuai Kategori Pilihan -->
+            <div class="pt-6 border-t border-surface-container">
+              <div class="pb-3 mb-3 border-b border-surface-container flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <span class="block text-xs font-bold text-on-surface">Total Estimasi Bayar</span>
-                  <span class="text-[10px] text-outline">Via SIMPONI / QRIS / VA</span>
+                  <span class="text-[11px] font-bold text-secondary uppercase tracking-wide">BAGIAN 02 • UNGGAH BERKAS PERSYARATAN</span>
+                  <h4 class="font-headline text-base font-bold text-on-surface mt-0.5 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-base">cloud_upload</span>
+                    Unggah Dokumen Berkas Pendukung (Kompresi Otomatis Klien)
+                  </h4>
                 </div>
-                <span class="font-display text-xl font-bold text-secondary">Rp20.000,-</span>
+                <span id="uploadCategoryBadge" class="text-[11px] font-semibold text-outline">Wajib 5 Dokumen Persyaratan</span>
+              </div>
+              
+              <!-- Dynamic Upload Cards Container -->
+              <div id="uploadCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                <!-- Dihasilkan dinamis oleh renderUploadCards(cat) di app.js -->
               </div>
             </div>
 
-            <!-- Info Box Bantuan -->
-            <div class="bg-surface-container-low p-5 rounded-xl border border-surface-container">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="material-symbols-outlined text-secondary text-lg">support_agent</span>
-                <span class="text-xs font-bold text-on-surface">Pusat Bantuan PTSP</span>
+            <!-- E-Meterai & PNBP Info Box -->
+            <div class="p-4 rounded-xl bg-surface-container flex items-start gap-3">
+              <span class="material-symbols-outlined text-secondary text-2xl">verified</span>
+              <div>
+                <h5 class="text-xs font-bold text-on-surface">Pemberitahuan Meterai Elektronik &amp; Leges PNBP Pengadilan</h5>
+                <p class="text-xs text-on-surface-variant mt-0.5">Pengenaan PNBP Rp10.000,- dan meterai Rp10.000,- diverifikasi langsung oleh Kepaniteraan Hukum. Pastikan dokumen Surat Kuasa asli telah ditandatangani dan dibubuhi meterai.</p>
               </div>
-              <p class="text-xs text-on-surface-variant leading-relaxed mb-3">Butuh bantuan pengisian formulir? Petugas Meja Informasi Hukum Pengadilan Negeri siap melayani Anda.</p>
-              <a href="https://wa.me/628119283771" target="_blank" class="w-full py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-xs font-semibold text-primary flex items-center justify-center gap-1.5 transition-colors">
-                <span class="material-symbols-outlined text-base">chat</span>
-                <span>WhatsApp Asisten PTSP</span>
-              </a>
+            </div>
+
+            <!-- Pernyataan Kebenaran Data -->
+            <div class="p-4 rounded-xl border border-secondary/30 bg-secondary-container/10">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input id="wzAgreeCheck" type="checkbox" checked class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary"/>
+                <span class="text-xs text-on-surface leading-relaxed">
+                  Saya menyatakan dengan sebenarnya bahwa seluruh data identitas dan dokumen persyaratan yang saya unggah adalah benar, sah, dan dapat dipertanggungjawabkan secara hukum sesuai peraturan perundang-undangan.
+                </span>
+              </label>
+            </div>
+
+            <!-- Tombol Kirim Pendaftaran Langsung -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-surface-container">
+              <button type="button" onclick="navigateTo('beranda-dan-lacak')" class="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-surface-container text-xs font-semibold text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer">
+                Batal
+              </button>
+              <button type="button" id="btnSubmitWizard" onclick="submitWizardRegistration()" class="w-full sm:w-auto px-7 py-3 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer">
+                <span>Kirim Permohonan Pendaftaran</span>
+                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+              </button>
             </div>
           </div>
 

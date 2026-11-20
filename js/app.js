@@ -822,6 +822,7 @@ function onViewActivated(viewId) {
     case 'beranda-dan-lacak':
       break;
     case 'pendaftaran-kuasa':
+      setWizardCategory(wizardData.kategori || 'Advokat');
       break;
     case 'dashboard-admin':
       switchAdminTab(currentAdminTab || 'analitik');
