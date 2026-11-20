@@ -40,6 +40,12 @@ const INITIAL_SUBMISSIONS = [
       uraian: 'Mewakili, mendampingi, dan membela hak hukum Pemberi Kuasa dalam perkara gugatan Perbuatan Melawan Hukum (PMH) atas sengketa tanah dan bangunan di wilayah hukum Pengadilan Negeri.'
     },
     berkas: {
+      ktp_pemberi: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
+      ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+      kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+      bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
+      surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+      bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
       ktp: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
       kta: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80'
     },
@@ -77,6 +83,12 @@ const INITIAL_SUBMISSIONS = [
       uraian: 'Mewakili kepentingan hukum Pemberi Kuasa dalam mediasi dan persidangan perkara wanprestasi perjanjian sewa beli alat berat.'
     },
     berkas: {
+      ktp_pemberi: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+      ktp_penerima: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+      kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+      bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
+      surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+      bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
       ktp: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
       kta: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80'
     },
@@ -114,6 +126,12 @@ const INITIAL_SUBMISSIONS = [
       uraian: 'Mengurus permohonan penetapan ahli waris dan pembetulan akta kelahiran anak di Pengadilan Negeri.'
     },
     berkas: {
+      ktp_pemberi: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+      ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+      kta_penerima: '',
+      bas_penerima: '',
+      surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+      bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
       ktp: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
       kta: ''
     },
@@ -151,6 +169,12 @@ const INITIAL_SUBMISSIONS = [
       uraian: 'Mewakili secara penuh untuk menghadiri persidangan, perdamaian/mediasi, mengajukan replik, kesimpulan, hingga upaya hukum banding.'
     },
     berkas: {
+      ktp_pemberi: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+      ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+      kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+      bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
+      surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+      bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
       ktp: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
       kta: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80'
     },
@@ -987,7 +1011,16 @@ const wizardData = {
   pemberi: {},
   penerima: {},
   materi: {},
-  berkas: { ktp: '', kta: '' }
+  berkas: {
+    ktp_pemberi: '',
+    ktp_penerima: '',
+    kta_penerima: '',
+    bas_penerima: '',
+    surat_kuasa: '',
+    bukti_pnbp: '',
+    ktp: '',
+    kta: ''
+  }
 };
 
 function setWizardCategory(cat) {
@@ -1106,13 +1139,23 @@ function validateWizardStep2() {
     alamat: alamat || wizardData.pemberi.alamat
   };
 
-  // Pastikan berkas diisi atau gunakan mock jika demo
-  if (!wizardData.berkas.ktp) {
-    wizardData.berkas.ktp = 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80';
-  }
-  if (!wizardData.berkas.kta) {
-    wizardData.berkas.kta = 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80';
-  }
+  // Pastikan 6 berkas diisi atau gunakan mock jika demo
+  const demoImages = {
+    ktp_pemberi: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
+    ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+    kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+    bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
+    surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+    bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80'
+  };
+
+  ['ktp_pemberi', 'ktp_penerima', 'kta_penerima', 'bas_penerima', 'surat_kuasa', 'bukti_pnbp'].forEach(k => {
+    if (!wizardData.berkas[k]) {
+      wizardData.berkas[k] = demoImages[k];
+    }
+  });
+  wizardData.berkas.ktp = wizardData.berkas.ktp_pemberi;
+  wizardData.berkas.kta = wizardData.berkas.kta_penerima;
 
   return true;
 }
@@ -1139,6 +1182,27 @@ function renderWizardStep4Review() {
   const container = document.getElementById('wizardStep4Summary');
   if (!container) return;
 
+  const docItems = [
+    { key: 'ktp_pemberi', label: '1. KTP Pemberi Kuasa' },
+    { key: 'ktp_penerima', label: '2. KTP Penerima Kuasa' },
+    { key: 'kta_penerima', label: '3. KTA Penerima Kuasa' },
+    { key: 'bas_penerima', label: '4. BAS Penerima Kuasa' },
+    { key: 'surat_kuasa', label: '5. Naskah Surat Kuasa' },
+    { key: 'bukti_pnbp', label: '6. Bukti Bayar Leges PNBP' }
+  ];
+
+  const docsHtml = docItems.map(d => {
+    const isUploaded = !!wizardData.berkas[d.key];
+    return `
+      <div class="flex items-center gap-2 p-2 rounded-lg bg-surface-container-low border border-surface-container">
+        <span class="material-symbols-outlined text-sm ${isUploaded ? 'text-primary' : 'text-outline'}">
+          ${isUploaded ? 'check_circle' : 'pending'}
+        </span>
+        <span class="text-[11px] font-semibold text-on-surface truncate">${d.label}</span>
+      </div>
+    `;
+  }).join('');
+
   container.innerHTML = `
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container">
@@ -1163,9 +1227,20 @@ function renderWizardStep4Review() {
       </div>
     </div>
 
+    <!-- Kelengkapan 6 Berkas Persyaratan -->
+    <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container">
+      <div class="flex items-center justify-between mb-2.5">
+        <span class="font-label-sm text-label-sm uppercase font-bold text-outline">Kelengkapan 6 Berkas Persyaratan</span>
+        <button onclick="goWizardStep(2)" class="text-xs text-primary font-semibold hover:underline">Cek Berkas</button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        ${docsHtml}
+      </div>
+    </div>
+
     <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container">
       <div class="flex items-center justify-between mb-2">
-        <span class="font-label-sm text-label-sm uppercase font-bold text-outline">Perihal & Ruang Lingkup Kuasa</span>
+        <span class="font-label-sm text-label-sm uppercase font-bold text-outline">Perihal &amp; Ruang Lingkup Kuasa</span>
         <button onclick="goWizardStep(3)" class="text-xs text-primary font-semibold hover:underline">Ubah</button>
       </div>
       <p class="text-xs font-semibold text-primary">Klasifikasi: ${wizardData.materi.jenisPerkara} • No. Perkara: ${wizardData.materi.nomorPerkara}</p>
@@ -1174,16 +1249,36 @@ function renderWizardStep4Review() {
   `;
 }
 
-// Client-Side Image Compression (Pola /gas-scale-turbo)
+// Client-Side Image & PDF Compression / Loading (Pola /gas-scale-turbo)
 function handleFileUpload(input, type) {
   const file = input.files[0];
   if (!file) return;
 
+  const badge = document.getElementById(`uploadBadge_${type}`);
+  if (badge) {
+    badge.innerHTML = `<span class="material-symbols-outlined text-xs animate-spin">sync</span> Memproses...`;
+    badge.className = 'mt-2 text-[10px] text-primary flex items-center gap-1';
+  }
+
   const reader = new FileReader();
   reader.onload = function(e) {
+    const result = e.target.result;
+
+    if (file.type === 'application/pdf') {
+      wizardData.berkas[type] = result;
+      if (type === 'ktp_pemberi') wizardData.berkas.ktp = result;
+      if (type === 'kta_penerima') wizardData.berkas.kta = result;
+
+      if (badge) {
+        badge.innerHTML = `<span class="material-symbols-outlined text-xs">picture_as_pdf</span> PDF Terunggah (~${Math.round(file.size / 1024)} KB)`;
+        badge.className = 'mt-2 px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-semibold flex items-center gap-1';
+      }
+      return;
+    }
+
     const img = new Image();
     img.onload = function() {
-      // Kompresi via HTML5 Canvas ke resolusi ramah payload (~800px max, 0.7 quality)
+      // Kompresi via HTML5 Canvas ke resolusi ramah payload (~800px max, 0.72 quality)
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const maxDim = 800;
@@ -1204,14 +1299,15 @@ function handleFileUpload(input, type) {
 
       const compressedBase64 = canvas.toDataURL('image/jpeg', 0.72);
       wizardData.berkas[type] = compressedBase64;
+      if (type === 'ktp_pemberi') wizardData.berkas.ktp = compressedBase64;
+      if (type === 'kta_penerima') wizardData.berkas.kta = compressedBase64;
 
-      const badge = document.getElementById(`uploadBadge_${type}`);
       if (badge) {
         badge.innerHTML = `<span class="material-symbols-outlined text-xs">check_circle</span> Terunggah (~${Math.round(compressedBase64.length / 1024)} KB)`;
-        badge.className = 'px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-xs font-semibold flex items-center gap-1';
+        badge.className = 'mt-2 px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-semibold flex items-center gap-1';
       }
     };
-    img.src = e.target.result;
+    img.src = result;
   };
   reader.readAsDataURL(file);
 }
@@ -1373,6 +1469,61 @@ function renderVerifikatorTable() {
 let currentInspectedItem = null;
 let currentPreviewZoom = 100;
 let currentPreviewRotate = 0;
+let currentInspectDocType = 'ktp_pemberi';
+
+const INSPECT_DOC_TITLES = {
+  ktp_pemberi: '1. KTP Pemberi Kuasa',
+  ktp_penerima: '2. KTP Penerima Kuasa',
+  kta_penerima: '3. KTA Penerima Kuasa',
+  bas_penerima: '4. BAS Penerima Kuasa',
+  surat_kuasa: '5. Naskah Surat Kuasa',
+  bukti_pnbp: '6. Bukti Bayar Leges PNBP'
+};
+
+function switchInspectDoc(docKey) {
+  if (!currentInspectedItem) return;
+  currentInspectDocType = docKey;
+
+  // Update tabs active state
+  Object.keys(INSPECT_DOC_TITLES).forEach(key => {
+    const tab = document.getElementById(`tab_${key}`);
+    if (tab) {
+      if (key === docKey) {
+        tab.className = 'px-1.5 py-1 rounded text-[10px] font-bold bg-primary text-on-primary transition-all text-center truncate shadow-sm';
+      } else {
+        tab.className = 'px-1.5 py-1 rounded text-[10px] font-semibold bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all text-center truncate';
+      }
+    }
+  });
+
+  // Update title
+  const titleEl = document.getElementById('inspectDocTitle');
+  if (titleEl) titleEl.textContent = INSPECT_DOC_TITLES[docKey] || docKey;
+
+  const berkas = currentInspectedItem.berkas || {};
+  let docUrl = berkas[docKey] || '';
+  if (!docUrl && docKey === 'ktp_pemberi') docUrl = berkas.ktp || '';
+  if (!docUrl && docKey === 'kta_penerima') docUrl = berkas.kta || '';
+
+  const imgEl = document.getElementById('inspectDocImage');
+  const pdfNotice = document.getElementById('inspectPdfNotice');
+  const pdfLink = document.getElementById('inspectPdfLink');
+
+  if (docUrl && (docUrl.startsWith('data:application/pdf') || docUrl.endsWith('.pdf'))) {
+    if (imgEl) imgEl.classList.add('hidden');
+    if (pdfNotice) pdfNotice.classList.remove('hidden');
+    if (pdfLink) pdfLink.href = docUrl;
+  } else {
+    if (pdfNotice) pdfNotice.classList.add('hidden');
+    if (imgEl) {
+      imgEl.classList.remove('hidden');
+      imgEl.src = docUrl || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80';
+      currentPreviewZoom = 100;
+      currentPreviewRotate = 0;
+      applyDocTransform();
+    }
+  }
+}
 
 function openInspectDrawer(id) {
   const item = Storage.findById(id);
@@ -1396,11 +1547,8 @@ function openInspectDrawer(id) {
   document.getElementById('insPerkara').textContent = `${item.materi.jenisPerkara} • ${item.materi.nomorPerkara}`;
   document.getElementById('insCatatanInput').value = item.catatanPetugas || '';
 
-  const imgEl = document.getElementById('inspectDocImage');
-  if (imgEl) {
-    imgEl.src = item.berkas.ktp || item.berkas.kta || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80';
-    imgEl.style.transform = `scale(1) rotate(0deg)`;
-  }
+  // Switch ke dokumen pertama (1. KTP Pemberi Kuasa)
+  switchInspectDoc('ktp_pemberi');
 
   overlay.classList.remove('hidden');
   drawer.classList.remove('hidden');
