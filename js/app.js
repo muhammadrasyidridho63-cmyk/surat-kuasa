@@ -1070,10 +1070,10 @@ const CATEGORY_DOC_CONFIG = {
     title: 'Advokat / Kuasa Hukum',
     countText: 'Wajib 5 Dokumen Persyaratan',
     docs: [
-      { key: 'ktp_pemberi', code: 'a', title: 'KTP Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
-      { key: 'ktp_penerima', code: 'b', title: 'KTP Penerima Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
-      { key: 'kta_penerima', code: 'c', title: 'KTA Penerima Kuasa', desc: 'KTA Advokat Aktif • Maks 5 MB', icon: 'contact_mail', color: 'secondary' },
-      { key: 'bas_penerima', code: 'd', title: 'Berita Acara Sumpah Advokat Penerima Kuasa', desc: 'BAS Pengadilan Tinggi • Maks 5 MB', icon: 'history_edu', color: 'secondary' },
+      { key: 'ktp_pemberi', code: 'a', title: 'Kartu Tanda Penduduk Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
+      { key: 'ktp_penerima', code: 'b', title: 'Kartu Tanda Penduduk Penerima Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
+      { key: 'kta_penerima', code: 'c', title: 'Kartu Tanda Advokat Penerima Kuasa', desc: 'KTA Advokat Aktif • Maks 5 MB', icon: 'contact_mail', color: 'secondary' },
+      { key: 'bas_penerima', code: 'd', title: 'Berita Acara Sumpah Advokat', desc: 'BAS Pengadilan Tinggi • Maks 5 MB', icon: 'history_edu', color: 'secondary' },
       { key: 'surat_kuasa', code: 'e', title: 'Surat Kuasa', desc: 'Asli Bermeterai & TTD • JPG/PDF', icon: 'article', color: 'primary' }
     ]
   },
@@ -1081,8 +1081,8 @@ const CATEGORY_DOC_CONFIG = {
     title: 'Kuasa Instansi Pemerintah',
     countText: 'Wajib 3 Dokumen Persyaratan',
     docs: [
-      { key: 'ktp_pemberi', code: 'a', title: 'KTP Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
-      { key: 'ktp_penerima', code: 'b', title: 'KTP Penerima Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
+      { key: 'ktp_pemberi', code: 'a', title: 'Kartu Tanda Penduduk Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
+      { key: 'ktp_penerima', code: 'b', title: 'Kartu Tanda Penduduk Penerima Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
       { key: 'surat_kuasa', code: 'c', title: 'Surat Kuasa', desc: 'Surat Tugas / Kuasa Kedinasan • JPG/PDF', icon: 'article', color: 'primary' }
     ]
   },
@@ -1090,8 +1090,8 @@ const CATEGORY_DOC_CONFIG = {
     title: 'Kuasa Insidentil',
     countText: 'Wajib 4 Dokumen Persyaratan',
     docs: [
-      { key: 'ktp_pemberi', code: 'a', title: 'KTP Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
-      { key: 'ktp_penerima', code: 'b', title: 'KTP Penerima Kuas', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
+      { key: 'ktp_pemberi', code: 'a', title: 'Kartu Tanda Penduduk Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
+      { key: 'ktp_penerima', code: 'b', title: 'Kartu Tanda Penduduk Penerima Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
       { key: 'surat_kuasa', code: 'c', title: 'Surat Kuasa', desc: 'Asli Bermeterai & TTD • JPG/PDF', icon: 'article', color: 'primary' },
       { key: 'surat_lurah', code: 'd', title: 'Surat Keterangan Lurah / Desa terkait status hubungan', desc: 'Keterangan Hubungan Keluarga • JPG/PDF', icon: 'family_restroom', color: 'secondary' }
     ]
@@ -1475,11 +1475,11 @@ let currentPreviewRotate = 0;
 let currentInspectDocType = 'ktp_pemberi';
 
 const INSPECT_DOC_TITLES = {
-  ktp_pemberi: 'KTP Pemberi Kuasa',
-  ktp_penerima: 'KTP Penerima Kuasa',
-  kta_penerima: 'KTA Penerima Kuasa',
-  bas_penerima: 'Berita Acara Sumpah Advokat Penerima Kuasa',
-  surat_kuasa: 'Naskah Surat Kuasa',
+  ktp_pemberi: 'Kartu Tanda Penduduk Pemberi Kuasa',
+  ktp_penerima: 'Kartu Tanda Penduduk Penerima Kuasa',
+  kta_penerima: 'Kartu Tanda Advokat Penerima Kuasa',
+  bas_penerima: 'Berita Acara Sumpah Advokat',
+  surat_kuasa: 'Surat Kuasa',
   surat_lurah: 'Surat Keterangan Lurah / Desa',
   bukti_pnbp: 'Bukti Bayar Leges PNBP'
 };

@@ -108,10 +108,10 @@ Sistem memanfaatkan Google Sheets sebagai database relasional, Google Drive untu
      - Kategori 1: **Advokat / Kuasa Hukum**
        - Input Identitas: Nama Pemohon & No WhatsApp Aktif.
        - Berkas yang diunggah (5 berkas):
-         a. KTP Pemberi Kuasa
-         b. KTP Penerima Kuasa
-         c. KTA Penerima Kuasa
-         d. Berita Acara Sumpah Advokat Penerima Kuasa
+         a. Kartu Tanda Penduduk Pemberi Kuasa
+         b. Kartu Tanda Penduduk Penerima Kuasa
+         c. Kartu Tanda Advokat Penerima Kuasa
+         d. Berita Acara Sumpah Advokat
          e. Surat Kuasa
      - Kategori 2: **Kuasa Instansi Pemerintah**
        - Input Identitas: Nama Pemohon & No WhatsApp Aktif.

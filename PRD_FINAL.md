@@ -151,10 +151,10 @@ Setelah aparatur/admin login, di navbar akan muncul tautan **`Dashboard Admin`**
    - **Kategori 1: Advokat / Kuasa Hukum**
      - Form Input: **Nama Pemohon** & **Nomor WhatsApp Aktif**.
      - Berkas yang diunggah (5 berkas):
-       a. KTP Pemberi Kuasa
-       b. KTP Penerima Kuasa
-       c. KTA Penerima Kuasa
-       d. Berita Acara Sumpah Advokat Penerima Kuasa
+       a. Kartu Tanda Penduduk Pemberi Kuasa
+       b. Kartu Tanda Penduduk Penerima Kuasa
+       c. Kartu Tanda Advokat Penerima Kuasa
+       d. Berita Acara Sumpah Advokat
        e. Surat Kuasa
    - **Kategori 2: Kuasa Instansi Pemerintah**
      - Form Input: **Nama Pemohon** & **Nomor WhatsApp Aktif**.
