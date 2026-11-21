@@ -1,1465 +1,1014 @@
 /**
- * APLIKASI SURAT KUASA ONLINE PENGADILAN NEGERI
- * Client-Side SPA Controller & High-Performance State Engine
- * Mengimplementasikan prinsip:
- * - /gas-pro-api (REST API decoupled, no iframe, text/plain POST)
- * - /gas-scale-turbo (In-flight deduplication, SWR caching, instant 0ms switching)
- * - /gas-pwa-github (Offline-first caching, PWA installation)
+ * =========================================================================
+ * APP.JS — MESIN SPA 0MS INSTAN E-KUASA PENGADILAN NEGERI (v3.0-TURBO)
+ * =========================================================================
+ * - Arsitektur /gas-pro-api (Pure REST POST text/plain;charset=utf-8 — Bebas CORS)
+ * - Performa /gas-scale-turbo (0ms view switch, SWR localStorage cache,
+ *   In-Flight Request Deduplication, Optimistic UI, Client Canvas Compression)
+ * - Mode Demo Instan 0ms otomatis saat CONFIG.GAS_URL belum diisi.
  */
 
 // =========================================================================
-// 1. STATE MANAGEMENT & DEMO SEED DATA
+// 1. KONFIGURASI 3 KATEGORI & DOKUMEN RESMI (SESUAI PRD.md)
 // =========================================================================
 
-const INITIAL_SUBMISSIONS = [
-  {
-    id: 'REG-202611-0082',
-    timestamp: '2026-11-12T09:15:00.000Z',
-    tanggal: '12 Nov 2026, 09:15 WIB',
-    nomorRegister: 'W11-U1/242/HK.02/XI/2026',
-    kategori: 'Advokat',
-    status: 'Menunggu Pengesahan',
-    pemberi: {
-      nama: 'Bambang Sudarmono, S.T.',
-      nik: '3174082209840002',
-      pekerjaan: 'Wiraswasta / Direktur',
-      telepon: '081298457721',
-      email: 'bambang.sudarmono@gmail.com',
-      alamat: 'Jl. Melati Indah No. 14, RT 03/05, Kebayoran Baru, Jakarta Selatan'
-    },
-    penerima: {
-      nama: 'Dewi Kartika, S.H., M.H. & Partners',
-      identitas: '16.0452/ADV-JKT',
-      kantor: 'Kartika & Associates Law Office',
-      telepon: '08119283771',
-      alamat: 'Gedung Menara Batavia Lt. 12, Jl. KH Mas Mansyur Kav. 126, Jakarta Pusat'
-    },
-    materi: {
-      jenisPerkara: 'Perdata Gugatan',
-      nomorPerkara: '89/Pdt.G/2026/PN.Jkt.Pst',
-      uraian: 'Mewakili, mendampingi, dan membela hak hukum Pemberi Kuasa dalam perkara gugatan Perbuatan Melawan Hukum (PMH) atas sengketa tanah dan bangunan di wilayah hukum Pengadilan Negeri.'
-    },
-    berkas: {
-      ktp_pemberi: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
-      ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-      kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-      bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
-      surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-      bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
-      ktp: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
-      kta: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80'
-    },
-    petugas: 'Ahmad Syafii, S.Kom. (Staf Meja 1 PTSP)',
-    pejabat: 'Dr. H. Sulaiman, S.H., M.H. (Panitera Pengadilan Negeri)',
-    catatanPetugas: 'Berkas KTP Prinsipal, Berita Acara Sumpah (BAS), dan KTA Peradi Pemohon telah diverifikasi valid dan memenuhi syarat PERMA. Dokumen diteruskan ke Panitera untuk pembubuhan Pengesahan Elektronik (TTE).',
-    hashSha256: 'a8f4b23c91e56b8209dc47120fe817c0326e0802c61148e100f917208d7d91e0',
-    totalBiaya: 20000
+const CATEGORY_DOCS = {
+  'Advokat': {
+    badge: 'Wajib 5 Dokumen Persyaratan',
+    docs: [
+      { key: 'ktp_pemberi', code: 'a', title: 'Kartu Tanda Penduduk Pemberi Kuasa', desc: 'Maks 5 MB • PDF/JPG/PNG', icon: 'badge', tone: 'primary' },
+      { key: 'ktp_penerima', code: 'b', title: 'Kartu Tanda Penduduk Penerima Kuasa', desc: 'Maks 5 MB • PDF/JPG/PNG', icon: 'contact_emergency', tone: 'primary' },
+      { key: 'kta_advokat', code: 'c', title: 'Kartu Tanda Advokat Penerima Kuasa', desc: 'KTA Advokat Aktif • Maks 5 MB', icon: 'contact_mail', tone: 'gold' },
+      { key: 'bas_advokat', code: 'd', title: 'Berita Acara Sumpah Advokat', desc: 'BAS Pengadilan Tinggi • Maks 5 MB', icon: 'history_edu', tone: 'gold' },
+      { key: 'surat_kuasa', code: 'e', title: 'Surat Kuasa', desc: 'Asli Ditandatangani • PDF/JPG/PNG', icon: 'article', tone: 'primary' }
+    ]
   },
-  {
-    id: 'REG-202611-0091',
-    timestamp: '2026-11-14T10:15:00.000Z',
-    tanggal: '14 Nov 2026, 10:15 WIB',
-    nomorRegister: 'W11-U1/245/HK.02/XI/2026',
-    kategori: 'Advokat',
-    status: 'Menunggu Verifikasi',
-    pemberi: {
-      nama: 'Hendra Wijaya',
-      nik: '3578201204880003',
-      pekerjaan: 'Pengusaha',
-      telepon: '081330998812',
-      email: 'hendra.w@wjayagroup.id',
-      alamat: 'Jl. Raya Darmo Permai III No. 8, Surabaya, Jawa Timur'
-    },
-    penerima: {
-      nama: 'Aulia Rahma, S.H., M.H.',
-      identitas: '14.02981/DPC PERADI Surabaya',
-      kantor: 'Aulia Rahma & Co Advocates',
-      telepon: '081234567890',
-      alamat: 'Wisma Intiland Suite 502, Jl. Panglima Sudirman No. 101, Surabaya'
-    },
-    materi: {
-      jenisPerkara: 'Perdata Gugatan',
-      nomorPerkara: '112/Pdt.G/2026/PN',
-      uraian: 'Mewakili kepentingan hukum Pemberi Kuasa dalam mediasi dan persidangan perkara wanprestasi perjanjian sewa beli alat berat.'
-    },
-    berkas: {
-      ktp_pemberi: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-      ktp_penerima: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
-      kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-      bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
-      surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-      bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
-      ktp: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-      kta: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80'
-    },
-    petugas: '',
-    pejabat: 'Dr. H. Sulaiman, S.H., M.H.',
-    catatanPetugas: '',
-    hashSha256: 'f5e6d7c8b9a0123456789abcdef0123456789abcdef0123456789abcdef01234',
-    totalBiaya: 20000
+  'Instansi Pemerintah': {
+    badge: 'Wajib 3 Dokumen Persyaratan',
+    docs: [
+      { key: 'ktp_pemberi', code: 'a', title: 'Kartu Tanda Penduduk Pemberi Kuasa', desc: 'Maks 5 MB • PDF/JPG/PNG', icon: 'badge', tone: 'primary' },
+      { key: 'ktp_penerima', code: 'b', title: 'Kartu Tanda Penduduk Penerima Kuasa', desc: 'Maks 5 MB • PDF/JPG/PNG', icon: 'contact_emergency', tone: 'primary' },
+      { key: 'surat_kuasa', code: 'c', title: 'Surat Kuasa', desc: 'Surat Kuasa / Tugas Kedinasan • PDF/JPG', icon: 'article', tone: 'primary' }
+    ]
   },
-  {
-    id: 'REG-202611-0090',
-    timestamp: '2026-11-14T09:40:00.000Z',
-    tanggal: '14 Nov 2026, 09:40 WIB',
-    nomorRegister: 'W11-U1/244/HK.02/XI/2026',
-    kategori: 'Insidentil',
-    status: 'Perlu Revisi',
-    pemberi: {
-      nama: 'Siti Aminah',
-      nik: '3201085501720004',
-      pekerjaan: 'Ibu Rumah Tangga',
-      telepon: '085712349090',
-      email: 'siti.aminah@gmail.com',
-      alamat: 'Kp. Babakan Tengah RT 02/01, Cibinong, Bogor'
-    },
-    penerima: {
-      nama: 'M. Rizky (Anak Kandung)',
-      identitas: '3201081406980001',
-      kantor: 'Kuasa Insidentil Keluarga',
-      telepon: '085712349091',
-      alamat: 'Kp. Babakan Tengah RT 02/01, Cibinong, Bogor'
-    },
-    materi: {
-      jenisPerkara: 'Permohonan',
-      nomorPerkara: '45/Pdt.P/2026/PN',
-      uraian: 'Mengurus permohonan penetapan ahli waris dan pembetulan akta kelahiran anak di Pengadilan Negeri.'
-    },
-    berkas: {
-      ktp_pemberi: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
-      ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-      kta_penerima: '',
-      bas_penerima: '',
-      surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-      surat_lurah: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-      bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
-      ktp: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
-      kta: ''
-    },
-    petugas: 'Ahmad Syafii, S.Kom.',
-    pejabat: '',
-    catatanPetugas: 'Lampiran Kartu Keluarga (KK) dan Surat Keterangan Hubungan Keluarga dari Kelurahan belum diunggah. Mohon lengkapi berkas insidentil.',
-    hashSha256: '99887766554433221100aabbccddeeff99887766554433221100aabbccddeeff',
-    totalBiaya: 20000
-  },
-  {
-    id: 'REG-202611-0095',
-    timestamp: '2026-11-15T11:20:00.000Z',
-    tanggal: '15 Nov 2026, 11:20 WIB',
-    nomorRegister: 'W11-U1/246/HK.02/XI/2026',
-    kategori: 'Instansi',
-    status: 'Menunggu Verifikasi',
-    pemberi: {
-      nama: 'Biro Hukum Kementerian ATR/BPN',
-      nik: '3171012304750001',
-      pekerjaan: 'Instansi Pemerintah',
-      telepon: '081288776655',
-      email: 'birohukum@atrbpn.go.id',
-      alamat: 'Jl. Sisingamangaraja No. 2, Kebayoran Baru, Jakarta Selatan'
-    },
-    penerima: {
-      nama: 'Pratama Wicaksana, S.H. (Jaksa Pengacara Negara)',
-      identitas: 'NIP. 19850412 200801 1 003',
-      kantor: 'Kejaksaan Negeri / JPN',
-      telepon: '081288776655',
-      alamat: 'Jl. Melawai Raya No. 10, Jakarta Selatan'
-    },
-    materi: {
-      jenisPerkara: 'Perdata Gugatan',
-      nomorPerkara: '115/Pdt.G/2026/PN',
-      uraian: 'Mewakili Pemerintah cq Kementerian ATR/BPN dalam gugatan pembatalan sertifikat hak milik.'
-    },
-    berkas: {
-      ktp_pemberi: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-      ktp_penerima: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
-      surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80'
-    },
-    petugas: '',
-    pejabat: 'Dr. H. Sulaiman, S.H., M.H.',
-    catatanPetugas: '',
-    hashSha256: 'c3d4e5f6a1b234567890abcdef1234567890abcdef1234567890abcdef123456',
-    totalBiaya: 20000
-  },
-  {
-    id: 'REG-202611-0088',
-    timestamp: '2026-11-14T08:55:00.000Z',
-    tanggal: '14 Nov 2026, 08:55 WIB',
-    nomorRegister: 'W11-U1/241/HK.02/XI/2026',
-    kategori: 'Advokat',
-    status: 'Disahkan/Terdaftar',
-    pemberi: {
-      nama: 'Ir. Suryo Pratomo',
-      nik: '3175081905780003',
-      pekerjaan: 'Direktur Utama',
-      telepon: '081688992211',
-      email: 'suryo.pratomo@ptkaryamandiri.co.id',
-      alamat: 'Jl. Merdeka Barat No. 22, Gambir, Jakarta Pusat'
-    },
-    penerima: {
-      nama: 'Denny Siregar, S.H., M.H.',
-      identitas: '09.21841/PERADI',
-      kantor: 'Kantor Advokat Denny Siregar & Rekan',
-      telepon: '081299001122',
-      alamat: 'Sudirman Tower Lt. 18, Jl. Jend. Sudirman Kav. 50, Jakarta Selatan'
-    },
-    materi: {
-      jenisPerkara: 'Perdata Gugatan',
-      nomorPerkara: '89/Pdt.G/2026/PN',
-      uraian: 'Mewakili secara penuh untuk menghadiri persidangan, perdamaian/mediasi, mengajukan replik, kesimpulan, hingga upaya hukum banding.'
-    },
-    berkas: {
-      ktp_pemberi: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
-      ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-      kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-      bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
-      surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-      bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
-      ktp: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
-      kta: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80'
-    },
-    petugas: 'Ahmad Syafii, S.Kom.',
-    pejabat: 'Dr. H. Sulaiman, S.H., M.H.',
-    tanggalPengesahan: '14 Nov 2026, 11:42 WIB',
-    catatanPetugas: 'Berkas lengkap dan absah.',
-    hashSha256: 'a8f4b23c91e56b8209dc47120fe817c0326e0802c61148e100f917208d7d91e0',
-    totalBiaya: 20000
-  }
-];
-
-// App Local Database Engine (LocalStorage-backed with SWR Cache)
-const Storage = {
-  KEY: 'esuratkuasa_db_v2',
-  load() {
-    try {
-      const raw = localStorage.getItem(this.KEY);
-      if (!raw) {
-        this.save(INITIAL_SUBMISSIONS);
-        return INITIAL_SUBMISSIONS;
-      }
-      return JSON.parse(raw);
-    } catch (e) {
-      return INITIAL_SUBMISSIONS;
-    }
-  },
-  save(data) {
-    try {
-      localStorage.setItem(this.KEY, JSON.stringify(data));
-    } catch (e) {
-      console.warn('Storage save error:', e);
-    }
-  },
-  add(item) {
-    const list = this.load();
-    list.unshift(item);
-    this.save(list);
-    return item;
-  },
-  update(id, patch) {
-    const list = this.load();
-    const idx = list.findIndex(x => x.id === id);
-    if (idx > -1) {
-      list[idx] = Object.assign({}, list[idx], patch);
-      this.save(list);
-      return list[idx];
-    }
-    return null;
-  },
-  findById(id) {
-    const list = this.load();
-    return list.find(x => x.id.toUpperCase() === id.toUpperCase());
-  },
-  findByPhoneOrId(query) {
-    const list = this.load();
-    const q = query.trim().toUpperCase();
-    return list.find(x => {
-      const matchId = x.id.toUpperCase() === q;
-      const matchPhone1 = x.pemberi && x.pemberi.telepon && x.pemberi.telepon.includes(q);
-      const matchPhone2 = x.penerima && x.penerima.telepon && x.penerima.telepon.includes(q);
-      return matchId || matchPhone1 || matchPhone2;
-    });
+  'Insidentil': {
+    badge: 'Wajib 4 Dokumen Persyaratan',
+    docs: [
+      { key: 'ktp_pemberi', code: 'a', title: 'Kartu Tanda Penduduk Pemberi Kuasa', desc: 'Maks 5 MB • PDF/JPG/PNG', icon: 'badge', tone: 'primary' },
+      { key: 'ktp_penerima', code: 'b', title: 'Kartu Tanda Penduduk Penerima Kuasa', desc: 'Maks 5 MB • PDF/JPG/PNG', icon: 'contact_emergency', tone: 'primary' },
+      { key: 'surat_kuasa', code: 'c', title: 'Surat Kuasa', desc: 'Asli Ditandatangani • PDF/JPG/PNG', icon: 'article', tone: 'primary' },
+      { key: 'surat_lurah', code: 'd', title: 'Surat Keterangan Lurah / Desa terkait status hubungan', desc: 'Keterangan Hubungan Keluarga • PDF/JPG', icon: 'family_restroom', tone: 'gold' }
+    ]
   }
 };
 
-// =========================================================================
-// 2. NETWORK & GAS REST API ADAPTER (Pola /gas-pro-api & /gas-scale-turbo)
-// =========================================================================
-
-const _inflight = {};
-let _writeEpoch = 0;
-
-async function gasApi(action, data = {}) {
-  // Jika URL GAS belum disetel, gunakan Local Database (0ms offline mode)
-  if (IS_DEMO_MODE) {
-    await new Promise(r => setTimeout(r, 120)); // Simulasi micro-delay responsif
-    return handleDemoLocalApi(action, data);
-  }
-
-  // Deduplikasi in-flight requests untuk operasi GET/read
-  const isRead = /^(get|list|fetch|track|verify)/i.test(action);
-  if (!isRead) {
-    _writeEpoch++;
-  } else {
-    const cacheKey = `${_writeEpoch}|${action}|${JSON.stringify(data)}`;
-    if (_inflight[cacheKey]) return _inflight[cacheKey];
-  }
-
-  const promise = (async () => {
-    try {
-      const res = await fetch(CONFIG.GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // WAJIB text/plain agar bebas CORS
-        body: JSON.stringify({ action, data })
-      });
-      const json = await res.json();
-      return json;
-    } catch (err) {
-      console.warn('GAS Network failed, falling back to local cache:', err);
-      return handleDemoLocalApi(action, data);
-    }
-  })();
-
-  if (isRead) {
-    const cacheKey = `${_writeEpoch}|${action}|${JSON.stringify(data)}`;
-    _inflight[cacheKey] = promise;
-    promise.then(() => delete _inflight[cacheKey], () => delete _inflight[cacheKey]);
-  }
-
-  return promise;
-}
-
-function handleDemoLocalApi(action, data) {
-  switch (action) {
-    case 'getSubmissions':
-    case 'listPengajuan':
-      return { success: true, data: Storage.load() };
-    case 'trackPengajuan':
-      const found = Storage.findByPhoneOrId(data.query || '');
-      return found ? { success: true, data: found } : { success: false, message: 'Nomor Registrasi atau Telepon tidak ditemukan.' };
-    case 'daftarSuratKuasa':
-      const newItem = Storage.add(data);
-      return { success: true, data: newItem, message: 'Pendaftaran E-Surat Kuasa berhasil terkirim!' };
-    case 'updateStatus':
-      const updated = Storage.update(data.id, data.patch);
-      return { success: true, data: updated, message: 'Status pengajuan berhasil diperbarui.' };
-    case 'sahkanDokumen':
-      const approved = Storage.update(data.id, {
-        status: 'Disahkan/Terdaftar',
-        nomorRegister: data.nomorRegister || `W11-U1/${Math.floor(Math.random() * 800 + 200)}/HK.02/XI/2026`,
-        tanggalPengesahan: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB',
-        pejabat: 'Dr. H. Sulaiman, S.H., M.H.',
-        hashSha256: generateMockSha256()
-      });
-      return { success: true, data: approved, message: 'Surat Kuasa Resmi berhasil disahkan dan ber-QR code aktif!' };
-    default:
-      return { success: true, data: Storage.load() };
-  }
-}
-
-function generateMockSha256() {
-  const chars = '0123456789abcdef';
-  let s = '';
-  for (let i = 0; i < 64; i++) s += chars[Math.floor(Math.random() * chars.length)];
-  return s;
-}
-
-// =========================================================================
-// 2.5. APARATUR AUTHENTICATION & SESSION MANAGEMENT
-// =========================================================================
-
-const DEFAULT_USERS = {
-  admin: {
-    userId: 'USR-01',
-    username: 'admin',
-    password: 'admin123',
-    nama: 'Administrator IT Pengadilan',
-    nip: '19850101 201001 1 001',
-    jabatan: 'Pranata Komputer Ahli',
-    role: 'ADMIN'
-  },
-  petugas1: {
-    userId: 'USR-02',
-    username: 'petugas1',
-    password: 'petugas123',
-    nama: 'Ahmad Syafii, S.Kom.',
-    nip: '19920315 201602 1 003',
-    jabatan: 'Staf Meja 1 PTSP Perdata',
-    role: 'PETUGAS'
-  },
-  panitera: {
-    userId: 'USR-03',
-    username: 'panitera',
-    password: 'panitera123',
-    nama: 'Dr. H. Sulaiman, S.H., M.H.',
-    nip: '19740512 199903 1 002',
-    jabatan: 'Panitera Pengadilan Negeri',
-    role: 'PEJABAT'
-  }
+const DOC_LABEL_MAP = {
+  ktp_pemberi: 'Kartu Tanda Penduduk Pemberi Kuasa',
+  ktp_penerima: 'Kartu Tanda Penduduk Penerima Kuasa',
+  kta_advokat: 'Kartu Tanda Advokat Penerima Kuasa',
+  bas_advokat: 'Berita Acara Sumpah Advokat',
+  surat_kuasa: 'Surat Kuasa',
+  surat_lurah: 'Surat Keterangan Lurah / Desa terkait status hubungan'
 };
 
-let currentUser = null;
-let redirectAfterLogin = null;
-
-function initAuth() {
-  try {
-    const saved = localStorage.getItem('court_active_user');
-    if (saved) {
-      currentUser = JSON.parse(saved);
-    }
-  } catch (e) {
-    console.warn('Gagal memuat sesi akun:', e);
-  }
-  updateAuthUI();
-}
-
-function updateAuthUI() {
-  const loggedOutNav = document.getElementById('navLoggedOutArea');
-  const loggedInNav = document.getElementById('navLoggedInArea');
-  const drawerLoggedOut = document.getElementById('mobileDrawerLoggedOut');
-  const drawerLoggedIn = document.getElementById('mobileDrawerLoggedIn');
-  const drawerLogoutWrapper = document.getElementById('mobileDrawerLogoutWrapper');
-
-  if (currentUser) {
-    if (loggedOutNav) loggedOutNav.classList.add('hidden');
-    if (loggedInNav) loggedInNav.classList.remove('hidden');
-
-    const navAdmin = document.getElementById('navAdminLink');
-    if (navAdmin) navAdmin.classList.remove('hidden');
-
-    const drawerAdmin = document.getElementById('drawerAdminSection');
-    if (drawerAdmin) drawerAdmin.classList.remove('hidden');
-
-    const navName = document.getElementById('navUserName');
-    const navRole = document.getElementById('navUserRole');
-    if (navName) navName.textContent = currentUser.nama.split(',')[0];
-    if (navRole) navRole.textContent = `${currentUser.role} • NIP. ${currentUser.nip.slice(0, 8)}...`;
-
-    const dropFullName = document.getElementById('dropdownFullName');
-    const dropNip = document.getElementById('dropdownNip');
-    const dropRole = document.getElementById('dropdownRoleBadge');
-    if (dropFullName) dropFullName.textContent = currentUser.nama;
-    if (dropNip) dropNip.textContent = `NIP. ${currentUser.nip}`;
-    if (dropRole) dropRole.textContent = currentUser.role;
-
-    if (drawerLoggedOut) drawerLoggedOut.classList.add('hidden');
-    if (drawerLoggedIn) drawerLoggedIn.classList.remove('hidden');
-    if (drawerLogoutWrapper) drawerLogoutWrapper.classList.remove('hidden');
-
-    const mName = document.getElementById('mobileDrawerUserName');
-    const mRole = document.getElementById('mobileDrawerUserRole');
-    if (mName) mName.textContent = currentUser.nama;
-    if (mRole) mRole.textContent = `${currentUser.role} • ${currentUser.jabatan}`;
-  } else {
-    if (loggedOutNav) loggedOutNav.classList.remove('hidden');
-    if (loggedInNav) loggedInNav.classList.add('hidden');
-
-    const navAdmin = document.getElementById('navAdminLink');
-    if (navAdmin) navAdmin.classList.add('hidden');
-
-    const drawerAdmin = document.getElementById('drawerAdminSection');
-    if (drawerAdmin) drawerAdmin.classList.add('hidden');
-
-    if (drawerLoggedOut) drawerLoggedOut.classList.remove('hidden');
-    if (drawerLoggedIn) drawerLoggedIn.classList.add('hidden');
-    if (drawerLogoutWrapper) drawerLogoutWrapper.classList.add('hidden');
-
-    toggleUserDropdown(false);
-  }
-}
-
-function toggleUserDropdown(force) {
-  const menu = document.getElementById('userDropdownMenu');
-  if (!menu) return;
-  if (typeof force === 'boolean') {
-    if (force) menu.classList.remove('hidden');
-    else menu.classList.add('hidden');
-  } else {
-    menu.classList.toggle('hidden');
-  }
-}
-
-// Tutup dropdown jika klik di luar
-document.addEventListener('click', (e) => {
-  const btn = document.getElementById('btnUserMenu');
-  const menu = document.getElementById('userDropdownMenu');
-  if (menu && !menu.classList.contains('hidden')) {
-    if (btn && !btn.contains(e.target) && !menu.contains(e.target)) {
-      menu.classList.add('hidden');
-    }
-  }
-});
-
-function openLoginModal(noticeMessage = '') {
-  const modal = document.getElementById('loginModal');
-  const banner = document.getElementById('loginNoticeBanner');
-  const bannerText = document.getElementById('loginNoticeText');
-  const errBox = document.getElementById('loginErrorBox');
-
-  if (errBox) errBox.classList.add('hidden');
-
-  if (banner && bannerText) {
-    if (noticeMessage) {
-      bannerText.textContent = noticeMessage;
-      banner.classList.remove('hidden');
-    } else {
-      banner.classList.add('hidden');
-    }
-  }
-
-  if (modal) {
-    modal.classList.remove('hidden');
-    const uInput = document.getElementById('loginUsername');
-    if (uInput) setTimeout(() => uInput.focus(), 100);
-  }
-}
-
-function closeLoginModal() {
-  const modal = document.getElementById('loginModal');
-  if (modal) modal.classList.add('hidden');
-  const banner = document.getElementById('loginNoticeBanner');
-  if (banner) banner.classList.add('hidden');
-}
-
-function selectQuickUser(roleKey) {
-  const uInput = document.getElementById('loginUsername');
-  const pInput = document.getElementById('loginPassword');
-  const errBox = document.getElementById('loginErrorBox');
-  if (errBox) errBox.classList.add('hidden');
-
-  const preset = DEFAULT_USERS[roleKey];
-  if (preset && uInput && pInput) {
-    uInput.value = preset.username;
-    pInput.value = preset.password;
-    showToast(`Akun ${preset.role} (${preset.username}) dipilih. Klik Masuk.`, 'info');
-  }
-}
-
-function togglePasswordVisibility(inputId, btn) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-  const isPass = input.type === 'password';
-  input.type = isPass ? 'text' : 'password';
-  const icon = btn.querySelector('.material-symbols-outlined');
-  if (icon) {
-    icon.textContent = isPass ? 'visibility_off' : 'visibility';
-  }
-}
-
-async function handleLoginSubmit(e) {
-  if (e) e.preventDefault();
-  const u = (document.getElementById('loginUsername')?.value || '').trim().toLowerCase();
-  const p = (document.getElementById('loginPassword')?.value || '').trim();
-  const errBox = document.getElementById('loginErrorBox');
-  const errMsg = document.getElementById('loginErrorMsg');
-  const submitBtn = document.getElementById('btnLoginSubmit');
-
-  if (!u || !p) {
-    if (errBox && errMsg) {
-      errMsg.textContent = 'Username dan kata sandi wajib diisi.';
-      errBox.classList.remove('hidden');
-    }
-    return;
-  }
-
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-lg">progress_activity</span><span>Memverifikasi...</span>';
-  }
-
-  let matchedUser = DEFAULT_USERS[u];
-  if (!matchedUser && u === 'petugas') {
-    matchedUser = DEFAULT_USERS['petugas1'];
-  }
-
-  let isVerified = false;
-
-  // Verifikasi ke server GAS jika online
-  if (typeof CONFIG !== 'undefined' && CONFIG.GAS_URL && !CONFIG.DEMO_MODE) {
-    try {
-      const res = await callGasApi('login', { username: u, password: p });
-      if (res && res.success && res.user) {
-        matchedUser = res.user;
-        isVerified = true;
-      } else if (res && !res.success) {
-        if (errBox && errMsg) {
-          errMsg.textContent = res.message || 'Kredensial login tidak cocok.';
-          errBox.classList.remove('hidden');
-        }
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span class="material-symbols-outlined text-lg">login</span><span>Masuk ke Sistem</span>';
-        }
-        return;
-      }
-    } catch (errApi) {
-      console.warn('API login offline, menggunakan verifikasi lokal:', errApi);
-    }
-  }
-
-  // Verifikasi password lokal (offline / demo)
-  if (!isVerified) {
-    if (matchedUser && matchedUser.password === p) {
-      isVerified = true;
-    }
-  }
-
-  if (submitBtn) {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<span class="material-symbols-outlined text-lg">login</span><span>Masuk ke Sistem</span>';
-  }
-
-  if (isVerified && matchedUser) {
-    currentUser = {
-      userId: matchedUser.userId,
-      username: matchedUser.username,
-      nama: matchedUser.nama,
-      nip: matchedUser.nip,
-      jabatan: matchedUser.jabatan,
-      role: matchedUser.role,
-      token: 'SESSION-' + Date.now()
-    };
-    localStorage.setItem('court_active_user', JSON.stringify(currentUser));
-    updateAuthUI();
-    closeLoginModal();
-    showToast(`Berhasil masuk! Selamat datang, ${currentUser.nama}.`, 'success');
-
-    // Alihkan ke halaman yang dituju sebelumnya jika ada
-    if (redirectAfterLogin) {
-      const target = redirectAfterLogin;
-      redirectAfterLogin = null;
-      navigateTo(target);
-    } else {
-      if (currentUser.role === 'ADMIN') navigateTo('dashboard-admin');
-      else if (currentUser.role === 'PETUGAS') navigateTo('meja-verifikator');
-      else if (currentUser.role === 'PEJABAT') navigateTo('meja-pengesahan');
-      else navigateTo('beranda-dan-lacak');
-    }
-  } else {
-    if (errBox && errMsg) {
-      errMsg.textContent = 'Username atau kata sandi tidak cocok. Silakan gunakan tombol akun demo di atas.';
-      errBox.classList.remove('hidden');
-    }
-  }
-}
-
-function handleLogout() {
-  if (confirm('Apakah Anda yakin ingin keluar dari sesi aparatur pengadilan?')) {
-    currentUser = null;
-    localStorage.removeItem('court_active_user');
-    updateAuthUI();
-    showToast('Sesi Anda telah diakhiri.', 'info');
-
-    const internalViews = ['meja-verifikator', 'meja-pengesahan', 'dashboard-admin'];
-    if (internalViews.includes(currentView)) {
-      navigateTo('beranda-dan-lacak');
-    }
-  }
-}
+const DEMO_SAMPLE_IMG = {
+  ktp_pemberi: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
+  ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+  kta_advokat: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+  bas_advokat: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
+  surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+  surat_lurah: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80'
+};
 
 // =========================================================================
-// 3. SPA ROUTER & VIEW SWITCHER (0ms INSTANT NAVIGATION)
+// 2. STATE ENGINE & SWR LOCALSTORAGE CACHE (0MS INSTANT UX)
 // =========================================================================
 
-const VALID_VIEWS = [
-  'beranda-dan-lacak',
-  'pendaftaran-kuasa',
-  'meja-verifikator',
-  'meja-pengesahan',
-  'dashboard-admin',
-  'validasi-qr-dokumen'
-];
+const STORE_KEY = 'ekuasa_v3_store';
+const SESSION_KEY = 'ekuasa_v3_session';
 
-const PROTECTED_VIEWS = [
-  'meja-verifikator',
-  'meja-pengesahan',
-  'dashboard-admin'
-];
-
-let currentView = 'beranda-dan-lacak';
-let currentAdminTab = 'analitik';
-
-function switchAdminTab(tabName) {
-  const tabs = ['analitik', 'verifikator', 'pengesahan', 'pengaturan'];
-  if (!tabs.includes(tabName)) tabName = 'analitik';
-  currentAdminTab = tabName;
-
-  const paneMap = {
-    analitik: 'adminPaneAnalitik',
-    verifikator: 'adminPaneVerifikator',
-    pengesahan: 'adminPanePengesahan',
-    pengaturan: 'adminPanePengaturan'
-  };
-
-  const btnMap = {
-    analitik: 'tabBtnAnalitik',
-    verifikator: 'tabBtnVerifikator',
-    pengesahan: 'tabBtnPengesahan',
-    pengaturan: 'tabBtnPengaturan'
-  };
-
-  // Toggle visual pane
-  tabs.forEach(t => {
-    const pane = document.getElementById(paneMap[t]);
-    const btn = document.getElementById(btnMap[t]);
-    if (pane) {
-      if (t === tabName) pane.classList.remove('hidden');
-      else pane.classList.add('hidden');
-    }
-    if (btn) {
-      if (t === tabName) {
-        btn.className = 'flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-primary text-on-primary shadow-sm transition-all cursor-pointer flex-shrink-0';
-      } else {
-        btn.className = 'flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs bg-surface-container-low text-on-surface hover:bg-surface-container transition-all cursor-pointer flex-shrink-0';
+const SEED_DATA = {
+  users: [
+    { userId: 'USR-001', username: 'admin', password: 'admin123', nama: 'Administrator IT Kepaniteraan', wa: '08119283771', role: 'Admin', aktif: true, createdAt: '2026-11-01T08:00:00Z' },
+    { userId: 'USR-002', username: 'petugas1', password: 'petugas123', nama: 'Siti Rahmawati, S.H.', wa: '081234567890', role: 'Petugas', aktif: true, createdAt: '2026-11-02T08:00:00Z' },
+    { userId: 'USR-003', username: 'advokat@kantorhukum.id', password: 'pemohon123', nama: 'Farhan Pratama, S.H., M.H.', wa: '081298421082', role: 'Pemohon', aktif: true, createdAt: '2026-11-05T09:30:00Z' }
+  ],
+  permohonan: [
+    {
+      permohonanId: 'REG-202611-001',
+      userId: 'USR-003',
+      tanggalPengajuan: '2026-11-12T09:30:00+07:00',
+      kategoriKuasa: 'Advokat',
+      namaPemohon: 'H. Ahmad Subardjo',
+      noHpWa: '081298421082',
+      status: 'Disetujui',
+      nomorRegisterResmi: 'W10.U1/142/SK/HK.01/XI/2026',
+      catatanPetugas: 'Berkas lengkap, sah, dan telah tercatat dalam Buku Register Elektronik.',
+      petugasVerifikator: 'Siti Rahmawati, S.H.',
+      tanggalVerifikasi: '2026-11-13T10:00:00+07:00',
+      hashVerifikasi: '7f2a8c91e56b8209dc47120fe817c0326e0802c61148e100f917208d9c14b8',
+      berkas: { ...DEMO_SAMPLE_IMG }
+    },
+    {
+      permohonanId: 'REG-202611-002',
+      userId: 'USR-003',
+      tanggalPengajuan: '2026-11-14T11:15:00+07:00',
+      kategoriKuasa: 'Insidentil',
+      namaPemohon: 'Siti Aminah',
+      noHpWa: '085712349090',
+      status: 'Perlu Revisi',
+      nomorRegisterResmi: '',
+      catatanPetugas: 'Surat Keterangan Lurah / Desa buram pada bagian stempel. Mohon unggah ulang dengan scan yang jelas.',
+      petugasVerifikator: 'Siti Rahmawati, S.H.',
+      tanggalVerifikasi: '2026-11-14T14:20:00+07:00',
+      hashVerifikasi: '',
+      berkas: {
+        ktp_pemberi: DEMO_SAMPLE_IMG.ktp_pemberi,
+        ktp_penerima: DEMO_SAMPLE_IMG.ktp_penerima,
+        surat_kuasa: DEMO_SAMPLE_IMG.surat_kuasa,
+        surat_lurah: DEMO_SAMPLE_IMG.surat_lurah
+      }
+    },
+    {
+      permohonanId: 'REG-202611-003',
+      userId: 'USR-003',
+      tanggalPengajuan: '2026-11-15T13:40:00+07:00',
+      kategoriKuasa: 'Instansi Pemerintah',
+      namaPemohon: 'Biro Hukum Kementerian ATR/BPN',
+      noHpWa: '081288776655',
+      status: 'Menunggu Verifikasi',
+      nomorRegisterResmi: '',
+      catatanPetugas: '',
+      petugasVerifikator: '',
+      tanggalVerifikasi: '',
+      hashVerifikasi: '',
+      berkas: {
+        ktp_pemberi: DEMO_SAMPLE_IMG.ktp_pemberi,
+        ktp_penerima: DEMO_SAMPLE_IMG.ktp_penerima,
+        surat_kuasa: DEMO_SAMPLE_IMG.surat_kuasa
       }
     }
-  });
+  ],
+  logs: [
+    { Timestamp: '2026-11-15T13:40:00+07:00', User: 'advokat@kantorhukum.id', Aksi: 'PERMOHONAN_BARU', Ref_ID: 'REG-202611-003', Keterangan: 'Pengajuan Kuasa Instansi Pemerintah' },
+    { Timestamp: '2026-11-14T14:20:00+07:00', User: 'petugas1', Aksi: 'VERIFIKASI_PERLU_REVISI', Ref_ID: 'REG-202611-002', Keterangan: 'Minta perbaikan Surat Keterangan Lurah' },
+    { Timestamp: '2026-11-13T10:00:00+07:00', User: 'petugas1', Aksi: 'VERIFIKASI_DISETUJUI', Ref_ID: 'REG-202611-001', Keterangan: 'Terbit Register W10.U1/142/SK/HK.01/XI/2026' }
+  ],
+  crm: [
+    { KontakID: 'KTK-001', Nama: 'Farhan Pratama, S.H., M.H.', NoWA: '081298421082', Segmen: 'Advokat', OptOut: 'TIDAK' },
+    { KontakID: 'KTK-002', Nama: 'Siti Aminah', NoWA: '085712349090', Segmen: 'Insidentil', OptOut: 'TIDAK' },
+    { KontakID: 'KTK-003', Nama: 'Biro Hukum Kementerian ATR/BPN', NoWA: '081288776655', Segmen: 'Instansi Pemerintah', OptOut: 'TIDAK' }
+  ],
+  drive: { usedMb: 1840, limitMb: 15360, percent: 12 },
+  secrets: { FONNTE_TOKEN_ADA: false, FONNTE_TOKEN_MASK: '' },
+  notifConfig: { waAktif: true, emailAktif: false }
+};
 
-  // Update badge counter di tab
+let APP_STATE = loadLocalState();
+let CURRENT_SESSION = loadSession();
+let CURRENT_ROUTE = 'portal-publik-dan-lacak';
+let SELECTED_KATEGORI = 'Advokat';
+let FORM_UPLOADS = {};
+let REVISION_TARGET_ID = null;
+let DRAWER_ITEM = null;
+let DRAWER_ZOOM = 100;
+let DRAWER_ROTATE = 0;
+
+// In-Flight Deduplication Map (/gas-scale-turbo)
+const _inFlight = new Map();
+
+function loadLocalState() {
   try {
-    const list = Storage.load();
-    const pendingVerif = list.filter(x => x.status === 'Menunggu Verifikasi').length;
-    const pendingSah = list.filter(x => x.status === 'Menunggu Pengesahan').length;
-    const bVerif = document.getElementById('tabBadgeVerif');
-    const bSah = document.getElementById('tabBadgeSah');
-    if (bVerif) bVerif.textContent = pendingVerif;
-    if (bSah) bSah.textContent = pendingSah;
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
   } catch (e) {}
+  localStorage.setItem(STORE_KEY, JSON.stringify(SEED_DATA));
+  return JSON.parse(JSON.stringify(SEED_DATA));
+}
 
-  // Jalankan lifecycle data per tab
-  if (tabName === 'analitik') {
-    renderAdminDashboard();
-  } else if (tabName === 'verifikator') {
-    renderVerifikatorTable();
-  } else if (tabName === 'pengesahan') {
-    renderPengesahanQueue();
-  } else if (tabName === 'pengaturan') {
-    renderCaseTypesTable();
-    loadGeneralSettings();
+function saveLocalState() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(APP_STATE)); } catch (e) {}
+}
+
+function loadSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function saveSession(sesi) {
+  CURRENT_SESSION = sesi;
+  try {
+    if (sesi) localStorage.setItem(SESSION_KEY, JSON.stringify(sesi));
+    else localStorage.removeItem(SESSION_KEY);
+  } catch (e) {}
+}
+
+// =========================================================================
+// 3. CLIENT REST API (PURE POST text/plain — ZERO CORS PREFLIGHT)
+// =========================================================================
+
+async function callApi(action, payload = {}) {
+  if (IS_DEMO_MODE) {
+    return { _demo: true, success: true };
+  }
+  const dedupeKey = action + ':' + JSON.stringify(payload).slice(0, 120);
+  if (_inFlight.has(dedupeKey)) return _inFlight.get(dedupeKey);
+
+  const req = fetch(CONFIG.GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      action,
+      token: CURRENT_SESSION ? CURRENT_SESSION.token : '',
+      ...payload
+    })
+  })
+    .then(r => r.json())
+    .catch(err => ({ success: false, message: 'Koneksi ke server GAS gagal: ' + err.message }))
+    .finally(() => _inFlight.delete(dedupeKey));
+
+  _inFlight.set(dedupeKey, req);
+  return req;
+}
+
+async function syncPermohonanFromServer() {
+  if (IS_DEMO_MODE || !CURRENT_SESSION) return;
+  const res = await callApi('listPermohonan');
+  if (res && res.success && Array.isArray(res.data)) {
+    APP_STATE.permohonan = res.data;
+    saveLocalState();
+    refreshActiveViewData();
   }
 }
 
-function navigateTo(viewId, triggerHistory = true) {
-  if (!VALID_VIEWS.includes(viewId)) {
-    viewId = 'beranda-dan-lacak';
+async function syncAdminFromServer() {
+  if (IS_DEMO_MODE || !CURRENT_SESSION || CURRENT_SESSION.user.role !== 'Admin') return;
+  const res = await callApi('getAdminData');
+  if (res && res.success) {
+    APP_STATE.users = res.users || [];
+    APP_STATE.logs = res.logs || [];
+    APP_STATE.crm = res.crm || [];
+    APP_STATE.drive = res.drive || APP_STATE.drive;
+    APP_STATE.secrets = res.secrets || APP_STATE.secrets;
+    APP_STATE.notifConfig = res.notifConfig || APP_STATE.notifConfig;
+    saveLocalState();
+    renderAdminPanel();
   }
+}
 
-  // Route Guard: Proteksi akses area kerja internal pengadilan
-  if (PROTECTED_VIEWS.includes(viewId) && !currentUser) {
-    redirectAfterLogin = viewId;
-    const viewLabels = {
-      'dashboard-admin': 'Dashboard Admin',
-      'meja-verifikator': 'Meja Verifikator PTSP',
-      'meja-pengesahan': 'Meja Pengesahan Panitera'
-    };
-    openLoginModal('Akses ' + (viewLabels[viewId] || 'menu ini') + ' memerlukan login akun aparatur pengadilan.');
-    return;
-  }
+// =========================================================================
+// 4. 0MS INSTANT SPA ROUTER & ROLE ACCESS GUARD
+// =========================================================================
 
-  // Meja Verifikator & Meja Pengesahan terintegrasi ke dalam Dashboard Admin
-  if (viewId === 'meja-verifikator') {
-    navigateTo('dashboard-admin', triggerHistory);
-    switchAdminTab('verifikator');
-    return;
-  }
-  if (viewId === 'meja-pengesahan') {
-    navigateTo('dashboard-admin', triggerHistory);
-    switchAdminTab('pengesahan');
-    return;
-  }
+const VALID_ROUTES = [
+  'portal-publik-dan-lacak',
+  'permohonan-baru',
+  'riwayat-berkas',
+  'antrean-verifikasi-petugas',
+  'buku-register-kuasa',
+  'admin-dan-log'
+];
 
-  currentView = viewId;
+const ROUTE_ROLES = {
+  'portal-publik-dan-lacak': null,
+  'permohonan-baru': ['Pemohon', 'Petugas', 'Admin'],
+  'riwayat-berkas': ['Pemohon', 'Petugas', 'Admin'],
+  'antrean-verifikasi-petugas': ['Petugas', 'Admin'],
+  'buku-register-kuasa': ['Petugas', 'Admin'],
+  'admin-dan-log': ['Admin']
+};
 
-  // Sembunyikan semua views
-  VALID_VIEWS.forEach(id => {
-    const el = document.getElementById(`view-${id}`);
-    if (el) el.classList.add('hidden');
-  });
+function navigateTo(route, updateHash = true) {
+  if (!VALID_ROUTES.includes(route)) route = 'portal-publik-dan-lacak';
 
-  // Tampilkan active view
-  const activeEl = document.getElementById(`view-${viewId}`);
-  if (activeEl) {
-    activeEl.classList.remove('hidden');
-    activeEl.classList.add('animate-fade-in');
-  }
-
-  // Update navbar links active styling
-  document.querySelectorAll('[data-path]').forEach(link => {
-    const path = link.getAttribute('data-path');
-    if (path === viewId) {
-      link.classList.add('text-secondary-container', 'font-semibold');
-      link.classList.remove('text-on-primary-container');
-    } else {
-      link.classList.remove('text-secondary-container', 'font-semibold');
-      link.classList.add('text-on-primary-container');
+  const allowed = ROUTE_ROLES[route];
+  if (allowed) {
+    if (!CURRENT_SESSION) {
+      showToast('Silakan masuk (login) terlebih dahulu untuk mengakses menu ini.', 'warning');
+      route = 'portal-publik-dan-lacak';
+    } else if (!allowed.includes(CURRENT_SESSION.user.role)) {
+      showToast('Akses ditolak untuk peran ' + CURRENT_SESSION.user.role + '.', 'error');
+      return;
     }
-  });
-
-  // Update sidebar links active styling (untuk meja kerja internal)
-  document.querySelectorAll('aside nav a[data-path]').forEach(link => {
-    const path = link.getAttribute('data-path');
-    if (path === viewId) {
-      link.classList.add('bg-primary-container', 'text-on-primary', 'font-semibold', 'shadow-sm');
-      link.classList.remove('text-on-surface-variant');
-    } else {
-      link.classList.remove('bg-primary-container', 'text-on-primary', 'font-semibold', 'shadow-sm');
-      link.classList.add('text-on-surface-variant');
-    }
-  });
-
-  // Set URL hash
-  if (triggerHistory && window.location.hash.slice(1) !== viewId) {
-    window.location.hash = viewId;
   }
 
-  // Jalankan lifecycle hook per view
-  onViewActivated(viewId);
+  CURRENT_ROUTE = route;
+  if (updateHash && window.location.hash !== '#' + route) {
+    window.location.hash = route;
+  }
 
-  // Scroll to top
+  // Toggle views instantaneously (0ms)
+  document.querySelectorAll('.app-view').forEach(el => el.classList.add('hidden'));
+  const activeView = document.getElementById('view-' + route);
+  if (activeView) activeView.classList.remove('hidden');
+
+  // Show/hide persistent sidebar (hidden on Public Portal, shown on dashboard views)
+  const sidebar = document.getElementById('appSidebar');
+  const mainShell = document.getElementById('mainShell');
+  const isDashboard = route !== 'portal-publik-dan-lacak' && !!CURRENT_SESSION;
+
+  if (sidebar && mainShell) {
+    if (isDashboard) {
+      sidebar.classList.remove('hidden');
+      sidebar.classList.add('md:flex');
+      mainShell.classList.add('md:pl-64');
+    } else {
+      sidebar.classList.add('hidden');
+      sidebar.classList.remove('md:flex');
+      mainShell.classList.remove('md:pl-64');
+    }
+  }
+
+  // Highlight active nav links
+  document.querySelectorAll('.nav-link').forEach(a => {
+    const isAct = a.getAttribute('data-route') === route;
+    a.className = isAct
+      ? 'nav-link px-3 py-2 rounded-lg text-[13px] font-bold bg-primary text-on-primary shadow-sm transition-all whitespace-nowrap'
+      : 'nav-link px-3 py-2 rounded-lg text-[13px] font-medium text-on-primary-container hover:bg-primary/50 hover:text-on-primary transition-all whitespace-nowrap';
+  });
+
+  document.querySelectorAll('.side-link').forEach(a => {
+    const isAct = a.getAttribute('data-route') === route;
+    a.className = isAct
+      ? 'side-link flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-bold bg-primary-container text-on-primary shadow-sm transition-all'
+      : 'side-link flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all';
+  });
+
+  toggleMobileDrawer(false);
+  refreshActiveViewData();
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
-function onViewActivated(viewId) {
-  switch (viewId) {
-    case 'beranda-dan-lacak':
-      break;
-    case 'pendaftaran-kuasa':
-      setWizardCategory(wizardData.kategori || 'Advokat');
-      break;
-    case 'dashboard-admin':
-      switchAdminTab(currentAdminTab || 'analitik');
-      break;
-    case 'validasi-qr-dokumen':
-      renderQrValidationPage();
-      break;
+function refreshActiveViewData() {
+  updateRoleNavigationVisibility();
+  updatePendingBadges();
+
+  if (CURRENT_ROUTE === 'portal-publik-dan-lacak') {
+    handlePublicTrack(true);
+  } else if (CURRENT_ROUTE === 'permohonan-baru') {
+    renderPemohonKpis();
+    selectKategoriKuasa(SELECTED_KATEGORI);
+  } else if (CURRENT_ROUTE === 'riwayat-berkas') {
+    renderRiwayatTable();
+  } else if (CURRENT_ROUTE === 'antrean-verifikasi-petugas') {
+    renderVerifikatorTable();
+  } else if (CURRENT_ROUTE === 'buku-register-kuasa') {
+    renderBukuRegisterTable();
+  } else if (CURRENT_ROUTE === 'admin-dan-log') {
+    renderAdminPanel();
   }
 }
 
-// Inisialisasi Event Listener Routing
-window.addEventListener('hashchange', () => {
-  const hash = window.location.hash.replace('#', '');
-  if (hash && VALID_VIEWS.includes(hash)) {
-    navigateTo(hash, false);
-  }
-});
-
-// Toggle Mobile Navigation Drawer
-function toggleMobileMenu() {
-  const overlay = document.getElementById('mobileMenuOverlay');
-  const drawer = document.getElementById('mobileMenuDrawer');
-  if (overlay && drawer) {
-    const isHidden = overlay.classList.contains('hidden');
-    if (isHidden) {
-      overlay.classList.remove('hidden');
-      drawer.classList.remove('hidden');
-    } else {
-      overlay.classList.add('hidden');
-      drawer.classList.add('hidden');
-    }
+function toggleMobileDrawer(force) {
+  const sidebar = document.getElementById('appSidebar');
+  const backdrop = document.getElementById('mobileDrawerBackdrop');
+  if (!sidebar || !backdrop) return;
+  const open = typeof force === 'boolean' ? force : sidebar.classList.contains('hidden');
+  if (open && CURRENT_SESSION) {
+    sidebar.classList.remove('hidden');
+    sidebar.classList.add('flex');
+    backdrop.classList.remove('hidden');
+  } else if (window.innerWidth < 768) {
+    sidebar.classList.add('hidden');
+    sidebar.classList.remove('flex');
+    backdrop.classList.add('hidden');
   }
 }
 
-// =========================================================================
-// 4. TOAST NOTIFICATIONS & MODALS
-// =========================================================================
+function updateRoleNavigationVisibility() {
+  const role = CURRENT_SESSION ? CURRENT_SESSION.user.role : null;
+  document.querySelectorAll('[data-roles]').forEach(el => {
+    const allowed = el.getAttribute('data-roles').split(',');
+    if (role && allowed.includes(role)) el.classList.remove('hidden');
+    else el.classList.add('hidden');
+  });
 
-function showToast(message, type = 'success') {
-  const container = document.getElementById('toastContainer');
-  if (!container) return;
+  const btnLogin = document.getElementById('btnNavLogin');
+  const userBox = document.getElementById('navUserBox');
+  const demoBadge = document.getElementById('demoModeBadge');
+  if (demoBadge) demoBadge.classList.toggle('hidden', !IS_DEMO_MODE);
 
-  const toast = document.createElement('div');
-  const bgColors = {
-    success: 'bg-primary text-on-primary border-primary-fixed-dim',
-    error: 'bg-error text-on-error border-error-container',
-    warning: 'bg-secondary text-on-secondary border-secondary-container',
-    info: 'bg-surface-container-high text-on-surface border-surface-container-highest'
-  };
-  const icons = {
-    success: 'check_circle',
-    error: 'cancel',
-    warning: 'warning',
-    info: 'info'
-  };
+  if (CURRENT_SESSION) {
+    if (btnLogin) btnLogin.classList.add('hidden');
+    if (userBox) userBox.classList.remove('hidden');
+    const nameEl = document.getElementById('navUserName');
+    const roleEl = document.getElementById('navUserRole');
+    const avEl = document.getElementById('navUserAvatar');
+    if (nameEl) nameEl.textContent = CURRENT_SESSION.user.nama;
+    if (roleEl) roleEl.textContent = CURRENT_SESSION.user.role;
+    if (avEl) avEl.textContent = (CURRENT_SESSION.user.nama || 'PN').slice(0, 2).toUpperCase();
+  } else {
+    if (btnLogin) btnLogin.classList.remove('hidden');
+    if (userBox) userBox.classList.add('hidden');
+  }
+}
 
-  toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium animate-fade-in ${bgColors[type] || bgColors.info}`;
-  toast.innerHTML = `
-    <span class="material-symbols-outlined text-xl">${icons[type] || 'info'}</span>
-    <span class="flex-1">${message}</span>
-    <button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100 transition-opacity">
-      <span class="material-symbols-outlined text-lg">close</span>
-    </button>
-  `;
-
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transition = 'opacity 0.3s ease';
-    setTimeout(() => toast.remove(), 300);
-  }, 4500);
+function updatePendingBadges() {
+  const pendingCount = APP_STATE.permohonan.filter(p => p.status === 'Menunggu Verifikasi').length;
+  const badge = document.getElementById('sidebarPendingBadge');
+  if (badge) badge.textContent = pendingCount;
 }
 
 // =========================================================================
-// 5. MODUL 1: BERANDA & LACAK MANDIRI
+// 5. AUTHENTICATION (LOGIN, REGISTRASI & QUICK DEMO ROLE)
 // =========================================================================
 
-function initTracking() {
-  const form = document.getElementById('trackingForm');
-  if (!form) return;
+function switchAuthTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('formLogin').classList.toggle('hidden', !isLogin);
+  document.getElementById('formRegister').classList.toggle('hidden', isLogin);
+  document.getElementById('tabBtnLogin').className = isLogin
+    ? 'py-2 rounded-lg text-xs font-bold bg-primary-container text-on-primary shadow-sm transition-all cursor-pointer'
+    : 'py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-primary transition-all cursor-pointer';
+  document.getElementById('tabBtnRegister').className = !isLogin
+    ? 'py-2 rounded-lg text-xs font-bold bg-primary-container text-on-primary shadow-sm transition-all cursor-pointer'
+    : 'py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-primary transition-all cursor-pointer';
+}
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const query = document.getElementById('regIdInput').value.trim();
-    if (!query) {
-      showToast('Masukkan Nomor Registrasi atau Nomor WhatsApp.', 'warning');
+function quickLoginRole(role) {
+  if (role === 'Pemohon') {
+    document.getElementById('loginUsername').value = 'advokat@kantorhukum.id';
+    document.getElementById('loginPassword').value = 'pemohon123';
+  } else if (role === 'Petugas') {
+    document.getElementById('loginUsername').value = 'petugas1';
+    document.getElementById('loginPassword').value = 'petugas123';
+  } else {
+    document.getElementById('loginUsername').value = 'admin';
+    document.getElementById('loginPassword').value = 'admin123';
+  }
+  handleLoginSubmit();
+}
+
+async function handleLoginSubmit() {
+  const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+  if (!username || !password) {
+    showToast('Masukkan Username/Email dan Password.', 'warning');
+    return;
+  }
+
+  if (IS_DEMO_MODE) {
+    const found = APP_STATE.users.find(u => u.username.toLowerCase() === username && (u.password === password || !u.password));
+    if (!found) {
+      showToast('Username atau Password tidak cocok.', 'error');
       return;
     }
-
-    const res = await gasApi('trackPengajuan', { query });
-    const resultBox = document.getElementById('searchResultBox');
-    if (!resultBox) return;
-
-    if (res.success && res.data) {
-      renderTrackingResult(res.data);
-      resultBox.classList.remove('hidden');
-      resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      showToast(res.message || 'Data pendaftaran tidak ditemukan.', 'error');
+    if (!found.aktif) {
+      showToast('Akun Anda sedang dinonaktifkan oleh Admin.', 'error');
+      return;
     }
-  });
+    saveSession({ token: 'demo-token-' + Date.now(), user: { userId: found.userId, username: found.username, nama: found.nama, wa: found.wa, role: found.role } });
+    showToast('Selamat datang, ' + found.nama + ' (' + found.role + ')', 'success');
+    routeAfterLogin(found.role);
+    return;
+  }
+
+  const btn = document.getElementById('btnLoginSubmit');
+  btn.disabled = true;
+  const res = await callApi('login', { username, password });
+  btn.disabled = false;
+
+  if (res.success) {
+    saveSession({ token: res.token, user: res.user });
+    showToast('Login berhasil! Selamat datang, ' + res.user.nama, 'success');
+    syncPermohonanFromServer();
+    if (res.user.role === 'Admin') syncAdminFromServer();
+    routeAfterLogin(res.user.role);
+  } else {
+    showToast(res.message || 'Login gagal.', 'error');
+  }
 }
 
-function renderTrackingResult(item) {
-  const box = document.getElementById('searchResultBox');
-  if (!box) return;
+async function handleRegisterSubmit() {
+  const nama = document.getElementById('regNama').value.trim();
+  const username = document.getElementById('regUsername').value.trim().toLowerCase();
+  const wa = normalizeHp08(document.getElementById('regWa').value);
+  const password = document.getElementById('regPassword').value;
 
-  // Status mapping ke 4 tahapan alur
-  const steps = [
-    { title: '1. Pengajuan Masuk', desc: 'Formulir & dokumen kuasa berhasil diunggah secara daring.', time: item.tanggal || '12 Nov, 09:15' },
-    { title: '2. Verifikasi PTSP', desc: 'Pemeriksaan kelengkapan KTP, BAS, & validitas meterai.', time: item.status !== 'Menunggu Verifikasi' ? '12 Nov, 11:20' : 'Sedang diverifikasi' },
-    { title: '3. Pengesahan Pejabat', desc: 'Pemeriksaan substantif dan tanda tangan digital oleh Panitera.', time: item.status === 'Disahkan/Terdaftar' ? '12 Nov, 14:00' : 'Menunggu antrean TTE' },
-    { title: '4. Akta Terdaftar & QR', desc: 'Penerbitan akta registrasi resmi dengan QR verifikasi publik.', time: item.status === 'Disahkan/Terdaftar' ? 'Selesai & Aktif' : 'Estimasi 1-2 Jam' }
-  ];
+  if (!nama || !username || !wa || password.length < 6) {
+    showToast('Lengkapi semua kolom dan gunakan password minimal 6 karakter.', 'warning');
+    return;
+  }
 
-  let currentStepIdx = 0;
-  if (item.status === 'Menunggu Verifikasi') currentStepIdx = 1;
-  else if (item.status === 'Perlu Revisi') currentStepIdx = 1;
-  else if (item.status === 'Menunggu Pengesahan') currentStepIdx = 2;
-  else if (item.status === 'Disahkan/Terdaftar') currentStepIdx = 4;
+  if (IS_DEMO_MODE) {
+    if (APP_STATE.users.some(u => u.username.toLowerCase() === username)) {
+      showToast('Username/Email sudah terdaftar.', 'error');
+      return;
+    }
+    const newUser = {
+      userId: 'USR-' + String(APP_STATE.users.length + 1).padStart(3, '0'),
+      username, password, nama, wa, role: 'Pemohon', aktif: true, createdAt: new Date().toISOString()
+    };
+    APP_STATE.users.push(newUser);
+    saveLocalState();
+    saveSession({ token: 'demo-token-' + Date.now(), user: newUser });
+    showToast('Registrasi berhasil! Anda langsung masuk sebagai Pemohon.', 'success');
+    routeAfterLogin('Pemohon');
+    return;
+  }
 
-  box.innerHTML = `
-    <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-md border border-surface-container relative">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-surface-container">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-primary-container text-secondary-container flex items-center justify-center">
-            <span class="material-symbols-outlined text-2xl">verified</span>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-headline-sm text-headline-sm font-bold text-on-surface">${item.id}</span>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${getStatusBadgeClass(item.status)}">${item.status}</span>
-            </div>
-            <p class="font-body-sm text-body-sm text-on-surface-variant">Kategori: Surat Kuasa ${item.kategori} • Terdaftar pada ${item.tanggal}</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="downloadTandaTerima('${item.id}')" class="px-3.5 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold flex items-center gap-1.5 transition-colors">
-            <span class="material-symbols-outlined text-lg">download</span>
-            <span>Tanda Terima</span>
-          </button>
-          <a href="https://wa.me/${CONFIG.PTSP_WHATSAPP}?text=Halo%20PTSP,%20saya%20ingin%20menanyakan%20status%20Surat%20Kuasa%20${item.id}" target="_blank" class="px-3.5 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold flex items-center gap-1.5 hover:bg-primary-container transition-colors">
-            <span class="material-symbols-outlined text-lg">support_agent</span>
-            <span>Bantuan WA PTSP</span>
-          </a>
-        </div>
-      </div>
+  const res = await callApi('register', { nama, username, wa, password });
+  if (res.success) {
+    saveSession({ token: res.token, user: res.user });
+    showToast(res.message || 'Registrasi berhasil!', 'success');
+    routeAfterLogin('Pemohon');
+  } else {
+    showToast(res.message || 'Registrasi gagal.', 'error');
+  }
+}
 
-      <!-- Ringkasan Pihak -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 border-b border-surface-container">
-        <div class="p-3 rounded-lg bg-surface-container-low">
-          <span class="block text-xs uppercase font-bold text-outline">Pemberi Kuasa (Prinsipal)</span>
-          <span class="font-semibold text-on-surface">${item.pemberi.nama}</span>
-          <p class="text-xs text-on-surface-variant">NIK: ${maskNik(item.pemberi.nik)} • ${item.pemberi.alamat}</p>
-        </div>
-        <div class="p-3 rounded-lg bg-surface-container-low">
-          <span class="block text-xs uppercase font-bold text-outline">Penerima Kuasa (Advokat/Keluarga)</span>
-          <span class="font-semibold text-on-surface">${item.penerima.nama}</span>
-          <p class="text-xs text-on-surface-variant">ID/KTA: ${item.penerima.identitas} • ${item.penerima.kantor}</p>
-        </div>
-      </div>
+function routeAfterLogin(role) {
+  if (role === 'Petugas') navigateTo('antrean-verifikasi-petugas');
+  else if (role === 'Admin') navigateTo('admin-dan-log');
+  else navigateTo('permohonan-baru');
+}
 
-      <!-- 4 Langkah Alur Pengesahan -->
-      <div class="py-6">
-        <h4 class="font-label-lg text-label-lg font-bold text-on-surface mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-lg">timeline</span>
-          Progres Alur Pengesahan Dokumen
-        </h4>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          ${steps.map((st, i) => {
-            const isDone = i < currentStepIdx;
-            const isCurrent = i === currentStepIdx;
-            return `
-              <div class="p-3 rounded-xl border ${isDone ? 'bg-primary-container/10 border-primary/30 text-primary' : isCurrent ? 'bg-secondary-container/20 border-secondary text-secondary' : 'bg-surface-container-low/50 border-surface-container text-outline'}">
-                <div class="flex items-center justify-between mb-2">
-                  <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isDone ? 'bg-primary text-on-primary' : isCurrent ? 'bg-secondary text-on-secondary' : 'bg-surface-container-high text-on-surface-variant'}">
-                    ${isDone ? '<span class="material-symbols-outlined text-sm">check</span>' : i + 1}
-                  </div>
-                  <span class="text-[11px] font-medium opacity-80">${st.time}</span>
-                </div>
-                <h5 class="font-semibold text-sm leading-tight">${st.title}</h5>
-                <p class="text-xs text-on-surface-variant mt-1 leading-normal">${st.desc}</p>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-
-      <!-- Catatan Petugas / Status Info -->
-      ${item.catatanPetugas ? `
-        <div class="p-4 rounded-xl ${item.status === 'Perlu Revisi' ? 'bg-error-container text-on-error-container' : 'bg-surface-container text-on-surface'} flex items-start gap-3">
-          <span class="material-symbols-outlined text-xl mt-0.5">${item.status === 'Perlu Revisi' ? 'error' : 'info'}</span>
-          <div>
-            <h6 class="font-bold text-sm">Catatan Petugas Pemeriksa [${item.petugas || 'PTSP Perdata'}]:</h6>
-            <p class="text-sm mt-0.5">${item.catatanPetugas}</p>
-          </div>
-        </div>
-      ` : ''}
-
-      ${item.status === 'Disahkan/Terdaftar' ? `
-        <div class="mt-4 p-4 rounded-xl bg-primary-container text-on-primary flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-3xl text-secondary-container">verified_user</span>
-            <div>
-              <h5 class="font-bold text-base">Surat Kuasa Resmi Telah Disahkan!</h5>
-              <p class="text-xs text-primary-fixed-dim">Nomor Register: ${item.nomorRegister} • Dilengkapi QR Code HMAC Keaslian.</p>
-            </div>
-          </div>
-          <button onclick="openCertificateModal('${item.id}')" class="px-4 py-2.5 rounded-lg bg-secondary text-on-secondary font-semibold text-sm hover:bg-secondary-fixed transition-colors flex items-center gap-2">
-            <span class="material-symbols-outlined text-lg">visibility</span>
-            <span>Buka Lembar Akta PDF</span>
-          </button>
-        </div>
-      ` : ''}
-    </div>
-  `;
+function logoutUser() {
+  saveSession(null);
+  showToast('Anda telah keluar dari sistem.', 'info');
+  navigateTo('portal-publik-dan-lacak');
 }
 
 // =========================================================================
-// 6. MODUL 2: MULTI-STEP REGISTRATION WIZARD (FORM MANDIRI)
+// 6. VIEW 1: PUBLIC TRACKING (TANPA LOGIN)
 // =========================================================================
 
-let wizardStep = 1;
-const wizardData = {
-  kategori: 'Advokat',
-  pemberi: {},
-  penerima: {},
-  materi: {},
-  berkas: {
-    ktp_pemberi: '',
-    ktp_penerima: '',
-    kta_penerima: '',
-    bas_penerima: '',
-    surat_kuasa: '',
-    surat_lurah: '',
-    bukti_pnbp: '',
-    ktp: '',
-    kta: ''
-  }
-};
+function quickTrack(val) {
+  document.getElementById('trackQueryInput').value = val;
+  handlePublicTrack(false);
+}
 
-// Konfigurasi 3 Kategori & Dokumen Persyaratan Sesuai Ketentuan Kepaniteraan
-const CATEGORY_DOC_CONFIG = {
-  Advokat: {
-    title: 'Advokat / Kuasa Hukum',
-    countText: 'Wajib 5 Dokumen Persyaratan',
-    docs: [
-      { key: 'ktp_pemberi', code: 'a', title: 'Kartu Tanda Penduduk Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
-      { key: 'ktp_penerima', code: 'b', title: 'Kartu Tanda Penduduk Penerima Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
-      { key: 'kta_penerima', code: 'c', title: 'Kartu Tanda Advokat Penerima Kuasa', desc: 'KTA Advokat Aktif • Maks 5 MB', icon: 'contact_mail', color: 'secondary' },
-      { key: 'bas_penerima', code: 'd', title: 'Berita Acara Sumpah Advokat', desc: 'BAS Pengadilan Tinggi • Maks 5 MB', icon: 'history_edu', color: 'secondary' },
-      { key: 'surat_kuasa', code: 'e', title: 'Surat Kuasa', desc: 'Asli Bermeterai & TTD • JPG/PDF', icon: 'article', color: 'primary' }
-    ]
-  },
-  Instansi: {
-    title: 'Kuasa Instansi Pemerintah',
-    countText: 'Wajib 3 Dokumen Persyaratan',
-    docs: [
-      { key: 'ktp_pemberi', code: 'a', title: 'Kartu Tanda Penduduk Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
-      { key: 'ktp_penerima', code: 'b', title: 'Kartu Tanda Penduduk Penerima Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
-      { key: 'surat_kuasa', code: 'c', title: 'Surat Kuasa', desc: 'Surat Tugas / Kuasa Kedinasan • JPG/PDF', icon: 'article', color: 'primary' }
-    ]
-  },
-  Insidentil: {
-    title: 'Kuasa Insidentil',
-    countText: 'Wajib 4 Dokumen Persyaratan',
-    docs: [
-      { key: 'ktp_pemberi', code: 'a', title: 'Kartu Tanda Penduduk Pemberi Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'badge', color: 'primary' },
-      { key: 'ktp_penerima', code: 'b', title: 'Kartu Tanda Penduduk Penerima Kuasa', desc: 'Maks 5 MB • JPG/PNG/PDF', icon: 'contact_emergency', color: 'primary' },
-      { key: 'surat_kuasa', code: 'c', title: 'Surat Kuasa', desc: 'Asli Bermeterai & TTD • JPG/PDF', icon: 'article', color: 'primary' },
-      { key: 'surat_lurah', code: 'd', title: 'Surat Keterangan Lurah / Desa terkait status hubungan', desc: 'Keterangan Hubungan Keluarga • JPG/PDF', icon: 'family_restroom', color: 'secondary' }
-    ]
-  }
-};
-
-function renderUploadCards(cat) {
-  const container = document.getElementById('uploadCardsContainer');
-  const badgeEl = document.getElementById('uploadCategoryBadge');
-  const cfg = CATEGORY_DOC_CONFIG[cat] || CATEGORY_DOC_CONFIG.Advokat;
-
-  if (badgeEl) badgeEl.textContent = cfg.countText;
+async function handlePublicTrack(silent = false) {
+  const query = (document.getElementById('trackQueryInput')?.value || '').trim();
+  const container = document.getElementById('trackResultContainer');
   if (!container) return;
 
-  container.innerHTML = cfg.docs.map(doc => {
-    const isUploaded = !!wizardData.berkas[doc.key];
-    const borderCls = doc.color === 'primary' ? 'border-primary/40' : 'border-secondary/40';
-    const bgIconCls = doc.color === 'primary' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary';
-    const btnCls = doc.color === 'primary' ? 'bg-primary text-on-primary hover:bg-primary-container' : 'bg-secondary text-on-secondary hover:bg-secondary-fixed';
+  if (!query) {
+    container.innerHTML = '';
+    return;
+  }
+
+  let found = null;
+  const qLow = query.toLowerCase();
+  const qWa = normalizeHp08(query);
+
+  if (IS_DEMO_MODE) {
+    found = APP_STATE.permohonan.find(p => p.permohonanId.toLowerCase() === qLow || (qWa && normalizeHp08(p.noHpWa) === qWa));
+  } else {
+    const res = await callApi('trackPermohonan', { query });
+    if (res.success) found = res.data;
+  }
+
+  if (!found) {
+    container.innerHTML = `
+      <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/40 p-6 text-center shadow-sm">
+        <span class="material-symbols-outlined text-4xl text-outline mb-2 block">search_off</span>
+        <p class="text-sm font-bold text-on-surface">Permohonan "${escapeHtml(query)}" tidak ditemukan</p>
+        <p class="text-xs text-on-surface-variant mt-1">Pastikan ID Permohonan (contoh: REG-202611-001) atau Nomor WhatsApp sudah sesuai.</p>
+      </div>
+    `;
+    if (!silent) showToast('Data permohonan tidak ditemukan.', 'warning');
+    return;
+  }
+
+  const step2Done = found.status === 'Disetujui' || found.status === 'Perlu Revisi';
+  const step3Done = found.status === 'Disetujui';
+  const progressWidth = step3Done ? '100%' : (step2Done ? '50%' : '15%');
+
+  container.innerHTML = `
+    <div class="bg-surface-container-lowest rounded-xl shadow-md border border-outline-variant/40 overflow-hidden animate-fade-fast">
+      <div class="px-5 py-3.5 bg-surface-container-low/60 border-b border-outline-variant/30 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="font-display text-base font-extrabold text-primary tabular-nums">${escapeHtml(found.permohonanId)}</span>
+          <span class="px-2.5 py-0.5 rounded-full bg-surface-container-highest text-primary text-[11px] font-bold">${escapeHtml(found.kategoriKuasa)}</span>
+        </div>
+        ${statusPillHtml(found.status)}
+      </div>
+
+      <div class="p-5 space-y-5">
+        <!-- 3-Step Judicial Milestone Stepper -->
+        <div class="relative flex items-center justify-between px-2">
+          <div class="absolute left-8 right-8 top-4 h-1 bg-surface-container-high -z-0">
+            <div class="h-full bg-primary-container transition-all duration-500" style="width:${progressWidth}"></div>
+          </div>
+          <div class="relative z-10 flex flex-col items-center text-center">
+            <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-sm">check</span></div>
+            <span class="text-xs font-bold text-primary mt-1.5">Pengajuan</span>
+            <span class="text-[10px] text-outline tabular-nums">${formatShortDate(found.tanggalPengajuan)}</span>
+          </div>
+          <div class="relative z-10 flex flex-col items-center text-center">
+            <div class="w-8 h-8 rounded-full ${step2Done ? (found.status === 'Perlu Revisi' ? 'bg-error text-white' : 'bg-primary-container text-on-primary') : 'bg-surface-container-high text-outline'} flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-sm">${found.status === 'Perlu Revisi' ? 'priority_high' : (step2Done ? 'check' : 'schedule')}</span>
+            </div>
+            <span class="text-xs font-bold ${step2Done ? 'text-primary' : 'text-outline'} mt-1.5">${found.status === 'Perlu Revisi' ? 'Perlu Revisi' : 'Verifikasi'}</span>
+            <span class="text-[10px] text-outline tabular-nums">${found.tanggalVerifikasi ? formatShortDate(found.tanggalVerifikasi) : 'Dalam antrean'}</span>
+          </div>
+          <div class="relative z-10 flex flex-col items-center text-center">
+            <div class="w-8 h-8 rounded-full ${step3Done ? 'bg-primary text-secondary-container ring-4 ring-secondary-container/60' : 'bg-surface-container-high text-outline'} flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-sm">${step3Done ? 'stars' : 'verified'}</span>
+            </div>
+            <span class="text-xs font-bold ${step3Done ? 'text-primary' : 'text-outline'} mt-1.5">Terdaftar Sah</span>
+            <span class="text-[10px] text-outline">${step3Done ? 'Aktif & Resmi' : 'Menunggu'}</span>
+          </div>
+        </div>
+
+        <!-- Legalization Identity Box -->
+        <div class="p-4 rounded-xl bg-surface border border-outline-variant/40 space-y-2.5 text-xs">
+          <div class="flex items-center gap-1.5 text-primary font-bold uppercase tracking-wider text-[11px]">
+            <span class="material-symbols-outlined text-base">gavel</span>
+            <span>Identitas Legalisasi Kepaniteraan Hukum</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <span class="text-outline block">Nomor Register Resmi</span>
+              <strong class="text-primary tabular-nums">${escapeHtml(found.nomorRegisterResmi || 'Belum diterbitkan')}</strong>
+            </div>
+            <div>
+              <span class="text-outline block">Petugas Verifikator</span>
+              <strong class="text-on-surface">${escapeHtml(found.petugasVerifikator || 'Menunggu penugasan')}</strong>
+            </div>
+            <div>
+              <span class="text-outline block">Nama Pemohon / Pemberi Kuasa</span>
+              <strong class="text-on-surface">${escapeHtml(found.namaPemohon)}</strong>
+            </div>
+            <div>
+              <span class="text-outline block">Catatan Petugas</span>
+              <span class="${found.status === 'Perlu Revisi' ? 'text-error font-semibold' : 'text-on-surface-variant'}">${escapeHtml(found.catatanPetugas || '-')}</span>
+            </div>
+          </div>
+        </div>
+
+        ${step3Done ? `
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-outline-variant/30">
+            <button onclick="openReceiptModal('${escapeHtml(found.permohonanId)}')" class="px-4 py-2 rounded-lg border border-primary-container text-primary hover:bg-primary-fixed/40 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer">
+              <span class="material-symbols-outlined text-base">print</span>
+              <span>Cetak Bukti Tanda Terima Resmi</span>
+            </button>
+            <span class="text-[11px] text-outline flex items-center gap-1"><span class="material-symbols-outlined text-sm text-primary-container">verified_user</span> Tercatat sah dalam Buku Register Elektronik</span>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+
+  if (!silent) showToast('Status Permohonan ' + found.permohonanId + ' ditemukan!', 'success');
+}
+
+// =========================================================================
+// 7. VIEW 2: FORMULIR PERMOHONAN BARU (3 KATEGORI DINAMIS + CANVAS COMPRESS)
+// =========================================================================
+
+function renderPemohonKpis() {
+  const mine = getVisiblePermohonan();
+  document.getElementById('kpiPemohonTotal').textContent = mine.length;
+  document.getElementById('kpiPemohonMenunggu').textContent = mine.filter(x => x.status === 'Menunggu Verifikasi').length;
+  document.getElementById('kpiPemohonRevisi').textContent = mine.filter(x => x.status === 'Perlu Revisi').length;
+  document.getElementById('kpiPemohonDisetujui').textContent = mine.filter(x => x.status === 'Disetujui').length;
+}
+
+function selectKategoriKuasa(kat) {
+  SELECTED_KATEGORI = kat;
+  const map = {
+    'Advokat': 'catCardAdvokat',
+    'Instansi Pemerintah': 'catCardInstansi',
+    'Insidentil': 'catCardInsidentil'
+  };
+
+  Object.keys(map).forEach(k => {
+    const el = document.getElementById(map[k]);
+    if (!el) return;
+    const active = k === kat;
+    el.className = active
+      ? 'text-left p-4 rounded-xl border border-primary-container bg-primary-container text-on-primary shadow-md transition-all cursor-pointer flex flex-col justify-between gap-2'
+      : 'text-left p-4 rounded-xl border border-outline-variant/50 bg-surface-container-low/50 text-on-surface hover:bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2';
+    const chk = el.querySelector('.cat-check');
+    if (chk) {
+      chk.textContent = active ? 'check_circle' : 'radio_button_unchecked';
+      chk.className = 'cat-check material-symbols-outlined text-[18px] ' + (active ? 'text-secondary-container' : 'text-outline');
+    }
+  });
+
+  renderDynamicUploadGrid();
+}
+
+function renderDynamicUploadGrid() {
+  const cfg = CATEGORY_DOCS[SELECTED_KATEGORI] || CATEGORY_DOCS['Advokat'];
+  const badge = document.getElementById('formUploadCountBadge');
+  if (badge) badge.textContent = cfg.badge;
+
+  const grid = document.getElementById('dynamicUploadGrid');
+  if (!grid) return;
+
+  grid.innerHTML = cfg.docs.map(doc => {
+    const fileVal = FORM_UPLOADS[doc.key];
+    const isSet = !!fileVal;
+    const isGold = doc.tone === 'gold';
+    const btnCls = isGold
+      ? 'bg-secondary hover:bg-secondary/90 text-white'
+      : 'bg-primary-container hover:bg-primary text-on-primary';
 
     return `
-      <div class="p-3.5 rounded-xl border border-dashed ${borderCls} bg-surface-container-low/50 flex flex-col items-center text-center">
-        <div class="w-10 h-10 rounded-full ${bgIconCls} flex items-center justify-center mb-1.5">
-          <span class="material-symbols-outlined text-2xl">${doc.icon}</span>
+      <div class="p-4 rounded-xl border-[1.5px] border-dashed ${isSet ? 'border-primary-container bg-primary-fixed/15' : 'border-outline-variant bg-surface'} flex flex-col items-center text-center transition-all hover:border-primary-container">
+        <div class="w-10 h-10 rounded-full ${isGold ? 'bg-secondary-fixed text-secondary' : 'bg-surface-container text-primary'} flex items-center justify-center mb-2">
+          <span class="material-symbols-outlined text-[22px]">${doc.icon}</span>
         </div>
-        <span class="font-bold text-xs text-on-surface leading-tight min-h-[32px] flex items-center justify-center">${doc.code}. ${doc.title}</span>
-        <span class="text-[10px] text-outline mb-2.5 mt-1">${doc.desc}</span>
-        <label class="px-3 py-1.5 rounded-lg ${btnCls} text-xs font-semibold cursor-pointer transition-colors shadow-sm">
-          Pilih Berkas
-          <input type="file" accept="image/*,.pdf" class="hidden" onchange="handleFileUpload(this, '${doc.key}')"/>
+        <span class="font-bold text-xs text-on-surface leading-snug min-h-[34px] flex items-center justify-center">${doc.code}. ${doc.title}</span>
+        <span class="text-[10px] text-outline mt-0.5 mb-3">${doc.desc}</span>
+        <label class="px-3.5 py-1.5 rounded-lg ${btnCls} text-xs font-semibold cursor-pointer shadow-sm transition-colors">
+          ${isSet ? 'Ganti Berkas' : 'Pilih Berkas'}
+          <input type="file" accept="image/jpeg,image/png,application/pdf" class="hidden" onchange="handleFormFileSelect(this, '${doc.key}')"/>
         </label>
-        <span id="uploadBadge_${doc.key}" class="mt-2 text-[10px] text-outline ${isUploaded ? 'px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-semibold flex items-center gap-1' : ''}">
-          ${isUploaded ? '<span class="material-symbols-outlined text-xs">check_circle</span> Berkas Terpasang' : 'Gunakan contoh otomatis jika dilewati'}
+        <span id="uploadStatus_${doc.key}" class="mt-2 text-[10px] font-semibold ${isSet ? 'text-[#166534] bg-[#DCFCE7] px-2 py-0.5 rounded-full flex items-center gap-1' : 'text-outline'}">
+          ${isSet ? '<span class="material-symbols-outlined text-xs">check_circle</span> Berkas Siap Diunggah' : 'Wajib diunggah'}
         </span>
       </div>
     `;
   }).join('');
 }
 
-function setWizardCategory(cat) {
-  wizardData.kategori = cat;
-
-  const btnAdvokat = document.getElementById('btnCatAdvokat');
-  const btnInstansi = document.getElementById('btnCatInstansi');
-  const btnInsidentil = document.getElementById('btnCatInsidentil');
-
-  const activeCls = 'py-3 px-3 rounded-xl text-xs sm:text-sm font-bold bg-primary text-on-primary shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer text-center';
-  const inactiveCls = 'py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all flex items-center justify-center gap-2 cursor-pointer text-center';
-
-  if (btnAdvokat) btnAdvokat.className = cat === 'Advokat' ? activeCls : inactiveCls;
-  if (btnInstansi) btnInstansi.className = cat === 'Instansi' ? activeCls : inactiveCls;
-  if (btnInsidentil) btnInsidentil.className = cat === 'Insidentil' ? activeCls : inactiveCls;
-
-  renderUploadCards(cat);
-}
-
-function goWizardStep(step) {
-  // Seluruh proses pendaftaran sekarang langsung dipusatkan di 1 formulir terpadu (Langkah 1)
-  const pane = document.getElementById('wizardStepPane1');
-  if (pane) pane.classList.remove('hidden');
-  window.scrollTo({ top: 120, behavior: 'smooth' });
-}
-
-function updateWizardStepperUI(step) {
-  // Tidak diperlukan lagi karena langkah 2, 3, dan 4 telah dihapus
-}
-
-function validateWizardStep1() {
-  const nama = document.getElementById('wzNamaPemberi').value.trim();
-  const wa = document.getElementById('wzWaPemberi').value.trim();
-
-  if (!nama || !wa) {
-    showToast('Harap lengkapi nama pemohon dan nomor WhatsApp aktif.', 'warning');
-    return false;
-  }
-
-  const nik = (document.getElementById('wzNikPemberi') && document.getElementById('wzNikPemberi').value.trim()) || '3174082209840002';
-  const alamat = (document.getElementById('wzAlamatPemberi') && document.getElementById('wzAlamatPemberi').value.trim()) || 'Sesuai Berkas Identitas Terlampir';
-
-  wizardData.pemberi = {
-    nama,
-    nik,
-    pekerjaan: (document.getElementById('wzPekerjaanPemberi') && document.getElementById('wzPekerjaanPemberi').value.trim()) || 'Pemohon Kuasa',
-    telepon: wa,
-    email: (document.getElementById('wzEmailPemberi') && document.getElementById('wzEmailPemberi').value.trim()) || `${wa.replace(/\D/g, '')}@layanan.go.id`,
-    alamat
-  };
-  return true;
-}
-
-function validateWizardStep2() { return true; }
-function validateWizardStep3() { return true; }
-function renderWizardStep4Review() { return true; }
-
-// Client-Side Image & PDF Compression / Loading (Pola /gas-scale-turbo)
-function handleFileUpload(input, type) {
-  const file = input.files[0];
+// Client-Side HTML5 Canvas Compression (< 500 KB) + PDF Base64 Validation (< 5 MB)
+function handleFormFileSelect(input, key) {
+  const file = input.files && input.files[0];
   if (!file) return;
 
-  const badge = document.getElementById(`uploadBadge_${type}`);
-  if (badge) {
-    badge.innerHTML = `<span class="material-symbols-outlined text-xs animate-spin">sync</span> Memproses...`;
-    badge.className = 'mt-2 text-[10px] text-primary flex items-center gap-1';
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Ukuran file melebihi batas maksimal 5 MB.', 'error');
+    input.value = '';
+    return;
   }
 
+  const badge = document.getElementById('uploadStatus_' + key);
+  if (badge) badge.textContent = 'Memproses file...';
+
   const reader = new FileReader();
-  reader.onload = function(e) {
-    const result = e.target.result;
-
+  reader.onload = function (e) {
+    const raw = e.target.result;
     if (file.type === 'application/pdf') {
-      wizardData.berkas[type] = result;
-      if (type === 'ktp_pemberi') wizardData.berkas.ktp = result;
-      if (type === 'kta_penerima') wizardData.berkas.kta = result;
-
-      if (badge) {
-        badge.innerHTML = `<span class="material-symbols-outlined text-xs">picture_as_pdf</span> PDF Terunggah (~${Math.round(file.size / 1024)} KB)`;
-        badge.className = 'mt-2 px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-semibold flex items-center gap-1';
-      }
+      FORM_UPLOADS[key] = raw;
+      renderDynamicUploadGrid();
+      showToast('PDF berhasil dilampirkan (' + Math.round(file.size / 1024) + ' KB).', 'success');
       return;
     }
 
     const img = new Image();
-    img.onload = function() {
-      // Kompresi via HTML5 Canvas ke resolusi ramah payload (~800px max, 0.72 quality)
+    img.onload = function () {
       const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const maxDim = 800;
-      let width = img.width;
-      let height = img.height;
-
-      if (width > height && width > maxDim) {
-        height = Math.round((height * maxDim) / width);
-        width = maxDim;
-      } else if (height > maxDim) {
-        width = Math.round((width * maxDim) / height);
-        height = maxDim;
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
-
-      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.72);
-      wizardData.berkas[type] = compressedBase64;
-      if (type === 'ktp_pemberi') wizardData.berkas.ktp = compressedBase64;
-      if (type === 'kta_penerima') wizardData.berkas.kta = compressedBase64;
-
-      if (badge) {
-        badge.innerHTML = `<span class="material-symbols-outlined text-xs">check_circle</span> Terunggah (~${Math.round(compressedBase64.length / 1024)} KB)`;
-        badge.className = 'mt-2 px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-semibold flex items-center gap-1';
-      }
+      const maxDim = 1000;
+      let w = img.width, h = img.height;
+      if (w > h && w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
+      else if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      FORM_UPLOADS[key] = canvas.toDataURL('image/jpeg', 0.72);
+      renderDynamicUploadGrid();
+      showToast('Gambar dikompresi otomatis (' + Math.round(FORM_UPLOADS[key].length / 1024) + ' KB).', 'success');
     };
-    img.src = result;
+    img.src = raw;
   };
   reader.readAsDataURL(file);
 }
 
-async function submitWizardRegistration() {
-  const nama = document.getElementById('wzNamaPemberi').value.trim();
-  const wa = document.getElementById('wzWaPemberi').value.trim();
+function resetPermohonanForm() {
+  document.getElementById('formNamaPemohon').value = '';
+  document.getElementById('formWaPemohon').value = '';
+  FORM_UPLOADS = {};
+  cancelRevisionMode();
+  renderDynamicUploadGrid();
+}
 
-  if (!nama || !wa) {
-    showToast('Harap masukkan Nama Pemohon dan Nomor WhatsApp aktif.', 'warning');
+function startRevisionMode(permohonanId) {
+  const item = APP_STATE.permohonan.find(p => p.permohonanId === permohonanId);
+  if (!item || item.status !== 'Perlu Revisi') {
+    showToast('Data terkunci! Hanya berkas berstatus Perlu Revisi yang dapat diperbaiki.', 'warning');
+    return;
+  }
+  REVISION_TARGET_ID = permohonanId;
+  SELECTED_KATEGORI = item.kategoriKuasa;
+  FORM_UPLOADS = { ...(item.berkas || {}) };
+
+  navigateTo('permohonan-baru');
+  document.getElementById('formNamaPemohon').value = item.namaPemohon;
+  document.getElementById('formWaPemohon').value = item.noHpWa;
+  document.getElementById('revisionTargetId').textContent = permohonanId;
+  document.getElementById('revisionOfficerNote').textContent = 'Catatan Petugas: ' + (item.catatanPetugas || '-');
+  document.getElementById('revisionModeBanner').classList.remove('hidden');
+  document.getElementById('formHeadingTitle').textContent = 'Perbaikan Berkas Permohonan (' + permohonanId + ')';
+  document.getElementById('btnSubmitLabel').textContent = 'Kirim Ulang Perbaikan Berkas';
+  selectKategoriKuasa(SELECTED_KATEGORI);
+}
+
+function cancelRevisionMode() {
+  REVISION_TARGET_ID = null;
+  document.getElementById('revisionModeBanner')?.classList.add('hidden');
+  const titleEl = document.getElementById('formHeadingTitle');
+  if (titleEl) titleEl.textContent = 'Formulir Pendaftaran Surat Kuasa Baru';
+  const btnLbl = document.getElementById('btnSubmitLabel');
+  if (btnLbl) btnLbl.textContent = 'Kirim Permohonan Pendaftaran Kuasa';
+}
+
+async function submitPermohonanForm() {
+  const namaPemohon = document.getElementById('formNamaPemohon').value.trim();
+  const noHpWa = normalizeHp08(document.getElementById('formWaPemohon').value);
+  const agreed = document.getElementById('formAgreeCheck').checked;
+
+  if (!namaPemohon || !noHpWa) {
+    showToast('Nama Pemohon dan Nomor WhatsApp Aktif wajib diisi.', 'warning');
+    return;
+  }
+  if (!agreed) {
+    showToast('Centang pernyataan kebenaran data terlebih dahulu.', 'warning');
     return;
   }
 
-  const agree = document.getElementById('wzAgreeCheck');
-  if (agree && !agree.checked) {
-    showToast('Silakan centang pernyataan kebenaran data terlebih dahulu.', 'warning');
-    return;
-  }
-
-  const nik = (document.getElementById('wzNikPemberi') && document.getElementById('wzNikPemberi').value.trim()) || '3174082209840002';
-  const alamat = (document.getElementById('wzAlamatPemberi') && document.getElementById('wzAlamatPemberi').value.trim()) || 'Sesuai Berkas Identitas Terlampir';
-  const pekerjaan = (document.getElementById('wzPekerjaanPemberi') && document.getElementById('wzPekerjaanPemberi').value.trim()) || 'Pemohon Kuasa';
-  const email = (document.getElementById('wzEmailPemberi') && document.getElementById('wzEmailPemberi').value.trim()) || `${wa.replace(/\D/g, '')}@layanan.go.id`;
-
-  // Fallback dokumen untuk demonstrasi jika dilewati
-  const demoImages = {
-    ktp_pemberi: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
-    ktp_penerima: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-    kta_penerima: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-    bas_penerima: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&auto=format&fit=crop&q=80',
-    surat_kuasa: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-    surat_lurah: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
-    bukti_pnbp: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80'
-  };
-
-  const activeCfg = CATEGORY_DOC_CONFIG[wizardData.kategori] || CATEGORY_DOC_CONFIG.Advokat;
-  activeCfg.docs.forEach(d => {
-    if (!wizardData.berkas[d.key]) {
-      wizardData.berkas[d.key] = demoImages[d.key] || demoImages.surat_kuasa;
+  const cfg = CATEGORY_DOCS[SELECTED_KATEGORI] || CATEGORY_DOCS['Advokat'];
+  const missing = cfg.docs.filter(d => !FORM_UPLOADS[d.key]);
+  if (missing.length > 0) {
+    if (IS_DEMO_MODE) {
+      // Di Mode Demo, izinkan auto-lampirkan berkas contoh agar mudah diuji
+      missing.forEach(d => { FORM_UPLOADS[d.key] = DEMO_SAMPLE_IMG[d.key] || DEMO_SAMPLE_IMG.surat_kuasa; });
+    } else {
+      showToast('Berkas wajib belum lengkap: ' + missing.map(m => m.title).join(', '), 'error');
+      return;
     }
+  }
+
+  const btn = document.getElementById('btnSubmitPermohonan');
+  btn.disabled = true;
+
+  if (REVISION_TARGET_ID) {
+    // MODE PERBAIKAN REVISI
+    if (IS_DEMO_MODE) {
+      const idx = APP_STATE.permohonan.findIndex(p => p.permohonanId === REVISION_TARGET_ID);
+      if (idx > -1) {
+        APP_STATE.permohonan[idx].namaPemohon = namaPemohon;
+        APP_STATE.permohonan[idx].noHpWa = noHpWa;
+        APP_STATE.permohonan[idx].status = 'Menunggu Verifikasi';
+        APP_STATE.permohonan[idx].berkas = { ...FORM_UPLOADS };
+        saveLocalState();
+      }
+      btn.disabled = false;
+      showToast('Perbaikan berkas ' + REVISION_TARGET_ID + ' berhasil dikirim ulang!', 'success');
+      resetPermohonanForm();
+      navigateTo('riwayat-berkas');
+      return;
+    }
+    const res = await callApi('revisiPermohonan', { permohonanId: REVISION_TARGET_ID, namaPemohon, noHpWa, berkas: FORM_UPLOADS });
+    btn.disabled = false;
+    if (res.success) {
+      showToast(res.message || 'Perbaikan berkas berhasil dikirim!', 'success');
+      resetPermohonanForm();
+      await syncPermohonanFromServer();
+      navigateTo('riwayat-berkas');
+    } else {
+      showToast(res.message || 'Gagal mengirim perbaikan.', 'error');
+    }
+    return;
+  }
+
+  // MODE PENDAFTARAN BARU (Optimistic UI)
+  const now = new Date();
+  const ym = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0');
+  const tempId = 'REG-' + ym + '-' + String(Math.floor(Math.random() * 900 + 100));
+
+  if (IS_DEMO_MODE) {
+    const newItem = {
+      permohonanId: tempId,
+      userId: CURRENT_SESSION ? CURRENT_SESSION.user.userId : 'USR-003',
+      tanggalPengajuan: now.toISOString(),
+      kategoriKuasa: SELECTED_KATEGORI,
+      namaPemohon,
+      noHpWa,
+      status: 'Menunggu Verifikasi',
+      nomorRegisterResmi: '',
+      catatanPetugas: '',
+      petugasVerifikator: '',
+      tanggalVerifikasi: '',
+      hashVerifikasi: '',
+      berkas: { ...FORM_UPLOADS }
+    };
+    APP_STATE.permohonan.unshift(newItem);
+    APP_STATE.logs.unshift({ Timestamp: now.toISOString(), User: CURRENT_SESSION?.user.username || 'pemohon', Aksi: 'PERMOHONAN_BARU', Ref_ID: tempId, Keterangan: 'Pengajuan ' + SELECTED_KATEGORI + ' — ' + namaPemohon });
+    saveLocalState();
+    btn.disabled = false;
+    showToast('Permohonan ' + tempId + ' berhasil dikirim! Status: Menunggu Verifikasi.', 'success');
+    resetPermohonanForm();
+    navigateTo('riwayat-berkas');
+    return;
+  }
+
+  const res = await callApi('daftarPermohonan', { kategoriKuasa: SELECTED_KATEGORI, namaPemohon, noHpWa, berkas: FORM_UPLOADS });
+  btn.disabled = false;
+  if (res.success) {
+    showToast(res.message || 'Permohonan berhasil dikirim!', 'success');
+    resetPermohonanForm();
+    await syncPermohonanFromServer();
+    navigateTo('riwayat-berkas');
+  } else {
+    showToast(res.message || 'Gagal mengirim permohonan.', 'error');
+  }
+}
+
+// =========================================================================
+// 8. VIEW 3: RIWAYAT BERKAS & DATA LOCKING
+// =========================================================================
+
+function getVisiblePermohonan() {
+  if (!CURRENT_SESSION) return [];
+  if (CURRENT_SESSION.user.role === 'Petugas' || CURRENT_SESSION.user.role === 'Admin') {
+    return APP_STATE.permohonan;
+  }
+  return APP_STATE.permohonan.filter(p => p.userId === CURRENT_SESSION.user.userId || normalizeHp08(p.noHpWa) === normalizeHp08(CURRENT_SESSION.user.wa));
+}
+
+function renderRiwayatTable() {
+  const tbody = document.getElementById('riwayatTableBody');
+  if (!tbody) return;
+
+  const q = (document.getElementById('riwayatSearch')?.value || '').trim().toLowerCase();
+  const st = document.getElementById('riwayatStatusFilter')?.value || 'ALL';
+
+  const rows = getVisiblePermohonan().filter(item => {
+    const matchQ = !q || item.permohonanId.toLowerCase().includes(q) || item.namaPemohon.toLowerCase().includes(q) || (item.nomorRegisterResmi || '').toLowerCase().includes(q);
+    const matchSt = st === 'ALL' || item.status === st;
+    return matchQ && matchSt;
   });
 
-  wizardData.berkas.ktp = wizardData.berkas.ktp_pemberi;
-  wizardData.berkas.kta = wizardData.berkas.kta_penerima || '';
-
-  wizardData.pemberi = {
-    nama,
-    nik,
-    pekerjaan,
-    telepon: wa,
-    email,
-    alamat
-  };
-
-  const penerimaLabel = wizardData.kategori === 'Advokat'
-    ? 'Advokat / Kuasa Hukum (Sesuai KTA & BAS Terlampir)'
-    : (wizardData.kategori === 'Instansi'
-        ? 'Kuasa Instansi Pemerintah (Sesuai Dokumen Kedinasan Terlampir)'
-        : 'Penerima Kuasa Insidentil (Sesuai Surat Keterangan Lurah Terlampir)');
-
-  wizardData.penerima = {
-    nama: penerimaLabel,
-    identitas: wizardData.kategori === 'Advokat' ? 'KTA & BAS Terlampir' : (wizardData.kategori === 'Instansi' ? 'NIP/Identitas Kedinasan' : 'KTP & SK Lurah Terlampir'),
-    kantor: wizardData.kategori === 'Advokat' ? 'Kantor Advokat / Lembaga Bantuan Hukum' : (wizardData.kategori === 'Instansi' ? 'Instansi Pemerintah / Kementerian / Badan' : 'Keluarga / Kerabat'),
-    telepon: wa,
-    alamat: 'Sesuai Berkas Terlampir'
-  };
-
-  wizardData.materi = {
-    jenisPerkara: 'Sesuai Naskah Surat Kuasa',
-    nomorPerkara: 'Dalam Proses Registrasi',
-    uraian: `Pemberian kuasa permohonan kategori ${wizardData.kategori} sebagaimana termaktub dalam naskah Surat Kuasa terlampir.`
-  };
-
-  const btnSubmit = document.getElementById('btnSubmitWizard');
-  if (btnSubmit) {
-    btnSubmit.disabled = true;
-    btnSubmit.innerHTML = '<span class="material-symbols-outlined animate-spin text-lg">sync</span> Mengirim Permohonan...';
-  }
-
-  // Buat ID baru
-  const newId = `REG-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 9000 + 1000))}`;
-  const nowStr = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB';
-
-  const payload = {
-    id: newId,
-    timestamp: new Date().toISOString(),
-    tanggal: nowStr,
-    nomorRegister: 'Dalam Proses Verifikasi',
-    kategori: wizardData.kategori,
-    status: 'Menunggu Verifikasi',
-    pemberi: wizardData.pemberi,
-    penerima: wizardData.penerima,
-    materi: wizardData.materi,
-    berkas: wizardData.berkas,
-    petugas: '',
-    pejabat: '',
-    catatanPetugas: '',
-    hashSha256: generateMockSha256(),
-    totalBiaya: 20000
-  };
-
-  const res = await gasApi('daftarSuratKuasa', payload);
-
-  if (btnSubmit) {
-    btnSubmit.disabled = false;
-    btnSubmit.innerHTML = '<span>Kirim Permohonan Pendaftaran</span><span class="material-symbols-outlined text-lg">arrow_forward</span>';
-  }
-
-  if (res.success) {
-    // Tampilkan modal sukses
-    openSuccessModal(newId);
-  } else {
-    showToast(res.message || 'Gagal mengirim pendaftaran.', 'error');
-  }
-}
-
-function openSuccessModal(regId) {
-  const modal = document.getElementById('successRegisterModal');
-  const codeEl = document.getElementById('successRegCode');
-  if (codeEl) codeEl.textContent = regId;
-  if (modal) modal.classList.remove('hidden');
-}
-
-function closeSuccessModal() {
-  const modal = document.getElementById('successRegisterModal');
-  if (modal) modal.classList.add('hidden');
-  // Kembali ke beranda dan lacak langsung
-  navigateTo('beranda-dan-lacak');
-}
-
-// =========================================================================
-// 7. MODUL 3: MEJA VERIFIKATOR (STAF PTSP KEPANITERAAN HUKUM)
-// =========================================================================
-
-let verifikatorFilter = 'Semua';
-
-function setVerifikatorFilter(filter) {
-  verifikatorFilter = filter;
-  renderVerifikatorTable();
-}
-
-function renderVerifikatorTable() {
-  const tableBody = document.getElementById('verifikatorTableBody');
-  if (!tableBody) return;
-
-  const list = Storage.load();
-
-  // Hitung KPI
-  const countTotal = list.length;
-  const countMenunggu = list.filter(x => x.status === 'Menunggu Verifikasi').length;
-  const countRevisi = list.filter(x => x.status === 'Perlu Revisi').length;
-  const countPejabat = list.filter(x => x.status === 'Menunggu Pengesahan' || x.status === 'Disahkan/Terdaftar').length;
-
-  const elTotal = document.getElementById('kpiVerifTotal');
-  const elMenunggu = document.getElementById('kpiVerifMenunggu');
-  const elRevisi = document.getElementById('kpiVerifRevisi');
-  const elPejabat = document.getElementById('kpiVerifPejabat');
-
-  if (elTotal) elTotal.textContent = String(countTotal).padStart(2, '0');
-  if (elMenunggu) elMenunggu.textContent = String(countMenunggu).padStart(2, '0');
-  if (elRevisi) elRevisi.textContent = String(countRevisi).padStart(2, '0');
-  if (elPejabat) elPejabat.textContent = String(countPejabat).padStart(2, '0');
-
-  // Filter list
-  let filtered = list;
-  if (verifikatorFilter === 'Menunggu') {
-    filtered = list.filter(x => x.status === 'Menunggu Verifikasi');
-  } else if (verifikatorFilter === 'Revisi') {
-    filtered = list.filter(x => x.status === 'Perlu Revisi');
-  } else if (verifikatorFilter === 'Lolos') {
-    filtered = list.filter(x => x.status === 'Menunggu Pengesahan' || x.status === 'Disahkan/Terdaftar');
-  }
-
-  if (filtered.length === 0) {
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="5" class="py-12 text-center text-on-surface-variant font-medium">
-          <span class="material-symbols-outlined text-4xl text-outline mb-2 block">task_alt</span>
-          Tidak ada berkas dalam antrean filter ini.
-        </td>
-      </tr>
-    `;
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-xs text-outline">Belum ada permohonan surat kuasa yang sesuai filter.</td></tr>`;
     return;
   }
 
-  tableBody.innerHTML = filtered.map(item => `
-    <tr class="hover:bg-surface-container-low transition-colors border-b border-surface-container">
-      <td class="px-space-md py-4">
-        <div class="flex flex-col">
-          <span class="font-bold text-on-surface text-sm">${item.id}</span>
-          <span class="text-xs text-on-surface-variant">${item.tanggal || '14 Nov 2026'}</span>
-        </div>
+  tbody.innerHTML = rows.map(item => {
+    let actionHtml = '';
+    if (item.status === 'Disetujui') {
+      actionHtml = `
+        <button onclick="openReceiptModal('${escapeHtml(item.permohonanId)}')" class="px-3 py-1.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary text-xs font-bold inline-flex items-center gap-1 shadow-sm cursor-pointer">
+          <span class="material-symbols-outlined text-sm">print</span>
+          <span>Cetak Tanda Terima</span>
+        </button>`;
+    } else if (item.status === 'Perlu Revisi') {
+      actionHtml = `
+        <button onclick="startRevisionMode('${escapeHtml(item.permohonanId)}')" class="px-3 py-1.5 rounded-lg bg-secondary-container hover:bg-secondary-fixed text-on-secondary-fixed text-xs font-bold inline-flex items-center gap-1 shadow-sm cursor-pointer">
+          <span class="material-symbols-outlined text-sm">edit_document</span>
+          <span>Perbaiki &amp; Unggah Ulang</span>
+        </button>`;
+    } else {
+      actionHtml = `
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F1F5F9] text-[#475569] text-[11px] font-semibold" title="Data terkunci saat diverifikasi petugas">
+          <span class="material-symbols-outlined text-xs">lock</span> Terkunci
+        </span>`;
+    }
+
+    return `
+      <tr class="hover:bg-surface-container-low/40 transition-colors">
+        <td class="py-3.5 px-4 align-top">
+          <span class="font-bold text-primary tabular-nums block">${escapeHtml(item.permohonanId)}</span>
+          <span class="text-[11px] text-outline tabular-nums">${formatShortDate(item.tanggalPengajuan)}</span>
+        </td>
+        <td class="py-3.5 px-4 align-top">
+          <span class="font-semibold text-on-surface block">${escapeHtml(item.namaPemohon)}</span>
+          <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-surface-container text-primary text-[10px] font-bold">${escapeHtml(item.kategoriKuasa)}</span>
+        </td>
+        <td class="py-3.5 px-4 align-top">
+          ${statusPillHtml(item.status)}
+          ${item.nomorRegisterResmi ? `<span class="block mt-1 text-[11px] font-bold text-primary tabular-nums">${escapeHtml(item.nomorRegisterResmi)}</span>` : ''}
+        </td>
+        <td class="py-3.5 px-4 align-top text-xs ${item.status === 'Perlu Revisi' ? 'text-error font-medium' : 'text-on-surface-variant'} max-w-xs">
+          ${escapeHtml(item.catatanPetugas || '-')}
+        </td>
+        <td class="py-3.5 px-4 align-top text-right whitespace-nowrap">${actionHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// =========================================================================
+// 9. VIEW 4: ANTREAN VERIFIKASI PETUGAS & SLIDE-OVER DRAWER
+// =========================================================================
+
+function renderVerifikatorTable() {
+  const all = APP_STATE.permohonan;
+  document.getElementById('kpiPetugasTotal').textContent = all.length;
+  document.getElementById('kpiPetugasPending').textContent = all.filter(x => x.status === 'Menunggu Verifikasi').length;
+  document.getElementById('kpiPetugasDone').textContent = all.filter(x => x.status === 'Disetujui').length;
+
+  const q = (document.getElementById('verifSearch')?.value || '').trim().toLowerCase();
+  const st = document.getElementById('verifStatusFilter')?.value || 'ALL';
+  const kat = document.getElementById('verifKatFilter')?.value || 'ALL';
+
+  const rows = all.filter(item => {
+    const matchQ = !q || item.permohonanId.toLowerCase().includes(q) || item.namaPemohon.toLowerCase().includes(q) || item.noHpWa.includes(q);
+    const matchSt = st === 'ALL' || item.status === st;
+    const matchKat = kat === 'ALL' || item.kategoriKuasa === kat;
+    return matchQ && matchSt && matchKat;
+  });
+
+  const tbody = document.getElementById('verifTableBody');
+  if (!tbody) return;
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-xs text-outline">Tidak ada berkas dalam antrean yang sesuai filter.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(item => `
+    <tr class="hover:bg-surface-container-low/40 transition-colors">
+      <td class="py-3.5 px-4">
+        <span class="font-bold text-primary tabular-nums block">${escapeHtml(item.permohonanId)}</span>
+        <span class="text-[11px] text-outline tabular-nums">${formatShortDate(item.tanggalPengajuan)}</span>
       </td>
-      <td class="px-space-md py-4">
-        <div class="flex flex-col">
-          <span class="font-semibold text-on-surface text-sm">${item.pemberi.nama}</span>
-          <span class="text-xs text-on-surface-variant">Advokat: ${item.penerima.nama}</span>
-        </div>
+      <td class="py-3.5 px-4">
+        <span class="font-semibold text-on-surface block">${escapeHtml(item.namaPemohon)}</span>
+        <span class="text-[11px] text-outline tabular-nums">${escapeHtml(item.noHpWa)}</span>
       </td>
-      <td class="px-space-md py-4">
-        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${
-          item.kategori === 'Advokat' ? 'bg-primary-fixed text-on-primary-fixed-variant' :
-          (item.kategori === 'Instansi' ? 'bg-tertiary-fixed text-on-tertiary-fixed-variant' : 'bg-secondary-fixed text-on-secondary-fixed-variant')
-        }">
-          ${item.kategori === 'Advokat' ? 'Advokat' : (item.kategori === 'Instansi' ? 'Instansi Pemerintah' : 'Insidentil')}
-        </span>
+      <td class="py-3.5 px-4">
+        <span class="px-2.5 py-0.5 rounded-full bg-surface-container text-primary text-[11px] font-bold">${escapeHtml(item.kategoriKuasa)}</span>
       </td>
-      <td class="px-space-md py-4">
-        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(item.status)}">
-          ${item.status}
-        </span>
-      </td>
-      <td class="px-space-md py-4 text-right">
-        <button onclick="openInspectDrawer('${item.id}')" class="px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold flex items-center gap-1.5 inline-flex transition-colors">
+      <td class="py-3.5 px-4">${statusPillHtml(item.status)}</td>
+      <td class="py-3.5 px-4 text-right">
+        <button onclick="openVerifDrawer('${escapeHtml(item.permohonanId)}')" class="px-3.5 py-1.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary text-xs font-bold inline-flex items-center gap-1 shadow-sm cursor-pointer">
           <span class="material-symbols-outlined text-sm">visibility</span>
           <span>Periksa Berkas</span>
         </button>
@@ -1468,862 +1017,547 @@ function renderVerifikatorTable() {
   `).join('');
 }
 
-// Slide-Over Drawer Inspeksi Berkas
-let currentInspectedItem = null;
-let currentPreviewZoom = 100;
-let currentPreviewRotate = 0;
-let currentInspectDocType = 'ktp_pemberi';
+function openVerifDrawer(permohonanId) {
+  const item = APP_STATE.permohonan.find(p => p.permohonanId === permohonanId);
+  if (!item) return;
+  DRAWER_ITEM = item;
+  DRAWER_ZOOM = 100;
+  DRAWER_ROTATE = 0;
 
-const INSPECT_DOC_TITLES = {
-  ktp_pemberi: 'Kartu Tanda Penduduk Pemberi Kuasa',
-  ktp_penerima: 'Kartu Tanda Penduduk Penerima Kuasa',
-  kta_penerima: 'Kartu Tanda Advokat Penerima Kuasa',
-  bas_penerima: 'Berita Acara Sumpah Advokat',
-  surat_kuasa: 'Surat Kuasa',
-  surat_lurah: 'Surat Keterangan Lurah / Desa',
-  bukti_pnbp: 'Bukti Bayar Leges PNBP'
-};
+  document.getElementById('drawerTitleId').textContent = 'Verifikasi: ' + item.permohonanId;
+  document.getElementById('drawerKategoriPill').textContent = item.kategoriKuasa;
+  document.getElementById('drawerNamaPemohon').textContent = item.namaPemohon;
+  document.getElementById('drawerWaPemohon').textContent = item.noHpWa;
+  document.getElementById('drawerRegisterInput').value = item.nomorRegisterResmi || '';
+  document.getElementById('drawerNoteInput').value = item.catatanPetugas || '';
 
-function renderInspectTabs(category) {
-  const tabsContainer = document.getElementById('inspectDocTabs');
-  if (!tabsContainer) return;
-  const cfg = CATEGORY_DOC_CONFIG[category] || CATEGORY_DOC_CONFIG.Advokat;
-  tabsContainer.innerHTML = cfg.docs.map(doc => `
-    <button type="button" onclick="switchInspectDoc('${doc.key}')" id="tab_${doc.key}" class="px-2.5 py-1 rounded text-[10px] font-semibold bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all text-center">
-      ${doc.code}. ${doc.title.length > 20 ? doc.title.slice(0, 18) + '...' : doc.title}
+  const cfg = CATEGORY_DOCS[item.kategoriKuasa] || CATEGORY_DOCS['Advokat'];
+  const tabsEl = document.getElementById('drawerDocTabs');
+  tabsEl.innerHTML = cfg.docs.map(d => `
+    <button type="button" id="dtab_${d.key}" onclick="switchDrawerDoc('${d.key}')" class="px-2.5 py-1 rounded text-[10px] font-semibold bg-surface-container text-on-surface-variant hover:bg-surface-container-high cursor-pointer">
+      ${d.code}. ${d.title.length > 22 ? d.title.slice(0, 20) + '…' : d.title}
     </button>
   `).join('');
+
+  switchDrawerDoc(cfg.docs[0].key);
+  document.getElementById('verifDrawerOverlay').classList.remove('hidden');
+  document.getElementById('verifDrawer').classList.remove('hidden');
+  document.getElementById('verifDrawer').classList.add('flex');
 }
 
-function switchInspectDoc(docKey) {
-  if (!currentInspectedItem) return;
-  currentInspectDocType = docKey;
+function closeVerifDrawer() {
+  document.getElementById('verifDrawerOverlay').classList.add('hidden');
+  document.getElementById('verifDrawer').classList.add('hidden');
+  document.getElementById('verifDrawer').classList.remove('flex');
+  DRAWER_ITEM = null;
+}
 
-  // Update tabs active state
-  const tabsContainer = document.getElementById('inspectDocTabs');
-  if (tabsContainer) {
-    const tabs = tabsContainer.querySelectorAll('button');
-    tabs.forEach(tab => {
-      if (tab.id === `tab_${docKey}`) {
-        tab.className = 'px-2.5 py-1 rounded text-[10px] font-bold bg-primary text-on-primary transition-all text-center shadow-sm';
-      } else {
-        tab.className = 'px-2.5 py-1 rounded text-[10px] font-semibold bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all text-center';
-      }
-    });
+function switchDrawerDoc(docKey) {
+  if (!DRAWER_ITEM) return;
+  document.querySelectorAll('#drawerDocTabs button').forEach(btn => {
+    const act = btn.id === 'dtab_' + docKey;
+    btn.className = act
+      ? 'px-2.5 py-1 rounded text-[10px] font-bold bg-primary-container text-on-primary shadow-sm cursor-pointer'
+      : 'px-2.5 py-1 rounded text-[10px] font-semibold bg-surface-container text-on-surface-variant hover:bg-surface-container-high cursor-pointer';
+  });
+
+  document.getElementById('drawerDocTitle').textContent = DOC_LABEL_MAP[docKey] || docKey;
+  const url = (DRAWER_ITEM.berkas && DRAWER_ITEM.berkas[docKey]) || '';
+  const img = document.getElementById('drawerDocImg');
+  const iframe = document.getElementById('drawerDocIframe');
+  const empty = document.getElementById('drawerDocEmpty');
+
+  img.classList.add('hidden');
+  iframe.classList.add('hidden');
+  empty.classList.add('hidden');
+
+  if (!url) {
+    empty.classList.remove('hidden');
+    return;
   }
-
-  // Update title
-  const titleEl = document.getElementById('inspectDocTitle');
-  if (titleEl) titleEl.textContent = INSPECT_DOC_TITLES[docKey] || docKey;
-
-  const berkas = currentInspectedItem.berkas || {};
-  let docUrl = berkas[docKey] || '';
-  if (!docUrl && docKey === 'ktp_pemberi') docUrl = berkas.ktp || '';
-  if (!docUrl && docKey === 'kta_penerima') docUrl = berkas.kta || '';
-
-  const imgEl = document.getElementById('inspectDocImage');
-  const pdfNotice = document.getElementById('inspectPdfNotice');
-  const pdfLink = document.getElementById('inspectPdfLink');
-
-  if (docUrl && (docUrl.startsWith('data:application/pdf') || docUrl.endsWith('.pdf'))) {
-    if (imgEl) imgEl.classList.add('hidden');
-    if (pdfNotice) pdfNotice.classList.remove('hidden');
-    if (pdfLink) pdfLink.href = docUrl;
+  if (url.includes('/preview') || url.startsWith('data:application/pdf') || url.endsWith('.pdf')) {
+    iframe.src = url;
+    iframe.classList.remove('hidden');
   } else {
-    if (pdfNotice) pdfNotice.classList.add('hidden');
-    if (imgEl) {
-      imgEl.classList.remove('hidden');
-      imgEl.src = docUrl || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80';
-      currentPreviewZoom = 100;
-      currentPreviewRotate = 0;
-      applyDocTransform();
-    }
+    DRAWER_ZOOM = 100;
+    DRAWER_ROTATE = 0;
+    img.src = url;
+    img.style.transform = 'scale(1) rotate(0deg)';
+    img.classList.remove('hidden');
   }
 }
 
-function openInspectDrawer(id) {
-  const item = Storage.findById(id);
-  if (!item) return;
-
-  currentInspectedItem = item;
-  currentPreviewZoom = 100;
-  currentPreviewRotate = 0;
-
-  const drawer = document.getElementById('inspectDrawer');
-  const overlay = document.getElementById('inspectOverlay');
-  if (!drawer || !overlay) return;
-
-  document.getElementById('insId').textContent = item.id;
-  document.getElementById('insStatus').textContent = item.status;
-  document.getElementById('insStatus').className = `px-2 py-0.5 rounded-full text-xs font-semibold ${getStatusBadgeClass(item.status)}`;
-  document.getElementById('insPemohonNama').textContent = item.pemberi.nama;
-  document.getElementById('insPemohonNik').textContent = maskNik(item.pemberi.nik);
-  document.getElementById('insPenerimaNama').textContent = item.penerima.nama;
-  document.getElementById('insPenerimaKta').textContent = item.penerima.identitas;
-  document.getElementById('insPerkara').textContent = `${item.materi.jenisPerkara} • ${item.materi.nomorPerkara}`;
-  document.getElementById('insCatatanInput').value = item.catatanPetugas || '';
-
-  // Render tabs dinamis sesuai kategori (Advokat / Instansi / Insidentil)
-  renderInspectTabs(item.kategori);
-
-  // Switch ke dokumen pertama (KTP Pemberi Kuasa)
-  switchInspectDoc('ktp_pemberi');
-
-  overlay.classList.remove('hidden');
-  drawer.classList.remove('hidden');
+function zoomDrawerDoc(delta) {
+  DRAWER_ZOOM = Math.max(60, Math.min(200, DRAWER_ZOOM + delta));
+  const img = document.getElementById('drawerDocImg');
+  if (img) img.style.transform = `scale(${DRAWER_ZOOM / 100}) rotate(${DRAWER_ROTATE}deg)`;
 }
 
-function closeInspectDrawer() {
-  const drawer = document.getElementById('inspectDrawer');
-  const overlay = document.getElementById('inspectOverlay');
-  if (drawer) drawer.classList.add('hidden');
-  if (overlay) overlay.classList.add('hidden');
-  currentInspectedItem = null;
+function rotateDrawerDoc() {
+  DRAWER_ROTATE = (DRAWER_ROTATE + 90) % 360;
+  const img = document.getElementById('drawerDocImg');
+  if (img) img.style.transform = `scale(${DRAWER_ZOOM / 100}) rotate(${DRAWER_ROTATE}deg)`;
 }
 
-function zoomInspectDoc(delta) {
-  currentPreviewZoom = Math.min(200, Math.max(60, currentPreviewZoom + delta));
-  applyDocTransform();
-}
+async function submitVerifikasi(keputusan) {
+  if (!DRAWER_ITEM) return;
+  const nomorRegisterResmi = document.getElementById('drawerRegisterInput').value.trim();
+  const catatanPetugas = document.getElementById('drawerNoteInput').value.trim();
 
-function rotateInspectDoc() {
-  currentPreviewRotate = (currentPreviewRotate + 90) % 360;
-  applyDocTransform();
-}
-
-function applyDocTransform() {
-  const imgEl = document.getElementById('inspectDocImage');
-  if (imgEl) {
-    imgEl.style.transform = `scale(${currentPreviewZoom / 100}) rotate(${currentPreviewRotate}deg)`;
+  if (keputusan === 'Disetujui' && !nomorRegisterResmi) {
+    showToast('Nomor Register Resmi wajib diisi untuk menyetujui permohonan!', 'warning');
+    document.getElementById('drawerRegisterInput').focus();
+    return;
   }
-}
-
-async function actionVerifikator(actionType) {
-  if (!currentInspectedItem) return;
-
-  const catatan = document.getElementById('insCatatanInput').value.trim();
-
-  let newStatus = '';
-  if (actionType === 'lolos') {
-    newStatus = 'Menunggu Pengesahan';
-  } else if (actionType === 'revisi') {
-    if (!catatan) {
-      showToast('Wajib isi catatan kekurangan berkas sebelum meminta revisi.', 'warning');
-      return;
-    }
-    newStatus = 'Perlu Revisi';
-  } else if (actionType === 'tolak') {
-    if (!catatan) {
-      showToast('Wajib isi alasan penolakan berkas.', 'warning');
-      return;
-    }
-    newStatus = 'Ditolak';
+  if (keputusan === 'Perlu Revisi' && !catatanPetugas) {
+    showToast('Catatan perbaikan wajib diisi saat memilih Minta Revisi!', 'warning');
+    document.getElementById('drawerNoteInput').focus();
+    return;
   }
 
-  const res = await gasApi('updateStatus', {
-    id: currentInspectedItem.id,
-    patch: {
-      status: newStatus,
-      catatanPetugas: catatan,
-      petugas: 'Ahmad Syafii, S.Kom. (Staf Meja 1)'
-    }
-  });
+  const targetId = DRAWER_ITEM.permohonanId;
 
-  if (res.success) {
-    showToast(`Berkas ${currentInspectedItem.id} berhasil diupdate: ${newStatus}`, 'success');
-    closeInspectDrawer();
+  if (IS_DEMO_MODE) {
+    const idx = APP_STATE.permohonan.findIndex(p => p.permohonanId === targetId);
+    if (idx > -1) {
+      APP_STATE.permohonan[idx].status = keputusan;
+      APP_STATE.permohonan[idx].nomorRegisterResmi = keputusan === 'Disetujui' ? nomorRegisterResmi : '';
+      APP_STATE.permohonan[idx].catatanPetugas = catatanPetugas || 'Berkas lengkap, sah, dan terdaftar resmi.';
+      APP_STATE.permohonan[idx].petugasVerifikator = CURRENT_SESSION ? CURRENT_SESSION.user.nama : 'Siti Rahmawati, S.H.';
+      APP_STATE.permohonan[idx].tanggalVerifikasi = new Date().toISOString();
+      APP_STATE.permohonan[idx].hashVerifikasi = keputusan === 'Disetujui' ? ('sha256-' + Math.random().toString(16).slice(2) + Date.now().toString(16)) : '';
+      APP_STATE.logs.unshift({ Timestamp: new Date().toISOString(), User: CURRENT_SESSION?.user.username || 'petugas', Aksi: 'VERIFIKASI_' + keputusan.toUpperCase(), Ref_ID: targetId, Keterangan: nomorRegisterResmi || catatanPetugas });
+      saveLocalState();
+    }
+    closeVerifDrawer();
+    updatePendingBadges();
     renderVerifikatorTable();
-  }
-}
-
-// =========================================================================
-// 8. MODUL 4: MEJA PENGESAHAN PEJABAT (PANITERA / TTE DENGAN PIN)
-// =========================================================================
-
-let activeApprovalItem = null;
-let currentPin = '';
-
-function renderPengesahanQueue() {
-  const queueContainer = document.getElementById('pengesahanQueueContainer');
-  if (!queueContainer) return;
-
-  const list = Storage.load();
-  const pendingApproval = list.filter(x => x.status === 'Menunggu Pengesahan');
-
-  const countBadge = document.getElementById('pengesahanCountBadge');
-  if (countBadge) countBadge.textContent = `${pendingApproval.length} Berkas Memerlukan TTE`;
-
-  if (pendingApproval.length === 0) {
-    queueContainer.innerHTML = `
-      <div class="p-8 text-center bg-surface-container-lowest rounded-xl border border-surface-container text-on-surface-variant">
-        <span class="material-symbols-outlined text-4xl text-primary mb-2 block">task_alt</span>
-        <p class="font-bold text-on-surface">Semua Berkas Telah Disahkan</p>
-        <p class="text-xs text-on-surface-variant mt-1">Tidak ada berkas yang menunggu tanda tangan elektronik saat ini.</p>
-      </div>
-    `;
-    selectItemForApproval(null);
+    showToast('Status ' + targetId + ' berhasil diperbarui menjadi ' + keputusan + '!', 'success');
     return;
   }
 
-  // Pilih item pertama jika belum ada yang dipilih
-  if (!activeApprovalItem || !pendingApproval.find(x => x.id === activeApprovalItem.id)) {
-    activeApprovalItem = pendingApproval[0];
-  }
-
-  queueContainer.innerHTML = pendingApproval.map(item => {
-    const isSelected = activeApprovalItem && activeApprovalItem.id === item.id;
-    return `
-      <div onclick="selectItemForApproval('${item.id}')" class="p-4 rounded-xl cursor-pointer transition-all border ${isSelected ? 'bg-primary-container text-on-primary border-primary shadow-md' : 'bg-surface-container-lowest text-on-surface border-surface-container hover:bg-surface-container-low'}">
-        <div class="flex items-center justify-between mb-1.5">
-          <span class="font-bold text-sm ${isSelected ? 'text-on-primary' : 'text-on-surface'}">${item.id}</span>
-          <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${isSelected ? 'bg-secondary text-on-secondary' : 'bg-secondary-container text-on-secondary-container'}">Siap TTE</span>
-        </div>
-        <p class="text-xs font-semibold truncate ${isSelected ? 'text-primary-fixed-dim' : 'text-on-surface'}">${item.pemberi.nama}</p>
-        <p class="text-xs opacity-80 truncate">Advokat: ${item.penerima.nama}</p>
-        <div class="flex items-center justify-between mt-2 pt-2 border-t ${isSelected ? 'border-primary/30' : 'border-surface-container'} text-[11px] opacity-75">
-          <span>${item.materi.jenisPerkara}</span>
-          <span>${item.tanggal || '14 Nov'}</span>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  renderCertificatePreview(activeApprovalItem);
-}
-
-function selectItemForApproval(id) {
-  if (!id) {
-    activeApprovalItem = null;
-    renderCertificatePreview(null);
-    return;
-  }
-  activeApprovalItem = Storage.findById(id);
-  renderPengesahanQueue();
-}
-
-function renderCertificatePreview(item) {
-  const container = document.getElementById('certificatePreviewPane');
-  if (!container) return;
-
-  if (!item) {
-    container.innerHTML = `
-      <div class="h-96 flex flex-col items-center justify-center text-on-surface-variant">
-        <span class="material-symbols-outlined text-5xl text-outline mb-2">article</span>
-        <p class="font-medium text-sm">Pilih berkas dari antrean untuk pratinjau lembar akta.</p>
-      </div>
-    `;
-    return;
-  }
-
-  const regNo = item.nomorRegister && item.nomorRegister !== 'Dalam Proses Verifikasi'
-    ? item.nomorRegister
-    : 'W11-U1/245/HK.02/XI/2026';
-
-  container.innerHTML = `
-    <!-- Formal Court Header -->
-    <div class="text-center pb-4 border-b-2 border-primary/40 mb-6">
-      <div class="w-14 h-14 mx-auto mb-2 rounded-full bg-primary text-secondary-container flex items-center justify-center shadow-md">
-        <span class="material-symbols-outlined text-3xl">balance</span>
-      </div>
-      <h3 class="font-display text-lg font-bold uppercase tracking-wider text-primary">PENGADILAN NEGERI KELAS I A KHUSUS</h3>
-      <p class="text-xs text-on-surface-variant font-medium">Kepaniteraan Perdata • Layanan Terpadu Satu Pintu (PTSP) E-Surat Kuasa</p>
-      <p class="text-[11px] text-outline">Gedung Pengadilan Negeri, Jl. Merdeka Kehakiman No. 12 • Laman Resmi: pn.mahkamahagung.go.id</p>
-    </div>
-
-    <!-- Title & Register Number -->
-    <div class="text-center mb-6">
-      <h4 class="font-headline-sm text-base font-bold uppercase tracking-wide text-on-surface underline decoration-primary decoration-2 underline-offset-4">SURAT TANDA PENDAFTARAN SURAT KUASA</h4>
-      <p class="font-mono text-xs font-bold text-primary mt-1">Nomor Register: ${regNo}</p>
-    </div>
-
-    <!-- Clauses -->
-    <div class="text-xs text-on-surface space-y-3 leading-relaxed mb-6">
-      <p>Pada hari ini, tanggal <strong>${new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</strong>, bertempat di Kepaniteraan Pengadilan Negeri, telah didaftarkan dalam Buku Register Surat Kuasa Khusus Perdata oleh Panitera Pengadilan Negeri:</p>
-
-      <div class="grid grid-cols-12 gap-2 pl-4 py-2 bg-surface-container-low/50 rounded-lg">
-        <div class="col-span-4 font-semibold text-outline">Pemberi Kuasa</div>
-        <div class="col-span-8 font-bold text-on-surface">: ${item.pemberi.nama} (NIK: ${maskNik(item.pemberi.nik)})</div>
-
-        <div class="col-span-4 font-semibold text-outline">Penerima Kuasa</div>
-        <div class="col-span-8 font-bold text-on-surface">: ${item.penerima.nama} (${item.kategori === 'Advokat' ? 'Advokat/Penasihat Hukum' : 'Kuasa Insidentil'})</div>
-
-        <div class="col-span-4 font-semibold text-outline">Maksud Kuasa</div>
-        <div class="col-span-8 text-on-surface">: ${item.materi.uraian}</div>
-
-        <div class="col-span-4 font-semibold text-outline">Status PNBP & Meterai</div>
-        <div class="col-span-8 text-primary font-bold">: LUNAS & TERVERIFIKASI SIMPONI (NTPN: 20261114098231)</div>
-      </div>
-
-      <p class="text-[11px] text-on-surface-variant italic">Pendaftaran ini dicatat secara resmi melalui sistem otomasi E-Katalog Surat Kuasa Pengadilan dan mempunyai kekuatan pembuktian pendaftaran hukum sesuai peraturan perundang-undangan di Lingkungan Mahkamah Agung Republik Indonesia.</p>
-    </div>
-
-    <!-- Signature & HMAC QR Code Section -->
-    <div class="pt-4 border-t border-surface-container flex items-center justify-between">
-      <div class="p-2.5 rounded-lg bg-surface-container text-xs font-mono text-outline">
-        <span class="block text-[10px] uppercase font-bold text-primary">SHA-256 HMAC Seal:</span>
-        <span class="text-[10px] break-all">${item.hashSha256 || generateMockSha256()}</span>
-      </div>
-
-      <div class="flex flex-col items-center text-center">
-        <span class="text-[11px] font-semibold text-on-surface">A.n. KETUA PENGADILAN NEGERI<br>PANITERA,</span>
-        <div class="w-20 h-20 my-1 bg-surface-container-high rounded-lg p-1.5 flex items-center justify-center border border-dashed border-primary">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://pengadilan.go.id/validasi?reg=${item.id}" alt="QR Seal" class="w-full h-full object-contain">
-        </div>
-        <span class="text-xs font-bold text-primary underline">Dr. H. Sulaiman, S.H., M.H.</span>
-        <span class="text-[10px] text-outline">NIP. 19740512 199903 1 002</span>
-      </div>
-    </div>
-  `;
-}
-
-// PIN Keypad Logic
-function pressPin(digit) {
-  if (currentPin.length < 6) {
-    currentPin += digit;
-    updatePinDots();
-  }
-}
-
-function clearPin() {
-  currentPin = '';
-  updatePinDots();
-}
-
-function updatePinDots() {
-  for (let i = 1; i <= 6; i++) {
-    const dot = document.getElementById(`pinDot${i}`);
-    if (dot) {
-      if (i <= currentPin.length) {
-        dot.className = 'w-3 h-3 rounded-full bg-primary transition-all scale-125';
-      } else {
-        dot.className = 'w-3 h-3 rounded-full bg-surface-container-highest transition-all';
-      }
-    }
-  }
-}
-
-async function executeOfficialApproval() {
-  if (!activeApprovalItem) {
-    showToast('Pilih berkas dari antrean terlebih dahulu.', 'warning');
-    return;
-  }
-  if (currentPin.length < 6) {
-    showToast('Masukkan 6-digit PIN Pengesahan Pejabat (Contoh Demo: 123456).', 'warning');
-    return;
-  }
-
-  const btnApprove = document.getElementById('btnExecuteApproval');
-  if (btnApprove) {
-    btnApprove.disabled = true;
-    btnApprove.innerHTML = '<span class="material-symbols-outlined animate-spin text-lg">sync</span> Membubuhkan TTE...';
-  }
-
-  const res = await gasApi('sahkanDokumen', {
-    id: activeApprovalItem.id,
-    pin: currentPin
-  });
-
-  if (btnApprove) {
-    btnApprove.disabled = false;
-    btnApprove.innerHTML = '<span class="material-symbols-outlined text-lg">verified</span> Sahkan & Terbitkan Surat Kuasa Terdaftar';
-  }
-
+  const res = await callApi('verifikasiPermohonan', { permohonanId: targetId, keputusan, nomorRegisterResmi, catatanPetugas });
   if (res.success) {
-    showToast(`Dokumen ${activeApprovalItem.id} berhasil disahkan secara resmi!`, 'success');
-    clearPin();
-    renderPengesahanQueue();
+    closeVerifDrawer();
+    showToast(res.message || 'Verifikasi berhasil disimpan.', 'success');
+    await syncPermohonanFromServer();
+  } else {
+    showToast(res.message || 'Gagal menyimpan verifikasi.', 'error');
   }
 }
 
 // =========================================================================
-// 9. MODUL 5: EXECUTIVE ADMIN DASHBOARD & ANALYTICS
+// 10. VIEW 5: BUKU REGISTER KUASA & EKSPOR CSV
 // =========================================================================
 
-function renderAdminDashboard() {
-  const list = Storage.load();
-
-  // Metrics
-  const total = list.length;
-  const menunggu = list.filter(x => x.status === 'Menunggu Verifikasi').length;
-  const pengesahan = list.filter(x => x.status === 'Menunggu Pengesahan').length;
-  const terdaftar = list.filter(x => x.status === 'Disahkan/Terdaftar').length;
-
-  const m1 = document.getElementById('admMetricTotal');
-  const m2 = document.getElementById('admMetricMenunggu');
-  const m3 = document.getElementById('admMetricPengesahan');
-  const m4 = document.getElementById('admMetricTerdaftar');
-
-  if (m1) m1.textContent = total;
-  if (m2) m2.textContent = menunggu;
-  if (m3) m3.textContent = pengesahan;
-  if (m4) m4.textContent = terdaftar;
-
-  // Render Table
-  const table = document.getElementById('adminMasterTableBody');
-  if (table) {
-    table.innerHTML = list.map(item => `
-      <tr class="hover:bg-surface-container-low transition-colors border-b border-surface-container">
-        <td class="px-4 py-3 font-mono font-bold text-xs text-primary">${item.id}</td>
-        <td class="px-4 py-3 text-xs text-on-surface-variant">${item.tanggal || '14 Nov 2026'}</td>
-        <td class="px-4 py-3 font-semibold text-xs text-on-surface">${item.pemberi.nama}</td>
-        <td class="px-4 py-3 text-xs text-on-surface">${item.penerima.nama}</td>
-        <td class="px-4 py-3">
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${item.kategori === 'Advokat' ? 'bg-primary-fixed text-on-primary-fixed-variant' : 'bg-secondary-fixed text-on-secondary-fixed-variant'}">${item.kategori}</span>
-        </td>
-        <td class="px-4 py-3">
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusBadgeClass(item.status)}">${item.status}</span>
-        </td>
-        <td class="px-4 py-3 text-right">
-          <button onclick="openInspectDrawer('${item.id}')" class="p-1 rounded text-on-surface-variant hover:text-primary transition-colors" title="Lihat Detail">
-            <span class="material-symbols-outlined text-base">visibility</span>
-          </button>
-        </td>
-      </tr>
-    `).join('');
-  }
-}
-
-function exportDataToExcel() {
-  const list = Storage.load();
-  let csv = 'ID,Tanggal,Kategori,Status,Nama Pemberi,NIK Pemberi,Nama Penerima,KTA/ID Penerima,Jenis Perkara,Nomor Register\n';
-
-  list.forEach(item => {
-    csv += `"${item.id}","${item.tanggal}","${item.kategori}","${item.status}","${item.pemberi.nama}","${item.pemberi.nik}","${item.penerima.nama}","${item.penerima.identitas}","${item.materi.jenisPerkara}","${item.nomorRegister || ''}"\n`;
-  });
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Buku_Register_Surat_Kuasa_${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  showToast('Data berhasil diekspor ke format Excel/CSV.', 'success');
-}
-
-// =========================================================================
-// 10. MODUL 6: VALIDASI QR DOKUMEN PUBLIK
-// =========================================================================
-
-function renderQrValidationPage() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const regParam = urlParams.get('reg') || 'REG-202611-0088';
-
-  const item = Storage.findById(regParam) || Storage.load()[0];
-  if (!item) return;
-
-  const regNoEl = document.getElementById('qrValidRegNo');
-  const codeEl = document.getElementById('qrValidCode');
-  const pemberiEl = document.getElementById('qrValidPemberi');
-  const penerimaEl = document.getElementById('qrValidPenerima');
-  const perkaraEl = document.getElementById('qrValidPerkara');
-  const pejabatEl = document.getElementById('qrValidPejabat');
-  const hashEl = document.getElementById('qrValidHash');
-
-  if (regNoEl) regNoEl.textContent = item.nomorRegister || 'W11-U1/245/HK.02/XI/2026';
-  if (codeEl) codeEl.textContent = item.id;
-  if (pemberiEl) pemberiEl.innerHTML = `<span class="font-bold text-on-surface">${item.pemberi.nama}</span><br><span class="text-xs text-outline">NIK: ${maskNik(item.pemberi.nik)}</span>`;
-  if (penerimaEl) penerimaEl.innerHTML = `<span class="font-bold text-on-surface">${item.penerima.nama}</span><br><span class="text-xs text-outline">KTA: ${item.penerima.identitas}</span>`;
-  if (perkaraEl) perkaraEl.innerHTML = `<span class="font-bold text-on-surface">${item.materi.jenisPerkara}</span><br><span class="text-xs text-outline">No. ${item.materi.nomorPerkara}</span>`;
-  if (pejabatEl) pejabatEl.innerHTML = `<span class="font-bold text-on-surface">Dr. H. Sulaiman, S.H., M.H.</span><br><span class="text-xs text-outline">Panitera Pengadilan Negeri</span>`;
-  if (hashEl) hashEl.textContent = item.hashSha256 || generateMockSha256();
-}
-
-function copyText(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('Teks berhasil disalin ke papan klip!', 'info');
-  });
-}
-
-// =========================================================================
-// 11. MODAL CERTIFICATE PRINT & PREVIEW
-// =========================================================================
-
-function openCertificateModal(id) {
-  const item = Storage.findById(id);
-  if (!item) return;
-
-  const modal = document.getElementById('certificateModal');
-  const content = document.getElementById('certificateModalContent');
-  if (!modal || !content) return;
-
-  const regNo = item.nomorRegister && item.nomorRegister !== 'Dalam Proses Verifikasi'
-    ? item.nomorRegister
-    : 'W11-U1/245/HK.02/XI/2026';
-
-  content.innerHTML = `
-    <div id="printableCertificate" class="p-8 bg-surface-container-lowest rounded-xl max-w-3xl mx-auto shadow-sm border border-surface-container">
-      <div class="text-center pb-4 border-b-2 border-primary/40 mb-6">
-        <div class="w-16 h-16 mx-auto mb-2 rounded-full bg-primary text-secondary-container flex items-center justify-center shadow-md">
-          <span class="material-symbols-outlined text-4xl">balance</span>
-        </div>
-        <h3 class="font-display text-xl font-bold uppercase tracking-wider text-primary">PENGADILAN NEGERI KELAS I A KHUSUS</h3>
-        <p class="text-xs text-on-surface-variant font-medium">Kepaniteraan Perdata • Layanan Terpadu Satu Pintu (PTSP) E-Surat Kuasa</p>
-        <p class="text-[11px] text-outline">Gedung Pengadilan Negeri, Jl. Merdeka Kehakiman No. 12</p>
-      </div>
-
-      <div class="text-center mb-6">
-        <h4 class="font-headline-sm text-lg font-bold uppercase tracking-wide text-on-surface underline decoration-primary decoration-2 underline-offset-4">SURAT TANDA PENDAFTARAN SURAT KUASA</h4>
-        <p class="font-mono text-sm font-bold text-primary mt-1">Nomor Register: ${regNo}</p>
-      </div>
-
-      <div class="text-sm text-on-surface space-y-4 leading-relaxed mb-8">
-        <p>Pada hari ini, tanggal <strong>${new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</strong>, bertempat di Kepaniteraan Pengadilan Negeri, telah didaftarkan dalam Buku Register Surat Kuasa Khusus Perdata oleh Panitera Pengadilan Negeri:</p>
-
-        <div class="p-4 bg-surface-container-low rounded-lg space-y-2 text-xs">
-          <div class="grid grid-cols-12"><span class="col-span-4 font-bold text-outline">Pemberi Kuasa</span><span class="col-span-8 font-bold text-on-surface">: ${item.pemberi.nama} (NIK: ${maskNik(item.pemberi.nik)})</span></div>
-          <div class="grid grid-cols-12"><span class="col-span-4 font-bold text-outline">Penerima Kuasa</span><span class="col-span-8 font-bold text-on-surface">: ${item.penerima.nama} (${item.kategori})</span></div>
-          <div class="grid grid-cols-12"><span class="col-span-4 font-bold text-outline">Perihal / Ruang Lingkup</span><span class="col-span-8 text-on-surface">: ${item.materi.uraian}</span></div>
-          <div class="grid grid-cols-12"><span class="col-span-4 font-bold text-outline">Status PNBP & Meterai</span><span class="col-span-8 text-primary font-bold">: LUNAS & TERVERIFIKASI PERURI</span></div>
-        </div>
-
-        <p class="text-xs text-on-surface-variant italic">Akta pendaftaran ini adalah dokumen resmi yang diterbitkan secara elektronik dan dilindungi dengan segel kriptografi HMAC SHA-256. Verifikasi keabsahan dokumen dapat dilakukan langsung oleh Majelis Hakim atau Pihak Lawan dengan memindai kode QR di bawah.</p>
-      </div>
-
-      <div class="pt-4 border-t border-surface-container flex items-center justify-between">
-        <div class="text-xs font-mono text-outline">
-          <span class="block text-[10px] uppercase font-bold text-primary">Kode Validasi HMAC:</span>
-          <span class="text-[10px] break-all">${item.hashSha256 || generateMockSha256()}</span>
-        </div>
-
-        <div class="flex flex-col items-center text-center">
-          <span class="text-xs font-semibold text-on-surface">PANITERA PENGADILAN NEGERI,</span>
-          <div class="w-24 h-24 my-2 bg-white rounded-lg p-1 flex items-center justify-center border border-dashed border-primary">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://pengadilan.go.id/validasi?reg=${item.id}" alt="QR Seal" class="w-full h-full object-contain">
-          </div>
-          <span class="text-xs font-bold text-primary underline">Dr. H. Sulaiman, S.H., M.H.</span>
-          <span class="text-[10px] text-outline">NIP. 19740512 199903 1 002</span>
-        </div>
-      </div>
-    </div>
-  `;
-
-  modal.classList.remove('hidden');
-}
-
-function closeCertificateModal() {
-  const modal = document.getElementById('certificateModal');
-  if (modal) modal.classList.add('hidden');
-}
-
-function printCertificate() {
-  window.print();
-}
-
-function downloadTandaTerima(id) {
-  openCertificateModal(id);
-}
-
-// =========================================================================
-// 11.5. MASTER DATA MANAGEMENT: KLASIFIKASI & JENIS PERKARA (SETTINGS)
-// =========================================================================
-
-const DEFAULT_CASE_TYPES = [
-  { id: 'CT-01', nama: 'Perdata Gugatan', kategori: 'Perdata', kode: 'Pdt.G', aktif: true },
-  { id: 'CT-02', nama: 'Perdata Permohonan', kategori: 'Perdata', kode: 'Pdt.P', aktif: true },
-  { id: 'CT-03', nama: 'Pidana Umum', kategori: 'Pidana', kode: 'Pid.B', aktif: true },
-  { id: 'CT-04', nama: 'Pidana Khusus / Tipikor', kategori: 'Pidana', kode: 'Pid.Sus', aktif: true },
-  { id: 'CT-05', nama: 'Perselisihan Hubungan Industrial (PHI)', kategori: 'Khusus', kode: 'PHI', aktif: true }
-];
-
-function getCaseTypes() {
-  try {
-    const saved = localStorage.getItem('court_case_types');
-    if (saved) return JSON.parse(saved);
-  } catch (e) {
-    console.warn('Gagal memuat jenis perkara:', e);
-  }
-  return [...DEFAULT_CASE_TYPES];
-}
-
-function saveCaseTypes(list) {
-  localStorage.setItem('court_case_types', JSON.stringify(list));
-  populateJenisPerkaraDropdown();
-  renderCaseTypesTable();
-}
-
-function populateJenisPerkaraDropdown() {
-  const select = document.getElementById('wzJenisPerkara');
-  if (!select) return;
-
-  const currentVal = select.value;
-  const list = getCaseTypes().filter(x => x.aktif);
-
-  select.innerHTML = '';
-  list.forEach(ct => {
-    const opt = document.createElement('option');
-    opt.value = ct.nama;
-    opt.textContent = ct.nama;
-    if (ct.nama === currentVal) opt.selected = true;
-    select.appendChild(opt);
-  });
-
-  if (!select.value && list.length > 0) {
-    select.value = list[0].nama;
-  }
-}
-
-function renderCaseTypesTable() {
-  const tbody = document.getElementById('caseTypesTableBody');
-  const countBadge = document.getElementById('caseTypeCountBadge');
+function renderBukuRegisterTable() {
+  const tbody = document.getElementById('bukuRegisterBody');
   if (!tbody) return;
 
-  const list = getCaseTypes();
-  const activeCount = list.filter(x => x.aktif).length;
-  if (countBadge) countBadge.textContent = `${activeCount} Opsi Aktif (${list.length} Total)`;
+  const q = (document.getElementById('regSearch')?.value || '').trim().toLowerCase();
+  const kat = document.getElementById('regKatFilter')?.value || 'ALL';
+  const ym = document.getElementById('regDateFilter')?.value || '';
 
-  if (list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-xs text-outline">Belum ada jenis perkara yang ditambahkan. Klik tombol "Tambah Jenis Perkara" di atas.</td></tr>`;
+  const rows = APP_STATE.permohonan.filter(p => {
+    if (p.status !== 'Disetujui') return false;
+    const matchQ = !q || (p.nomorRegisterResmi || '').toLowerCase().includes(q) || p.namaPemohon.toLowerCase().includes(q) || p.permohonanId.toLowerCase().includes(q);
+    const matchKat = kat === 'ALL' || p.kategoriKuasa === kat;
+    const matchYm = !ym || (p.tanggalVerifikasi || p.tanggalPengajuan || '').startsWith(ym);
+    return matchQ && matchKat && matchYm;
+  });
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-xs text-outline">Belum ada surat kuasa terdaftar pada filter ini.</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = list.map((ct, idx) => `
-    <tr class="border-b border-surface-container hover:bg-surface-container-low/50 transition-colors">
-      <td class="px-4 py-3 text-xs font-mono font-bold text-outline">${idx + 1}</td>
-      <td class="px-4 py-3">
-        <div class="text-xs font-bold text-on-surface">${escapeHtml(ct.nama)}</div>
-        <div class="text-[10px] text-outline font-mono">${ct.id}</div>
+  tbody.innerHTML = rows.map(item => `
+    <tr class="hover:bg-surface-container-low/40 transition-colors">
+      <td class="py-3.5 px-4 font-bold text-primary tabular-nums">${escapeHtml(item.nomorRegisterResmi)}</td>
+      <td class="py-3.5 px-4">
+        <span class="font-semibold text-on-surface tabular-nums block">${escapeHtml(item.permohonanId)}</span>
+        <span class="text-[11px] text-outline tabular-nums">${formatShortDate(item.tanggalVerifikasi)}</span>
       </td>
-      <td class="px-4 py-3">
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${
-          ct.kategori === 'Perdata' ? 'bg-primary-fixed text-on-primary-fixed-variant' :
-          (ct.kategori === 'Pidana' ? 'bg-tertiary-container text-on-primary' : 'bg-secondary-fixed text-on-secondary-fixed-variant')
-        }">
-          ${escapeHtml(ct.kategori)}
-        </span>
-      </td>
-      <td class="px-4 py-3 text-xs font-mono font-semibold text-outline">
-        ${escapeHtml(ct.kode || '-')}
-      </td>
-      <td class="px-4 py-3">
-        <button onclick="toggleCaseTypeStatus('${ct.id}')" class="px-2.5 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-all ${
-          ct.aktif ? 'bg-primary text-on-primary hover:opacity-90' : 'bg-surface-container text-outline hover:bg-surface-container-high'
-        }">
-          ${ct.aktif ? '✓ Aktif di Form' : '✕ Nonaktif'}
+      <td class="py-3.5 px-4 font-semibold">${escapeHtml(item.namaPemohon)}</td>
+      <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded-full bg-surface-container text-primary text-[11px] font-bold">${escapeHtml(item.kategoriKuasa)}</span></td>
+      <td class="py-3.5 px-4 text-xs text-on-surface-variant">${escapeHtml(item.petugasVerifikator || '-')}</td>
+      <td class="py-3.5 px-4 text-right">
+        <button onclick="openReceiptModal('${escapeHtml(item.permohonanId)}')" class="px-3 py-1.5 rounded-lg border border-primary-container text-primary hover:bg-primary-fixed/40 text-xs font-bold inline-flex items-center gap-1 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">receipt_long</span> Tanda Terima
         </button>
-      </td>
-      <td class="px-4 py-3 text-right">
-        <div class="flex items-center justify-end gap-1.5">
-          <button onclick="editCaseType('${ct.id}')" class="p-1 rounded text-outline hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Edit Jenis Perkara">
-            <span class="material-symbols-outlined text-base">edit</span>
-          </button>
-          <button onclick="deleteCaseType('${ct.id}')" class="p-1 rounded text-outline hover:text-error hover:bg-error-container/30 transition-colors cursor-pointer" title="Hapus Jenis Perkara">
-            <span class="material-symbols-outlined text-base">delete</span>
-          </button>
-        </div>
       </td>
     </tr>
   `).join('');
 }
 
-function openCaseTypeModal() {
-  document.getElementById('caseTypeId').value = '';
-  document.getElementById('caseTypeName').value = '';
-  document.getElementById('caseTypeCategory').value = 'Perdata';
-  document.getElementById('caseTypeCode').value = '';
-  document.getElementById('caseTypeActive').checked = true;
-  document.getElementById('caseTypeModalTitle').textContent = 'Tambah Jenis Perkara Baru';
-  document.getElementById('caseTypeModal').classList.remove('hidden');
-  setTimeout(() => document.getElementById('caseTypeName')?.focus(), 100);
+function exportRegisterCsv() {
+  const approved = APP_STATE.permohonan.filter(p => p.status === 'Disetujui');
+  if (!approved.length) { showToast('Belum ada data disetujui untuk diekspor.', 'warning'); return; }
+  let csv = 'Nomor_Register_Resmi,Permohonan_ID,Tanggal_Verifikasi,Kategori_Kuasa,Nama_Pemohon,No_HP_WA,Petugas_Verifikator\n';
+  approved.forEach(p => {
+    csv += `"${p.nomorRegisterResmi}","${p.permohonanId}","${p.tanggalVerifikasi}","${p.kategoriKuasa}","${p.namaPemohon}","${p.noHpWa}","${p.petugasVerifikator}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Buku_Register_E-Kuasa_' + new Date().toISOString().slice(0, 10) + '.csv';
+  a.click();
+  showToast('Buku Register berhasil diekspor ke CSV.', 'success');
 }
 
-function closeCaseTypeModal() {
-  const modal = document.getElementById('caseTypeModal');
-  if (modal) modal.classList.add('hidden');
-}
+// =========================================================================
+// 11. VIEW 6: ADMIN (USER, DRIVE, WA CRM, SCRIPT PROPERTIES & MIGRASI DB)
+// =========================================================================
 
-function handleSaveCaseType(e) {
-  if (e) e.preventDefault();
-  const idInput = document.getElementById('caseTypeId').value;
-  const name = (document.getElementById('caseTypeName').value || '').trim();
-  const category = document.getElementById('caseTypeCategory').value;
-  const code = (document.getElementById('caseTypeCode').value || '').trim();
-  const active = document.getElementById('caseTypeActive').checked;
-
-  if (!name) {
-    showToast('Nama klasifikasi jenis perkara wajib diisi.', 'error');
-    return;
-  }
-
-  const list = getCaseTypes();
-  if (idInput) {
-    const idx = list.findIndex(x => x.id === idInput);
-    if (idx !== -1) {
-      list[idx] = { ...list[idx], nama: name, kategori: category, kode: code, aktif: active };
-      showToast(`Jenis perkara "${name}" berhasil diperbarui.`, 'success');
+function switchAdminSubTab(tab) {
+  ['users', 'wa_crm', 'log_migrasi'].forEach(t => {
+    document.getElementById('adminPane_' + t)?.classList.toggle('hidden', t !== tab);
+    const btn = document.getElementById('adminTab_' + t);
+    if (btn) {
+      btn.className = t === tab
+        ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-primary-container text-on-primary cursor-pointer'
+        : 'px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-primary cursor-pointer';
     }
-  } else {
-    const newId = 'CT-' + String(list.length + 1).padStart(2, '0') + '-' + Date.now().toString().slice(-3);
-    list.push({ id: newId, nama: name, kategori: category, kode: code, aktif: active });
-    showToast(`Jenis perkara "${name}" berhasil ditambahkan ke formulir pendaftaran!`, 'success');
-  }
-
-  saveCaseTypes(list);
-  closeCaseTypeModal();
-}
-
-function editCaseType(id) {
-  const list = getCaseTypes();
-  const target = list.find(x => x.id === id);
-  if (!target) return;
-
-  document.getElementById('caseTypeId').value = target.id;
-  document.getElementById('caseTypeName').value = target.nama;
-  document.getElementById('caseTypeCategory').value = target.kategori;
-  document.getElementById('caseTypeCode').value = target.kode || '';
-  document.getElementById('caseTypeActive').checked = !!target.aktif;
-
-  document.getElementById('caseTypeModalTitle').textContent = 'Edit Jenis Perkara';
-  document.getElementById('caseTypeModal').classList.remove('hidden');
-}
-
-function deleteCaseType(id) {
-  const list = getCaseTypes();
-  const target = list.find(x => x.id === id);
-  if (!target) return;
-
-  if (confirm(`Apakah Anda yakin ingin menghapus jenis perkara "${target.nama}" dari formulir pendaftaran?`)) {
-    const updated = list.filter(x => x.id !== id);
-    saveCaseTypes(updated);
-    showToast(`Jenis perkara "${target.nama}" berhasil dihapus.`, 'warning');
-  }
-}
-
-function toggleCaseTypeStatus(id) {
-  const list = getCaseTypes();
-  const target = list.find(x => x.id === id);
-  if (target) {
-    target.aktif = !target.aktif;
-    saveCaseTypes(list);
-    showToast(`Status "${target.nama}" kini: ${target.aktif ? 'Aktif di Form' : 'Nonaktif'}`, 'info');
-  }
-}
-
-function resetCaseTypesToDefault() {
-  if (confirm('Kembalikan seluruh daftar jenis perkara ke opsi bawaan standar Mahkamah Agung?')) {
-    saveCaseTypes([...DEFAULT_CASE_TYPES]);
-    showToast('Daftar jenis perkara berhasil dikembalikan ke standar bawaan.', 'success');
-  }
-}
-
-function loadGeneralSettings() {
-  try {
-    const saved = localStorage.getItem('court_general_config');
-    if (saved) {
-      const cfg = JSON.parse(saved);
-      if (document.getElementById('cfgBiayaPnbp') && cfg.pnbp) document.getElementById('cfgBiayaPnbp').value = cfg.pnbp;
-      if (document.getElementById('cfgBiayaMeterai') && cfg.meterai) document.getElementById('cfgBiayaMeterai').value = cfg.meterai;
-      if (document.getElementById('cfgHotline') && cfg.hotline) document.getElementById('cfgHotline').value = cfg.hotline;
-      if (document.getElementById('cfgWaPtsp') && cfg.wa) document.getElementById('cfgWaPtsp').value = cfg.wa;
-    }
-  } catch (e) {}
-}
-
-function saveGeneralSettings(e) {
-  if (e) e.preventDefault();
-  const pnbp = document.getElementById('cfgBiayaPnbp')?.value || '10000';
-  const meterai = document.getElementById('cfgBiayaMeterai')?.value || '10000';
-  const hotline = document.getElementById('cfgHotline')?.value || '(021) 8092-2345';
-  const wa = document.getElementById('cfgWaPtsp')?.value || '081298457721';
-
-  localStorage.setItem('court_general_config', JSON.stringify({ pnbp, meterai, hotline, wa }));
-  showToast('Pengaturan tarif & hotline instansi berhasil disimpan!', 'success');
-}
-
-// =========================================================================
-// 12. HELPER UTILITIES
-// =========================================================================
-
-function getStatusBadgeClass(status) {
-  switch (status) {
-    case 'Disahkan/Terdaftar':
-      return 'bg-primary-fixed text-on-primary-fixed-variant';
-    case 'Menunggu Verifikasi':
-    case 'Menunggu Pengesahan':
-      return 'bg-secondary-fixed text-on-secondary-fixed-variant';
-    case 'Perlu Revisi':
-      return 'bg-surface-container-high text-tertiary';
-    case 'Ditolak':
-      return 'bg-error-container text-on-error-container';
-    default:
-      return 'bg-surface-container text-on-surface-variant';
-  }
-}
-
-function maskNik(nik) {
-  if (!nik || nik.length < 8) return nik;
-  return nik.slice(0, 4) + '************' + nik.slice(-2);
-}
-
-// =========================================================================
-// 13. PWA INSTALLATION & SERVICE WORKER LIFECYCLE
-// =========================================================================
-
-let pwaInstallPrompt = null;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  pwaInstallPrompt = e;
-  const pwaBtn = document.getElementById('btnPwaInstall');
-  if (pwaBtn) pwaBtn.classList.remove('hidden');
-});
-
-function triggerPwaInstall() {
-  if (pwaInstallPrompt) {
-    pwaInstallPrompt.prompt();
-    pwaInstallPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        const pwaBtn = document.getElementById('btnPwaInstall');
-        if (pwaBtn) pwaBtn.classList.add('hidden');
-      }
-      pwaInstallPrompt = null;
-    });
-  }
-}
-
-// Daftarkan Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('✅ PWA Service Worker Aktif:', reg.scope))
-      .catch(err => console.warn('PWA Service Worker Registrasi Gagal:', err));
   });
 }
 
+function renderAdminPanel() {
+  // Drive & Users
+  const d = APP_STATE.drive || { usedMb: 0, limitMb: 15360, percent: 0 };
+  document.getElementById('drivePercentLabel').textContent = d.percent + '% terpakai';
+  document.getElementById('driveProgressBar').style.width = d.percent + '%';
+  document.getElementById('driveUsageDesc').textContent = `${d.usedMb.toLocaleString('id-ID')} MB dari ${d.limitMb.toLocaleString('id-ID')} MB • Folder Berkas_Persyaratan aktif`;
+  document.getElementById('adminTotalUsers').textContent = APP_STATE.users.length;
+
+  const uBody = document.getElementById('adminUsersBody');
+  if (uBody) {
+    uBody.innerHTML = APP_STATE.users.map(u => `
+      <tr class="hover:bg-surface-container-low/40">
+        <td class="py-3 px-4">
+          <strong class="text-primary block">${escapeHtml(u.nama)}</strong>
+          <span class="text-[11px] text-outline tabular-nums">${escapeHtml(u.userId)}</span>
+        </td>
+        <td class="py-3 px-4">
+          <span class="block text-xs font-medium">${escapeHtml(u.username)}</span>
+          <span class="text-[11px] text-outline tabular-nums">${escapeHtml(u.wa || '-')}</span>
+        </td>
+        <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-surface-container text-primary text-[10px] font-bold">${escapeHtml(u.role)}</span></td>
+        <td class="py-3 px-4">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${u.aktif ? 'bg-[#DCFCE7] text-[#166534]' : 'bg-[#FEE2E2] text-[#991B1B]'}">${u.aktif ? 'Aktif' : 'Nonaktif'}</span>
+        </td>
+        <td class="py-3 px-4 text-right whitespace-nowrap space-x-1.5">
+          <button onclick="resetUserPw('${escapeHtml(u.userId)}')" class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high text-primary text-[11px] font-bold cursor-pointer">Reset PW</button>
+          <button onclick="toggleUserAktif('${escapeHtml(u.userId)}')" class="px-2.5 py-1 rounded border border-outline-variant text-[11px] font-bold hover:bg-surface-container-low cursor-pointer">${u.aktif ? 'Nonaktifkan' : 'Aktifkan'}</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // WA & CRM
+  const s = APP_STATE.secrets || {};
+  const fPill = document.getElementById('fonnteStatusPill');
+  if (fPill) {
+    fPill.textContent = s.FONNTE_TOKEN_ADA ? ('Tersimpan: ' + (s.FONNTE_TOKEN_MASK || '••••••')) : 'Belum Diatur';
+    fPill.className = s.FONNTE_TOKEN_ADA
+      ? 'px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#166534] text-[10px] font-bold'
+      : 'px-2 py-0.5 rounded-full bg-[#FEF9C3] text-[#854D0E] text-[10px] font-bold';
+  }
+  if (APP_STATE.notifConfig) {
+    document.getElementById('cfgWaAktif').checked = !!APP_STATE.notifConfig.waAktif;
+    document.getElementById('cfgEmailAktif').checked = !!APP_STATE.notifConfig.emailAktif;
+  }
+
+  const crmBody = document.getElementById('adminCrmBody');
+  if (crmBody) {
+    crmBody.innerHTML = (APP_STATE.crm || []).map(c => `
+      <tr class="hover:bg-surface-container-low/40">
+        <td class="py-2.5 px-4 font-semibold">${escapeHtml(c.Nama)}</td>
+        <td class="py-2.5 px-4 tabular-nums">${escapeHtml(c.NoWA)}</td>
+        <td class="py-2.5 px-4"><span class="px-2 py-0.5 rounded-full bg-surface-container text-primary text-[10px] font-bold">${escapeHtml(c.Segmen)}</span></td>
+        <td class="py-2.5 px-4">
+          <button onclick="toggleCrmOptOut('${escapeHtml(c.KontakID)}')" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer ${c.OptOut === 'YA' ? 'bg-[#FEE2E2] text-[#991B1B]' : 'bg-[#DCFCE7] text-[#166534]'}">
+            ${c.OptOut === 'YA' ? 'Opt-Out (YA)' : 'Aktif Blast'}
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Logs
+  const logBody = document.getElementById('adminLogsBody');
+  if (logBody) {
+    logBody.innerHTML = (APP_STATE.logs || []).map(l => `
+      <tr class="hover:bg-surface-container-low/40">
+        <td class="py-2.5 px-4 tabular-nums text-outline">${formatShortDate(l.Timestamp)}</td>
+        <td class="py-2.5 px-4 font-semibold">${escapeHtml(l.User)}</td>
+        <td class="py-2.5 px-4"><span class="px-2 py-0.5 rounded bg-surface-container text-primary text-[10px] font-bold">${escapeHtml(l.Aksi)}</span></td>
+        <td class="py-2.5 px-4 tabular-nums">${escapeHtml(l.Ref_ID)}</td>
+        <td class="py-2.5 px-4 text-on-surface-variant">${escapeHtml(l.Keterangan)}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+function openAddUserModal() { document.getElementById('addUserModal').classList.remove('hidden'); document.getElementById('addUserModal').classList.add('flex'); }
+function closeAddUserModal() { document.getElementById('addUserModal').classList.add('hidden'); document.getElementById('addUserModal').classList.remove('flex'); }
+
+async function submitNewUser() {
+  const nama = document.getElementById('newUserNama').value.trim();
+  const username = document.getElementById('newUserUsername').value.trim().toLowerCase();
+  const wa = normalizeHp08(document.getElementById('newUserWa').value);
+  const role = document.getElementById('newUserRole').value;
+  const password = document.getElementById('newUserPass').value || 'ekuasa123';
+
+  if (IS_DEMO_MODE) {
+    APP_STATE.users.push({ userId: 'USR-' + String(APP_STATE.users.length + 1).padStart(3, '0'), username, password, nama, wa, role, aktif: true, createdAt: new Date().toISOString() });
+    saveLocalState();
+    closeAddUserModal();
+    renderAdminPanel();
+    showToast('Pengguna ' + nama + ' berhasil ditambahkan.', 'success');
+    return;
+  }
+  const res = await callApi('saveUser', { nama, username, wa, role, password });
+  if (res.success) { closeAddUserModal(); showToast(res.message, 'success'); syncAdminFromServer(); }
+  else showToast(res.message || 'Gagal menambah user.', 'error');
+}
+
+async function toggleUserAktif(userId) {
+  if (IS_DEMO_MODE) {
+    const u = APP_STATE.users.find(x => x.userId === userId);
+    if (u) u.aktif = !u.aktif;
+    saveLocalState();
+    renderAdminPanel();
+    showToast('Status akun diperbarui.', 'info');
+    return;
+  }
+  const res = await callApi('toggleUserStatus', { userId });
+  if (res.success) { showToast('Status akun diperbarui.', 'success'); syncAdminFromServer(); }
+}
+
+async function resetUserPw(userId) {
+  if (IS_DEMO_MODE) {
+    const u = APP_STATE.users.find(x => x.userId === userId);
+    if (u) u.password = 'ekuasa123';
+    saveLocalState();
+    showToast('Password akun ' + userId + ' direset menjadi: ekuasa123', 'success');
+    return;
+  }
+  const res = await callApi('resetUserPassword', { userId });
+  if (res.success) showToast('Password baru: ' + res.newPassword, 'success');
+}
+
+async function saveFonnteToken() {
+  const token = document.getElementById('inputFonnteToken').value.trim();
+  if (!token) { showToast('Masukkan token Fonnte terlebih dahulu.', 'warning'); return; }
+  if (IS_DEMO_MODE) {
+    APP_STATE.secrets = { FONNTE_TOKEN_ADA: true, FONNTE_TOKEN_MASK: token.slice(0, 4) + '••••••' + token.slice(-3) };
+    saveLocalState();
+    document.getElementById('inputFonnteToken').value = '';
+    renderAdminPanel();
+    showToast('Token Fonnte disimulasikan tersimpan aman di Script Properties.', 'success');
+    return;
+  }
+  const res = await callApi('saveSecrets', { secrets: { FONNTE_TOKEN: token } });
+  if (res.success) {
+    document.getElementById('inputFonnteToken').value = '';
+    showToast(res.message, 'success');
+    syncAdminFromServer();
+  } else showToast(res.message || 'Gagal menyimpan token.', 'error');
+}
+
+async function saveNotifSettings() {
+  const waAktif = document.getElementById('cfgWaAktif').checked;
+  const emailAktif = document.getElementById('cfgEmailAktif').checked;
+  if (IS_DEMO_MODE) {
+    APP_STATE.notifConfig = { waAktif, emailAktif };
+    saveLocalState();
+    showToast('Saklar notifikasi berhasil disimpan.', 'success');
+    return;
+  }
+  const res = await callApi('saveNotifConfig', { waAktif, emailAktif });
+  if (res.success) showToast(res.message, 'success');
+}
+
+async function syncCrmContacts() {
+  if (IS_DEMO_MODE) { showToast('CRM Kontak sudah tersinkronisasi (' + APP_STATE.crm.length + ' kontak).', 'success'); return; }
+  const res = await callApi('sinkronCrm');
+  if (res.success) { showToast('Sinkronisasi selesai: +' + res.data.inserted + ' kontak baru.', 'success'); syncAdminFromServer(); }
+}
+
+async function toggleCrmOptOut(kontakId) {
+  if (IS_DEMO_MODE) {
+    const c = APP_STATE.crm.find(x => x.KontakID === kontakId);
+    if (c) c.OptOut = c.OptOut === 'YA' ? 'TIDAK' : 'YA';
+    saveLocalState();
+    renderAdminPanel();
+    return;
+  }
+  const res = await callApi('toggleOptOutCrm', { kontakId });
+  if (res.success) syncAdminFromServer();
+}
+
+async function submitBlastWa() {
+  const judul = document.getElementById('blastJudul').value.trim();
+  const pesan = document.getElementById('blastPesan').value.trim();
+  const sasaran = document.getElementById('blastSasaran').value;
+  const ukuranBatch = Number(document.getElementById('blastBatchSize').value || 20);
+  if (!pesan) { showToast('Isi pesan blast wajib diisi.', 'warning'); return; }
+  if (IS_DEMO_MODE) {
+    const target = APP_STATE.crm.filter(c => c.OptOut !== 'YA' && (sasaran === 'Semua' || c.Segmen === sasaran));
+    showToast('Blast "' + (judul || 'Pengumuman') + '" diantrekan non-blocking untuk ' + target.length + ' kontak (Batch ' + ukuranBatch + ').', 'success');
+    document.getElementById('blastPesan').value = '';
+    return;
+  }
+  const res = await callApi('buatBlastWa', { judul, pesan, sasaran, ukuranBatch });
+  if (res.success) { showToast(res.message, 'success'); document.getElementById('blastPesan').value = ''; }
+  else showToast(res.message || 'Gagal membuat blast WA.', 'error');
+}
+
+async function runMigration(dryRun) {
+  const sourceUrl = document.getElementById('migrasiSourceUrl').value.trim();
+  const box = document.getElementById('migrasiResultBox');
+  if (!sourceUrl) { showToast('Masukkan ID atau URL Spreadsheet lama terlebih dahulu.', 'warning'); return; }
+  if (IS_DEMO_MODE) {
+    box.classList.remove('hidden');
+    box.textContent = (dryRun ? '[DRY-RUN PINDAI] ' : '[DELTA-SYNC SELESAI] ') + 'USERS: +2 baru, 0 duplikat | PERMOHONAN_KUASA: +5 baru, 1 dilewati | BERKAS_UNGGAHAN: +5 baru.';
+    showToast(dryRun ? 'Simulasi pindai migrasi selesai.' : 'Delta-Sync migrasi selesai.', 'success');
+    return;
+  }
+  const res = await callApi('jalankanMigrasi', { sourceUrl, dryRun });
+  if (res.success) {
+    box.classList.remove('hidden');
+    box.textContent = (dryRun ? '[DRY-RUN] ' : '[TEREKSEKUSI] ') + res.sourceName + ' -> ' + res.summary.map(s => `${s.target}: +${s.inserted} baru, ${s.updated} update, ${s.skipped} lewati`).join(' | ');
+    showToast(dryRun ? 'Pindai selesai!' : 'Migrasi Delta-Sync berhasil!', 'success');
+  } else {
+    showToast(res.message || 'Migrasi gagal.', 'error');
+  }
+}
+
 // =========================================================================
-// 14. APP INITIALIZATION ON DOM READY
+// 12. MODAL TANDA TERIMA RESMI (PRINT READY)
+// =========================================================================
+
+function openReceiptModal(permohonanId) {
+  const item = APP_STATE.permohonan.find(p => p.permohonanId === permohonanId);
+  if (!item || item.status !== 'Disetujui') {
+    showToast('Tanda terima hanya dapat dicetak untuk permohonan berstatus Disetujui.', 'warning');
+    return;
+  }
+  document.getElementById('rcptNomorRegister').textContent = 'NOMOR REGISTER RESMI: ' + item.nomorRegisterResmi;
+  document.getElementById('rcptId').textContent = item.permohonanId;
+  document.getElementById('rcptTglPengajuan').textContent = formatShortDate(item.tanggalPengajuan);
+  document.getElementById('rcptTglVerif').textContent = formatShortDate(item.tanggalVerifikasi);
+  document.getElementById('rcptKategori').textContent = item.kategoriKuasa;
+  document.getElementById('rcptNama').textContent = item.namaPemohon;
+  document.getElementById('rcptHash').textContent = 'SHA256: ' + (item.hashVerifikasi || 'VERIFIED-EKUASA').slice(0, 32) + '…';
+  document.getElementById('rcptPetugas').textContent = item.petugasVerifikator || 'Siti Rahmawati, S.H.';
+
+  const modal = document.getElementById('receiptModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeReceiptModal() {
+  const modal = document.getElementById('receiptModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+// =========================================================================
+// 13. HELPERS & TOAST
+// =========================================================================
+
+let _toastTimer = null;
+function showToast(msg, type = 'success') {
+  const box = document.getElementById('toastBox');
+  const icon = document.getElementById('toastIcon');
+  const title = document.getElementById('toastTitle');
+  const msgEl = document.getElementById('toastMsg');
+  if (!box) return;
+
+  const map = {
+    success: { icon: 'check_circle', title: 'Berhasil', border: 'border-primary-container', color: 'text-primary-container' },
+    error: { icon: 'error', title: 'Perhatian', border: 'border-error', color: 'text-error' },
+    warning: { icon: 'warning', title: 'Peringatan', border: 'border-secondary-container', color: 'text-secondary' },
+    info: { icon: 'info', title: 'Informasi', border: 'border-primary', color: 'text-primary' }
+  };
+  const cfg = map[type] || map.info;
+
+  box.className = `fixed top-20 right-4 md:right-6 z-[70] flex items-center gap-3 bg-surface-container-lowest px-4 py-3 rounded-xl shadow-xl border-l-4 ${cfg.border} max-w-sm animate-fade-fast no-print`;
+  icon.textContent = cfg.icon;
+  icon.className = 'material-symbols-outlined ' + cfg.color;
+  title.textContent = cfg.title;
+  title.className = 'text-[11px] uppercase font-bold tracking-wider ' + cfg.color;
+  msgEl.textContent = msg;
+
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(hideToast, 4000);
+}
+
+function hideToast() {
+  document.getElementById('toastBox')?.classList.add('hidden');
+}
+
+function statusPillHtml(status) {
+  if (status === 'Disetujui') {
+    return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#DCFCE7] text-[#166534] text-[11px] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-[#166534]"></span>Disetujui</span>`;
+  }
+  if (status === 'Perlu Revisi') {
+    return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEE2E2] text-[#991B1B] text-[11px] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-[#991B1B]"></span>Perlu Revisi</span>`;
+  }
+  return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF9C3] text-[#854D0E] text-[11px] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-[#854D0E]"></span>Menunggu Verifikasi</span>`;
+}
+
+function normalizeHp08(raw) {
+  let s = String(raw || '').replace(/[^\d]/g, '');
+  if (!s) return '';
+  if (s.startsWith('62')) s = '0' + s.slice(2);
+  else if (s.startsWith('8')) s = '0' + s;
+  return s;
+}
+
+function formatShortDate(iso) {
+  if (!iso) return '-';
+  try {
+    return new Date(iso).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+  } catch (e) { return String(iso); }
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// =========================================================================
+// 14. INITIALIZATION ON DOM READY
 // =========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Inisialisasi sesi autentikasi pengguna
-  initAuth();
-
-  // Inisialisasi dropdown opsi klasifikasi perkara dari master data
-  populateJenisPerkaraDropdown();
-  loadGeneralSettings();
-
-  // Setup routing awal berdasarkan hash URL
-  const hash = window.location.hash.replace('#', '');
-  if (hash && VALID_VIEWS.includes(hash)) {
-    navigateTo(hash, false);
-  } else {
-    navigateTo('beranda-dan-lacak', false);
-  }
-
-  // Setup tracker form
-  initTracking();
-
-  // Setup category button wizard
-  setWizardCategory('Advokat');
-
-  // Bind click navigation untuk semua elemen dengan attribute data-path
+  // Delegated 0ms navigation click handler
   document.addEventListener('click', (e) => {
-    const targetLink = e.target.closest('[data-path]');
-    if (targetLink) {
+    const link = e.target.closest('[data-route]');
+    if (link) {
       e.preventDefault();
-      const path = targetLink.getAttribute('data-path');
-      navigateTo(path);
+      navigateTo(link.getAttribute('data-route'));
     }
   });
+
+  window.addEventListener('hashchange', () => {
+    const h = window.location.hash.replace('#', '');
+    if (h && h !== CURRENT_ROUTE) navigateTo(h, false);
+  });
+
+  // Register PWA Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+
+  // Initial route
+  const initialHash = window.location.hash.replace('#', '');
+  navigateTo(VALID_ROUTES.includes(initialHash) ? initialHash : 'portal-publik-dan-lacak', false);
+
+  // Silent background sync if live GAS_URL configured
+  if (!IS_DEMO_MODE && CURRENT_SESSION) {
+    syncPermohonanFromServer();
+    if (CURRENT_SESSION.user.role === 'Admin') syncAdminFromServer();
+  }
 });

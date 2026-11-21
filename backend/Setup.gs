@@ -1,214 +1,247 @@
 /**
- * SETUP ENVIRONMENT OTOMATIS (IDEMPOTEN)
- * Jalankan fungsi setupAppEnvironment() SEKALI melalui Google Apps Script Editor.
- * 
- * Sesuai prinsip /gas-pro-api & /gas-rahasia-script-properties:
- * - Menyiapkan folder Google Drive otomatis
- * - Menyiapkan Google Spreadsheet dengan seluruh skema header tabel PRD
- * - Menyimpan seluruh ID & rahasia ke Script Properties secara aman
+ * =========================================================================
+ * SETUP.GS — INISIALISASI OTOMATIS & IDEMPOTEN E-KUASA PENGADILAN NEGERI
+ * =========================================================================
+ * Mematuhi standar:
+ * - /gas-rahasia-script-properties (R1–R13: zero literal secrets, auto-generated keys)
+ * - /gas-scale-turbo (setup idempoten, aman dijalankan berulang)
+ * - /gas-notifikasi-wa-crm (skema AntrianNotif, BlastWA, CRM_Kontak, CRM_Interaksi)
+ *
+ * Cara pakai:
+ * 1. Jalankan fungsi `setupAppEnvironment()` sekali dari editor Apps Script.
+ * 2. Jalankan fungsi `pasangTriggerNotif()` sekali untuk mengaktifkan antrean WA/Email.
+ * 3. Catat sandi darurat yang tercetak sekali di Log Eksekusi.
  */
 
 function setupAppEnvironment() {
-  const APP_NAME = 'E-Surat Kuasa Pengadilan Negeri';
-  Logger.log('🚀 Memulai inisialisasi lingkungan ' + APP_NAME + '...');
-
   const props = PropertiesService.getScriptProperties();
+  const existing = props.getProperties();
 
-  // 1. Folder Google Drive
-  let rootFolderId = props.getProperty('ROOT_FOLDER_ID');
-  let rootFolder;
-  if (!rootFolderId) {
-    rootFolder = DriveApp.createFolder('📁 [Sistem] ' + APP_NAME);
-    rootFolderId = rootFolder.getId();
-    props.setProperty('ROOT_FOLDER_ID', rootFolderId);
-    Logger.log('📁 Root Folder dibuat: ' + rootFolder.getName());
-  } else {
-    rootFolder = DriveApp.getFolderById(rootFolderId);
-    Logger.log('📁 Root Folder sudah ada: ' + rootFolder.getName());
+  // 1. Bangkitkan Rahasia Kriptografi Otomatis (Idempoten — tidak menimpa yang sudah ada)
+  const secretBatch = {};
+  if (!existing.SESSION_SECRET) {
+    secretBatch.SESSION_SECRET = acak_(64);
+  }
+  if (!existing.APP_SALT) {
+    secretBatch.APP_SALT = acak_(32);
+  }
+  if (!existing.EMERGENCY_USER) {
+    secretBatch.EMERGENCY_USER = 'admin';
+  }
+  let generatedEmergencyPass = '';
+  if (!existing.EMERGENCY_PASS_HASH || !existing.EMERGENCY_SALT) {
+    const eSalt = acak_(24);
+    generatedEmergencyPass = sandiAcak_(14);
+    secretBatch.EMERGENCY_SALT = eSalt;
+    secretBatch.EMERGENCY_PASS_HASH = hashPass_(generatedEmergencyPass, eSalt);
+  }
+  if (Object.keys(secretBatch).length) {
+    setProps_(secretBatch);
   }
 
-  let uploadsFolderId = props.getProperty('UPLOADS_FOLDER');
-  if (!uploadsFolderId) {
-    const uploadsFolder = rootFolder.createFolder('📂 Berkas_Identitas');
-    uploadsFolderId = uploadsFolder.getId();
-    props.setProperty('UPLOADS_FOLDER', uploadsFolderId);
+  // 2. Buat / Buka Folder Google Drive Arsip E-Kuasa
+  let rootFolderId = prop_('DRIVE_ROOT_FOLDER_ID');
+  let rootFolder = null;
+  if (rootFolderId) {
+    try { rootFolder = DriveApp.getFolderById(rootFolderId); } catch (e) { rootFolder = null; }
+  }
+  if (!rootFolder) {
+    const iter = DriveApp.getFoldersByName('[E-Kuasa] Arsip Surat Kuasa Online');
+    rootFolder = iter.hasNext() ? iter.next() : DriveApp.createFolder('[E-Kuasa] Arsip Surat Kuasa Online');
+    setProp_('DRIVE_ROOT_FOLDER_ID', rootFolder.getId());
   }
 
-  let exportsFolderId = props.getProperty('EXPORTS_FOLDER');
-  if (!exportsFolderId) {
-    const exportsFolder = rootFolder.createFolder('📂 Dokumen_Resmi_PDF');
-    exportsFolderId = exportsFolder.getId();
-    props.setProperty('EXPORTS_FOLDER', exportsFolderId);
+  let uploadsFolderId = prop_('FOLDER_BERKAS_ID');
+  let uploadsFolder = null;
+  if (uploadsFolderId) {
+    try { uploadsFolder = DriveApp.getFolderById(uploadsFolderId); } catch (e) { uploadsFolder = null; }
+  }
+  if (!uploadsFolder) {
+    const iter = rootFolder.getFoldersByName('Berkas_Persyaratan');
+    uploadsFolder = iter.hasNext() ? iter.next() : rootFolder.createFolder('Berkas_Persyaratan');
+    // Atur akses baca agar modal preview petugas dapat menampilkan dokumen langsung
+    try {
+      uploadsFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (e) {
+      Logger.log('Info sharing folder Drive: ' + e.message);
+    }
+    setProp_('FOLDER_BERKAS_ID', uploadsFolder.getId());
   }
 
-  // 2. Google Spreadsheet Database
-  let ssId = props.getProperty('SPREADSHEET_ID');
-  let ss;
-  if (!ssId) {
-    ss = SpreadsheetApp.create('🗃️ Database — ' + APP_NAME);
-    ssId = ss.getId();
-    props.setProperty('SPREADSHEET_ID', ssId);
+  // 3. Buat / Buka Spreadsheet Database Utama
+  let ssId = prop_('SPREADSHEET_ID');
+  let ss = null;
+  if (ssId) {
+    try { ss = SpreadsheetApp.openById(ssId); } catch (e) { ss = null; }
+  }
+  if (!ss) {
+    try {
+      ss = SpreadsheetApp.getActiveSpreadsheet();
+    } catch (e) {
+      ss = null;
+    }
+  }
+  if (!ss) {
+    ss = SpreadsheetApp.create('[E-Kuasa] Database Pendaftaran Surat Kuasa Online');
+    const file = DriveApp.getFileById(ss.getId());
+    rootFolder.addFile(file);
+  }
+  setProp_('SPREADSHEET_ID', ss.getId());
 
-    // Pindahkan file spreadsheet ke Root Folder
-    DriveApp.getFileById(ssId).moveTo(rootFolder);
-    Logger.log('🗃️ Spreadsheet baru dibuat: ' + ss.getName());
-  } else {
-    ss = SpreadsheetApp.openById(ssId);
-    Logger.log('🗃️ Menggunakan Spreadsheet terdaftar: ' + ss.getName());
+  // 4. Pastikan Seluruh Skema Sheet Terbentuk (Idempoten)
+  const schemas = {
+    USERS: [
+      'User_ID', 'Username', 'Password_Hash', 'Password_Salt', 'Nama_Lengkap',
+      'No_HP_WA', 'Role', 'Status_Aktif', 'Created_At'
+    ],
+    PERMOHONAN_KUASA: [
+      'Permohonan_ID', 'User_ID', 'Tanggal_Pengajuan', 'Kategori_Kuasa',
+      'Nama_Pemohon', 'No_HP_WA', 'Status', 'Nomor_Register_Resmi',
+      'Catatan_Petugas', 'Petugas_Verifikator', 'Tanggal_Verifikasi', 'Hash_Verifikasi'
+    ],
+    BERKAS_UNGGAHAN: [
+      'Berkas_ID', 'Permohonan_ID', 'Url_KTP_Pemberi', 'Url_KTP_Penerima',
+      'Url_KTA_Advokat', 'Url_BAS_Advokat', 'Url_Surat_Kuasa', 'Url_Surat_Lurah',
+      'Updated_At'
+    ],
+    AppConfig: [
+      'Key', 'Value', 'Keterangan'
+    ],
+    Log_Aktivitas: [
+      'Timestamp', 'User', 'Aksi', 'Ref_ID', 'Keterangan'
+    ],
+    AntrianNotif: [
+      'AntrianID', 'Kanal', 'Tujuan', 'NamaPenerima', 'Subjek', 'Pesan',
+      'Event', 'RefID', 'BlastID', 'Status', 'Percobaan', 'Respon',
+      'DibuatPada', 'DikirimPada'
+    ],
+    BlastWA: [
+      'BlastID', 'Judul', 'Pesan', 'Sasaran', 'Total', 'Terkirim', 'Gagal',
+      'UkuranBatch', 'JedaDetik', 'Status', 'DibuatOleh', 'Tanggal', 'SelesaiPada'
+    ],
+    CRM_Kontak: [
+      'KontakID', 'Nama', 'Email', 'NoWA', 'Segmen', 'Sumber', 'RefID', 'Tag',
+      'StatusWA', 'CekWAAt', 'EmailValid', 'OptOut', 'Catatan', 'JumlahPesan',
+      'TerakhirDihubungi', 'Info', 'DibuatPada', 'DiperbaruiPada'
+    ],
+    CRM_Interaksi: [
+      'InteraksiID', 'KontakID', 'Kanal', 'Arah', 'Ringkasan', 'RefID', 'Oleh', 'Tanggal'
+    ]
+  };
+
+  Object.keys(schemas).forEach(function (name) {
+    ensureSheet_(ss, name, schemas[name]);
+  });
+
+  // 5. Seed AppConfig Default (hanya jika kosong)
+  const shCfg = ss.getSheetByName('AppConfig');
+  if (shCfg.getLastRow() <= 1) {
+    const defaultCfg = [
+      ['NAMA_INSTITUSI', 'Pengadilan Negeri Kelas I A', 'Nama satuan kerja pengadilan'],
+      ['NAMA_APP', 'E-Kuasa | Pengadilan Negeri', 'Judul utama aplikasi'],
+      ['HOTLINE_PTSP', '(021) 3843348', 'Nomor telepon PTSP Kepaniteraan Hukum'],
+      ['WA_PTSP', '08119283771', 'Nomor WhatsApp bantuan PTSP'],
+      ['APP_URL', '', 'URL publik frontend GitHub Pages untuk tautan notifikasi'],
+      ['NOTIF_WA_AKTIF', 'TRUE', 'Saklar global pengiriman WhatsApp Fonnte'],
+      ['NOTIF_EMAIL_AKTIF', 'FALSE', 'Saklar global pengiriman Email MailApp'],
+      ['NOTIF_MATRIKS', JSON.stringify({
+        PERMOHONAN_MASUK: { wa: true, email: false },
+        PERMOHONAN_REVISI: { wa: true, email: false },
+        PERMOHONAN_DISETUJUI: { wa: true, email: false }
+      }), 'Matriks notifikasi per kejadian']
+    ];
+    shCfg.getRange(2, 1, defaultCfg.length, 3).setValues(defaultCfg);
   }
 
-  // 3. Setup Sheet "Pengajuan"
-  let shPengajuan = ss.getSheetByName('Pengajuan');
-  if (!shPengajuan) {
-    shPengajuan = ss.insertSheet('Pengajuan');
-    shPengajuan.appendRow([
-      'id_pengajuan',
-      'tanggal_daftar',
-      'nomor_register_resmi',
-      'kategori_pemohon',
-      'nama_pemberi_kuasa',
-      'nik_pemberi_kuasa',
-      'pekerjaan_pemberi_kuasa',
-      'alamat_pemberi_kuasa',
-      'no_wa_pemohon',
-      'email_pemohon',
-      'nama_penerima_kuasa',
-      'identitas_penerima_kuasa',
-      'kantor_penerima_kuasa',
-      'no_wa_penerima',
-      'alamat_penerima_kuasa',
-      'jenis_perkara',
-      'nomor_perkara',
-      'lingkup_wewenang',
-      'url_ktp_pemberi',
-      'url_ktp_penerima',
-      'url_kta_penerima',
-      'url_bas_penerima',
-      'url_surat_kuasa',
-      'url_surat_lurah',
-      'url_bukti_pnbp',
-      'status',
-      'catatan_petugas',
-      'petugas_verifikator',
-      'pejabat_pengesah',
-      'tanggal_pengesahan',
-      'url_dokumen_pdf',
-      'hash_verifikasi',
-      'total_biaya'
-    ]);
-
-    // Format Header Baris 1
-    shPengajuan.getRange(1, 1, 1, 32).setBackground('#0D5236').setFontColor('#FFFFFF').setFontWeight('bold');
-    shPengajuan.setFrozenRows(1);
-
-    // Seed Data Awal
-    shPengajuan.appendRow([
-      'REG-202611-0088',
-      '2026-11-14T08:55:00.000Z',
-      'W11-U1/241/HK.02/XI/2026',
-      'Advokat',
-      'Ir. Suryo Pratomo',
-      '3175081905780003',
-      'Direktur Utama',
-      'Jl. Merdeka Barat No. 22, Gambir, Jakarta Pusat',
-      '081688992211',
-      'suryo.pratomo@ptkaryamandiri.co.id',
-      'Denny Siregar, S.H., M.H.',
-      '09.21841/PERADI',
-      'Kantor Advokat Denny Siregar & Rekan',
-      '081299001122',
-      'Sudirman Tower Lt. 18, Jakarta Selatan',
-      'Perdata Gugatan',
-      '89/Pdt.G/2026/PN',
-      'Mewakili secara penuh untuk menghadiri persidangan, perdamaian/mediasi, mengajukan replik, kesimpulan, hingga upaya hukum banding.',
-      '', // url_ktp_pemberi
-      '', // url_ktp_penerima
-      '', // url_kta_penerima
-      '', // url_bas_penerima
-      '', // url_surat_kuasa
-      '', // url_surat_lurah
-      '', // url_bukti_pnbp
-      'Disahkan/Terdaftar',
-      'Berkas lengkap dan absah.',
-      'Ahmad Syafii, S.Kom.',
-      'Dr. H. Sulaiman, S.H., M.H. (Panitera)',
-      '14 Nov 2026, 11:42 WIB',
-      '',
-      'a8f4b23c91e56b8209dc47120fe817c0326e0802c61148e100f917208d7d91e0',
-      20000
-    ]);
+  // 6. Seed Akun Awal (hanya jika sheet USERS kosong — sandi di-hash dengan salt unik)
+  const shUsers = ss.getSheetByName('USERS');
+  if (shUsers.getLastRow() <= 1) {
+    const nowIso = new Date().toISOString();
+    const seedUsers = [
+      { id: 'USR-001', user: 'admin', pass: 'admin123', nama: 'Administrator IT Kepaniteraan', wa: '08119283771', role: 'Admin' },
+      { id: 'USR-002', user: 'petugas1', pass: 'petugas123', nama: 'Siti Rahmawati, S.H.', wa: '081234567890', role: 'Petugas' },
+      { id: 'USR-003', user: 'advokat@kantorhukum.id', pass: 'pemohon123', nama: 'Farhan Pratama, S.H., M.H.', wa: '081298421082', role: 'Pemohon' }
+    ];
+    const rows = seedUsers.map(function (u) {
+      const salt = acak_(16);
+      return [
+        u.id, u.user, hashPass_(u.pass, salt), salt,
+        u.nama, "'" + hp08_(u.wa), u.role, true, nowIso
+      ];
+    });
+    shUsers.getRange(2, 1, rows.length, 9).setValues(rows);
   }
 
-  // 4. Setup Sheet "Master_Pengguna"
-  let shPengguna = ss.getSheetByName('Master_Pengguna');
-  if (!shPengguna) {
-    shPengguna = ss.insertSheet('Master_Pengguna');
-    shPengguna.appendRow(['user_id', 'username', 'nama_lengkap', 'nip', 'jabatan', 'role', 'status_aktif']);
-    shPengguna.getRange(1, 1, 1, 7).setBackground('#0D5236').setFontColor('#FFFFFF').setFontWeight('bold');
-    shPengguna.setFrozenRows(1);
-
-    shPengguna.appendRow(['USR-01', 'admin', 'Administrator IT Pengadilan', '19850101 201001 1 001', 'Pranata Komputer', 'ADMIN', true]);
-    shPengguna.appendRow(['USR-02', 'petugas1', 'Ahmad Syafii, S.Kom.', '19920315 201602 1 003', 'Staf PTSP Meja 1', 'PETUGAS', true]);
-    shPengguna.appendRow(['USR-03', 'panitera', 'Dr. H. Sulaiman, S.H., M.H.', '19740512 199903 1 002', 'Panitera Pengadilan Negeri', 'PEJABAT', true]);
-  }
-
-  // 5. Setup Sheet "AppConfig"
-  let shConfig = ss.getSheetByName('AppConfig');
-  if (!shConfig) {
-    shConfig = ss.insertSheet('AppConfig');
-    shConfig.appendRow(['key', 'value', 'keterangan']);
-    shConfig.getRange(1, 1, 1, 3).setBackground('#0D5236').setFontColor('#FFFFFF').setFontWeight('bold');
-    shConfig.setFrozenRows(1);
-
-    shConfig.appendRow(['APP_NAME', APP_NAME, 'Nama Aplikasi']);
-    shConfig.appendRow(['INSTANSI', 'Pengadilan Negeri Kelas I A Khusus', 'Nama Lembaga']);
-    shConfig.appendRow(['HOTLINE_PTSP', '(021) 8092-2345', 'Hotline Bantuan PTSP']);
-    shConfig.appendRow(['BIAYA_PNBP', '10000', 'Tarif PNBP Pendaftaran Kuasa']);
-    shConfig.appendRow(['BIAYA_EMETERAI', '10000', 'Tarif Meterai Elektronik']);
-    shConfig.appendRow(['CREATED_AT', new Date().toISOString(), 'Waktu Setup Awal']);
-  }
-
-  // 6. Setup Sheet "Log_Aktivitas"
-  let shLog = ss.getSheetByName('Log_Aktivitas');
-  if (!shLog) {
-    shLog = ss.insertSheet('Log_Aktivitas');
-    shLog.appendRow(['timestamp', 'user', 'aksi', 'id_ref', 'keterangan']);
-    shLog.getRange(1, 1, 1, 5).setBackground('#0D5236').setFontColor('#FFFFFF').setFontWeight('bold');
-    shLog.setFrozenRows(1);
-    shLog.appendRow([new Date().toISOString(), 'SYSTEM', 'INITIAL_SETUP', 'SETUP', 'Lingkungan database berhasil diinisialisasi.']);
-  }
-
-  // 7. Setup Sheet "AntrianNotif" (Pola /gas-notifikasi-wa-crm)
-  let shNotif = ss.getSheetByName('AntrianNotif');
-  if (!shNotif) {
-    shNotif = ss.insertSheet('AntrianNotif');
-    shNotif.appendRow(['AntrianID', 'Kanal', 'Tujuan', 'NamaPenerima', 'Subjek', 'Pesan', 'Event', 'RefID', 'Status', 'DibuatPada']);
-    shNotif.getRange(1, 1, 1, 10).setBackground('#0D5236').setFontColor('#FFFFFF').setFontWeight('bold');
-    shNotif.setFrozenRows(1);
-  }
-
-  // 8. Hapus Sheet default bawaan Spreadsheet jika bernama "Sheet1"
-  const defaultSheet = ss.getSheetByName('Sheet1');
-  if (defaultSheet && ss.getSheets().length > 1) {
-    ss.deleteSheet(defaultSheet);
-  }
-
-  // 9. Konfigurasi Default Script Properties Kritis
-  if (!props.getProperty('SESSION_SECRET')) {
-    props.setProperty('SESSION_SECRET', Utilities.getUuid() + '-' + Utilities.getUuid());
-  }
-  if (!props.getProperty('PEJABAT_PIN')) {
-    props.setProperty('PEJABAT_PIN', '123456'); // Default PIN Pengesahan
+  // Hapus sheet bawaan "Sheet1" jika masih ada dan kosong
+  const shDefault = ss.getSheetByName('Sheet1');
+  if (shDefault && ss.getSheets().length > 1 && shDefault.getLastRow() <= 1) {
+    try { ss.deleteSheet(shDefault); } catch (e) {}
   }
 
   Logger.log('=====================================================');
-  Logger.log('✅ SETUP SUKSES!');
-  Logger.log('🔗 URL Spreadsheet Database : ' + ss.getUrl());
-  Logger.log('📁 URL Root Folder Google Drive: ' + rootFolder.getUrl());
-  Logger.log('🔐 SPREADSHEET_ID            : ' + ssId);
+  Logger.log('✅ SETUP E-KUASA BERHASIL (IDEMPOTEN)');
+  Logger.log('Spreadsheet URL : ' + ss.getUrl());
+  Logger.log('Drive Folder    : ' + rootFolder.getUrl());
+  if (generatedEmergencyPass) {
+    Logger.log('🔐 Sandi Darurat Baru (CATAT SEKALI, tidak ditampilkan lagi): ' + generatedEmergencyPass);
+  }
   Logger.log('=====================================================');
-  Logger.log('Langkah Berikutnya:');
-  Logger.log('1. Buka Deploy > New deployment > Web app');
-  Logger.log('2. Execute as: Me, Who has access: Anyone');
-  Logger.log('3. Salin URL /exec dan tempelkan ke js/config.js di frontend');
+  return {
+    success: true,
+    spreadsheetUrl: ss.getUrl(),
+    folderUrl: rootFolder.getUrl()
+  };
+}
+
+/**
+ * Helper idempoten: buat sheet & header jika belum ada
+ */
+function ensureSheet_(ss, name, headers) {
+  let sh = ss.getSheetByName(name);
+  if (!sh) {
+    sh = ss.insertSheet(name);
+  }
+  if (sh.getLastRow() === 0) {
+    sh.getRange(1, 1, 1, headers.length).setValues([headers]);
+    const headerRange = sh.getRange(1, 1, 1, headers.length);
+    headerRange.setBackground('#1b4332');
+    headerRange.setFontColor('#ffffff');
+    headerRange.setFontWeight('bold');
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+/**
+ * Reset sandi akses darurat dari editor Apps Script (Aturan R4)
+ */
+function resetAksesDarurat() {
+  const salt = acak_(24);
+  const passBaru = sandiAcak_(14);
+  setProps_({
+    EMERGENCY_SALT: salt,
+    EMERGENCY_PASS_HASH: hashPass_(passBaru, salt),
+    DARURAT_GAGAL: '0',
+    DARURAT_KUNCI_SAMPAI: '0'
+  });
+  Logger.log('🔐 Sandi akses darurat baru untuk "' + prop_('EMERGENCY_USER', 'admin') + '": ' + passBaru);
+}
+
+/**
+ * Pasang trigger latar belakang 1 menit/5 menit untuk antrean notifikasi non-blocking
+ */
+function pasangTriggerNotif() {
+  const triggers = ScriptApp.getProjectTriggers();
+  const exists = triggers.some(function (t) {
+    return t.getHandlerFunction() === 'prosesAntrianNotif';
+  });
+  if (!exists) {
+    ScriptApp.newTrigger('prosesAntrianNotif')
+      .timeBased()
+      .everyMinutes(5)
+      .create();
+    Logger.log('✅ Trigger background prosesAntrianNotif (setiap 5 menit) berhasil dipasang.');
+  } else {
+    Logger.log('ℹ️ Trigger prosesAntrianNotif sudah aktif sebelumnya.');
+  }
 }

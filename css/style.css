@@ -1,109 +1,78 @@
-/* Custom Styles for E-Surat Kuasa Online */
+/* =========================================================================
+ * STYLE.CSS — E-KUASA JUDICIAL PORTAL CUSTOM STYLES & PRINT LAYOUT
+ * ========================================================================= */
 
-/* Font smoothing & root defaults */
-*, *::before, *::after {
-  box-sizing: border-box;
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+  }
+  body {
+    overscroll-behavior: none;
+    font-feature-settings: 'tnum' on, 'cv05' on;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' on, 'cv05' on;
 }
 
-body {
-  overscroll-behavior: none;
-}
-
-/* Custom Scrollbar */
+/* Custom subtle scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #c1c8c2;
   border-radius: 9999px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #717973;
 }
 
-/* Utility Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+/* Instant micro-animations */
+@keyframes fadeInFast {
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes slideOver {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+.animate-fade-fast {
+  animation: fadeInFast 0.16s ease-out forwards;
 }
 
-@keyframes stampPulse {
-  0% { transform: scale(1.4) rotate(-5deg); opacity: 0; }
-  60% { transform: scale(0.95) rotate(-3deg); opacity: 1; }
-  100% { transform: scale(1) rotate(-3deg); opacity: 1; }
+/* Interactive card hover elevation */
+.court-card-hover {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.court-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-slide-over {
-  animation: slideOver 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-stamp {
-  animation: stampPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-/* Hide spin buttons on number inputs */
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-/* Material Symbols Styling */
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  vertical-align: middle;
-  user-select: none;
-}
-
-.material-symbols-outlined.fill {
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-}
-
-/* Print Certificate Rules */
+/* Print Layout: Cetak hanya Modal Tanda Terima Resmi dengan bersih */
 @media print {
   body * {
-    visibility: hidden;
+    visibility: hidden !important;
   }
-  #printableCertificate, #printableCertificate * {
-    visibility: visible;
+  #receiptPrintArea, #receiptPrintArea * {
+    visibility: visible !important;
   }
-  #printableCertificate {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 20mm;
+  #receiptPrintArea {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
     box-shadow: none !important;
     border: none !important;
+    background: #ffffff !important;
   }
-  @page {
-    size: A4;
-    margin: 15mm;
+  .no-print {
+    display: none !important;
   }
 }
